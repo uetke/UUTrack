@@ -1,0 +1,16 @@
+%YAML 1.2
+---
+# Default parameters for the trap program
+
+saving:
+  autoSave: 0
+  directory: '' # Leave blank for current directory
+  filenameVideo: Video.hdf5 # Can be the same filename for video and photo
+  filenamePhoto: Camera.hdf5
+
+GUI:
+  lengthWaterfall: 100 # Total length of the Waterfall (lines)
+  refreshTime: 100 # Refresh rate of the GUI (in ms)
+
+Camera:
+  exposureTime: 50 # Initial exposure time (in ms)
