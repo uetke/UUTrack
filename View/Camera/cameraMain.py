@@ -14,7 +14,7 @@ from PyQt4.Qt import QApplication
 
 
 from Model import workerSaver
-from View.Camera.cameraWidget import cameraWidget
+from View.Camera.camWidget import cameraMainWidget
 from View.Camera.cameraViewer import cameraViewer
 from View.Camera.workerThread import workThread
 from View.Camera.specialTaskWorker import specialTaskWorker
@@ -39,7 +39,7 @@ class cameraMain(QtGui.QMainWindow):
         self.q = Queue(0)
 
         self.setWindowTitle('Camera Monitor')
-        self.camWidget = cameraWidget()
+        self.camWidget = cameraMainWidget(self)
         self.setCentralWidget(self.camWidget)
 
         # self.movieTimer = QtCore.QTimer()
@@ -414,7 +414,7 @@ class cameraMain(QtGui.QMainWindow):
         """Updates the image displayed to the user.
         """
         if len(self.tempImage) >= 1:
-            self.camWidget.img.setImage(self.tempImage)
+            self.camWidget.img.setImage(self.tempImage,autoLevels=False,autoRange=False,autoHistogramRange=False)
 
         if len(self.centroidX) >= 1:
             self.camWidget.img2.setImage(self.trajectories)
@@ -426,30 +426,30 @@ class cameraMain(QtGui.QMainWindow):
         new_time = time.time()
         self.fps = new_time-self.lastRefresh
         self.lastRefresh = new_time
-        if self.q.qsize()/200*100 > 75:
-            self.camWidget.memory.setStyleSheet(self.camWidget.RED_STYLE)
-        elif self.q.qsize()/200*100 > 50:
-            self.camWidget.memory.setStyleSheet(self.camWidget.YELLOW_STYLE)
-        else:
-            self.camWidget.memory.setStyleSheet(self.camWidget.DEFAULT_STYLE)
-        if psutil.cpu_percent() > 75:
-            self.camWidget.processor.setStyleSheet(self.camWidget.RED_STYLE)
-        else:
-            self.camWidget.processor.setStyleSheet(self.camWidget.DEFAULT_STYLE)
-
-        self.camWidget.memory.setValue(self.q.qsize()/200*100)#psutil.virtual_memory().percent*4
-        self.camWidget.processor.setValue(psutil.cpu_percent())
-        self.camWidget.message.setHtml('<b>Buffer time:</b> %0.2f ms <br /> \
-            <b>Refresh time:</b> %0.2f ms <br /> \
-            <b>Acquired Frames</b> %i <br /> \
-            <b>Frames in buffer</b> %i'%(self.bufferTime*1000,self.fps*1000,self.totalFrames,self.q.qsize()))
-
-        self.logMessage = self.logMessage[-100:]
-        logs = ''
-        for msg in self.logMessage[::-1]:
-            logs+=msg
-            logs+='<br />'
-        self.camWidget.log.setHtml(logs)
+        # if self.q.qsize()/200*100 > 75:
+        #     self.camWidget.memory.setStyleSheet(self.camWidget.RED_STYLE)
+        # elif self.q.qsize()/200*100 > 50:
+        #     self.camWidget.memory.setStyleSheet(self.camWidget.YELLOW_STYLE)
+        # else:
+        #     self.camWidget.memory.setStyleSheet(self.camWidget.DEFAULT_STYLE)
+        # if psutil.cpu_percent() > 75:
+        #     self.camWidget.processor.setStyleSheet(self.camWidget.RED_STYLE)
+        # else:
+        #     self.camWidget.processor.setStyleSheet(self.camWidget.DEFAULT_STYLE)
+        #
+        # self.camWidget.memory.setValue(self.q.qsize()/200*100)#psutil.virtual_memory().percent*4
+        # self.camWidget.processor.setValue(psutil.cpu_percent())
+        # self.camWidget.message.setHtml('<b>Buffer time:</b> %0.2f ms <br /> \
+        #     <b>Refresh time:</b> %0.2f ms <br /> \
+        #     <b>Acquired Frames</b> %i <br /> \
+        #     <b>Frames in buffer</b> %i'%(self.bufferTime*1000,self.fps*1000,self.totalFrames,self.q.qsize()))
+        #
+        # self.logMessage = self.logMessage[-100:]
+        # logs = ''
+        # for msg in self.logMessage[::-1]:
+        #     logs+=msg
+        #     logs+='<br />'
+        # self.camWidget.log.setHtml(logs)
 
     def updateSession(self,session):
         """Updates the session variables passed by the config window.
