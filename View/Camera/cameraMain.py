@@ -10,6 +10,7 @@ import h5py
 
 from multiprocessing import Process, Queue
 from pyqtgraph.Qt import QtGui, QtCore
+from pyqtgraph.dockarea import *
 from PyQt4.Qt import QApplication
 
 
@@ -39,9 +40,27 @@ class cameraMain(QtGui.QMainWindow):
         self.q = Queue(0)
 
         self.setWindowTitle('Camera Monitor')
-        self.camWidget = cameraMainWidget(self)
-        self.setCentralWidget(self.camWidget)
 
+        self.area = DockArea()
+        self.setCentralWidget(self.area)
+        self.resize(800,800)
+
+        self.dparams = Dock("Parameters",size=(100,3))
+        self.dmainImage = Dock("Main Image",size=(500,500))
+        self.dlog = Dock("Log",size=(200,2))
+        self.dmessage = Dock("Messages",size=(200,2))
+        self.dstatus = Dock("Status",size=(100,3))
+        self.dwaterfall = Dock("Waterfall",size=(500,250))
+
+        self.area.addDock(self.dmainImage)
+        self.area.addDock(self.dwaterfall,'bottom',self.dmainImage)
+        self.area.addDock(self.dparams,'left',self.dmainImage)
+        self.area.addDock(self.dlog,'right',self.dmainImage)
+        self.area.addDock(self.dmessage,'bottom',self.dlog)
+        self.area.addDock(self.dstatus,'bottom',self.dparams)
+
+        self.camWidget = cameraMainWidget()
+        self.dmainImage.addWidget(self.camWidget)
         # self.movieTimer = QtCore.QTimer()
         # self.connect(self.movieTimer,QtCore.SIGNAL("timeout()"),self.movieData)
 
