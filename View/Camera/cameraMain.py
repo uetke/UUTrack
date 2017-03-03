@@ -80,7 +80,7 @@ class cameraMain(QtGui.QMainWindow):
         self.camWidget.vline1.setBounds((1,self.maxSizex-1))
         self.camWidget.vline2.setBounds((1,self.maxSizex-1))
         self.camWidget.crosshair[0].setBounds((1,self.maxSizex-1))
-        self.camWidget.crosshair[0].setBounds((1,self.maxSizey-1))
+        self.camWidget.crosshair[1].setBounds((1,self.maxSizey-1))
         self._session.ROIl = 1
         self._session.ROIr = self.maxSizex
         self._session.ROIu = self.maxSizey

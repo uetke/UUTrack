@@ -12,8 +12,6 @@ class cameraMainWidget(QtGui.QWidget):
         # General layout of the widget to hold an image and a histogram
         self.layout = QtGui.QHBoxLayout(self)
 
-
-
         # Settings for the image
         self.viewport = GraphicsLayoutWidget()
         self.view = self.viewport.addViewBox(colspan=3, rowspan=3, lockAspect = True, enableMenu=True)
@@ -30,7 +28,6 @@ class cameraMainWidget(QtGui.QWidget):
         self.crosshair.append(pg.InfiniteLine(angle=0, movable=False, pen={'color': 124, 'width': 4}))
         self.crosshair.append(pg.InfiniteLine(angle=90, movable=False, pen={'color': 124, 'width': 4}))
         self.showCrosshair = False
-        self.viewport.scene().sigMouseMoved.connect(self.mouseMoved)
 
         self.view.addItem(self.img)
         self.view.addItem(self.img2)
@@ -41,19 +38,18 @@ class cameraMainWidget(QtGui.QWidget):
 
         # Settings for the histogram
         # self.vp = GraphicsLayoutWidget()
-        self.h = self.viewport.addViewBox(enableMenu=False, colspan=3)
-        self.hist = pg.HistogramLUTItem(image=self.img,fillHistogram=False)
-        self.hist.setImageItem(self.img)
-        self.h.addItem(self.hist)
+        # self.h = self.viewport.addViewBox(enableMenu=False, colspan=3)
+        # self.hist = pg.HistogramLUTItem(image=self.img,fillHistogram=False)
+        # self.hist.setImageItem(self.img)
+        # self.h.addItem(self.hist)
 
         self.imv = pg.ImageView(view=self.view,imageItem=self.img)
+        self.imv.setMouseTracking(True)
+        self.imv.getImageItem().scene().sigMouseMoved.connect(self.mouseMoved)
 
         # Add everything to the widget
         self.layout.addWidget(self.imv)
-        # self.layout.addWidget(self.vp)
         self.setLayout(self.layout)
-
-
 
     def keyPressEvent(self,key):
         """Triggered when there is a key press with some modifier.
@@ -76,12 +72,14 @@ class cameraMainWidget(QtGui.QWidget):
 
     def mouseMoved(self,arg):
         """Updates the position of the cross hair. The mouse has to be moved while pressing down the Ctrl button."""
+        # arg = evt.pos()
         modifiers = QtGui.QApplication.keyboardModifiers()
         if modifiers == QtCore.Qt.ControlModifier:
             if not self.showCrosshair:
                 for c in self.crosshair:
                     self.view.addItem(c)
                 self.showCrosshair = True
+            print("Image position:", self.img.mapFromScene(arg))
             self.crosshair[1].setValue(int(self.img.mapFromScene(arg).x()))
             self.crosshair[0].setValue(int(self.img.mapFromScene(arg).y()))
 
