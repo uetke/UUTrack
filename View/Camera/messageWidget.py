@@ -117,6 +117,26 @@ class messageWidget(QtGui.QWidget):
             until = self.logMaxLength
         else:
             until = len(self.logText)
-        for m in self.logText[-until::-1]:
+
+        mm = self.logText[-until:]
+        for m in mm[::-1]:
             message += "<br />%s"%m
         self.log.setHtml(message)
+
+    def updateMemory(self,percentage):
+        if percentage > 75:
+            self.memory.setStyleSheet(self.RED_STYLE)
+        elif percentage > 50:
+            self.memory.setStyleSheet(self.YELLOW_STYLE)
+        else:
+            self.memory.setStyleSheet(self.DEFAULT_STYLE)
+
+        self.memory.setValue(percentage)
+
+    def updateProcessor(self,percentage):
+        if percentage > 75:
+            self.processor.setStyleSheet(self.RED_STYLE)
+        else:
+            self.processor.setStyleSheet(self.DEFAULT_STYLE)
+
+        self.processor.setValue(percentage)

@@ -22,12 +22,14 @@ from View.Camera.specialTaskWorker import specialTaskWorker
 from View.Camera.clearQueueThread import clearQueueThread
 from View.Camera.configWidget import configWidget
 from View.Camera.waterfallWidget import waterfallWidget
+from View.Camera.messageWidget import messageWidget
 
 class cameraMain(QtGui.QMainWindow):
     """ Displays the camera.
     """
     def __init__(self,session,cam,parent=None):
         super(cameraMain,self).__init__()
+        self.setMouseTracking(True)
         self._session = session
         self.camera = cam
         self._session.camera['camera'] = self.camera
@@ -44,23 +46,13 @@ class cameraMain(QtGui.QMainWindow):
         self.area = DockArea()
         self.setCentralWidget(self.area)
         self.resize(800,800)
-
-        self.dparams = Dock("Parameters",size=(100,3))
-        self.dmainImage = Dock("Main Image",size=(500,500))
-        self.dlog = Dock("Log",size=(200,2))
-        self.dmessage = Dock("Messages",size=(200,2))
-        self.dstatus = Dock("Status",size=(100,3))
-        self.dwaterfall = Dock("Waterfall",size=(500,250))
-
-        self.area.addDock(self.dmainImage)
-        self.area.addDock(self.dwaterfall,'bottom',self.dmainImage)
-        self.area.addDock(self.dparams,'left',self.dmainImage)
-        self.area.addDock(self.dlog,'right',self.dmainImage)
-        self.area.addDock(self.dmessage,'bottom',self.dlog)
-        self.area.addDock(self.dstatus,'bottom',self.dparams)
+        self.area.setMouseTracking(True)
 
         self.camWidget = cameraMainWidget()
-        self.dmainImage.addWidget(self.camWidget)
+        self.messageWidget = messageWidget()
+        self.config = configWidget(self._session)
+        self.area.mouseMoveEvent = self.camWidget.mouseMoveEvent
+
         # self.movieTimer = QtCore.QTimer()
         # self.connect(self.movieTimer,QtCore.SIGNAL("timeout()"),self.movieData)
 
@@ -80,12 +72,14 @@ class cameraMain(QtGui.QMainWindow):
         self.connect(self,QtCore.SIGNAL('stopChildMovie'),self.camViewer.stopCamera)
         self.connect(self,QtCore.SIGNAL('CloseAll'),self.camViewer.closeViewer)
 
-        self.config = configWidget(self._session)
+
         self.connect(self.config,QtCore.SIGNAL('updateConfig'),self.updateSession)
         self.connect(self,QtCore.SIGNAL('CloseAll'),self.config.close)
         self.setupActions()
         self.setupToolbar()
         self.setupMenubar()
+        self.setupDocks()
+
         self.acquiring = False
         self.logMessage = []
 
@@ -222,10 +216,10 @@ class cameraMain(QtGui.QMainWindow):
         """
         if not self.showWaterfall:
             self.watWidget = waterfallWidget()
-            self.camWidget.layout.addWidget(self.watWidget)
+            self.area.addDock(self.dwaterfall, 'bottom', self.dmainImage)
+            self.dwaterfall.addWidget(self.watWidget)
             self.showWaterfall = True
             Sx,Sy = self.camera.getSize()
-            print(Sx,Sy)
             self.watData = np.zeros((self._session.lengthWaterfall,Sx))
             self.watWidget.img.setImage(np.transpose(self.watData))
             self.logMessage.append('<b>Info:</b> Waterfall opened')
@@ -353,6 +347,9 @@ class cameraMain(QtGui.QMainWindow):
         self.configAction = QtGui.QAction('Config Window',self)
         self.configAction.triggered.connect(self.config.show)
 
+        self.dockAction = QtGui.QAction('Restore Docks', self)
+        self.dockAction.triggered.connect(self.setupDocks)
+
     def setupToolbar(self):
         """Setups the toolbar with the desired icons. It's placed into a function
         to make it easier to reuse in other windows.
@@ -370,16 +367,6 @@ class cameraMain(QtGui.QMainWindow):
         self.toolbar4.addAction(self.startWaterfallAction)
         self.toolbar4.addAction(self.setROIAction)
         self.toolbar4.addAction(self.clearROIAction)
-
-    def bufferStatus(self):
-        """Starts or stops the buffer accumulation.
-        """
-        if self.accumulateBuffer:
-            self.accumulateBuffer = False
-            self.logMessage.append('<b>Info:</b> Stopped the buffer accumulation')
-        else:
-            self.accumulateBuffer = True
-            self.logMessage.append('<b>Info:</b> Started the buffer accumulation')
 
     def setupMenubar(self):
         """Setups the menubar.
@@ -403,6 +390,41 @@ class cameraMain(QtGui.QMainWindow):
         self.configMenu.addAction(self.clearBufferAction)
         self.configMenu.addAction(self.viewerAction)
         self.configMenu.addAction(self.configAction)
+        self.configMenu.addAction(self.dockAction)
+
+    def setupDocks(self):
+        """Setups the docks in order to recover the initial configuration if one gets closed."""
+        self.dparams = Dock("Parameters", size=(100, 3))
+        self.dmainImage = Dock("Main Image", size=(500, 500))
+
+        self.dlog = Dock("Log", size=(200, 2))
+        self.dmessage = Dock("Messages", size=(200, 2))
+        self.dstatus = Dock("Status", size=(100, 3))
+        self.dwaterfall = Dock("Waterfall", size=(250, 250))
+
+        self.area.addDock(self.dparams)
+        self.area.addDock(self.dmainImage, 'right')
+        self.area.addDock(self.dlog, 'right')
+        self.area.addDock(self.dmessage, 'bottom', self.dlog)
+        self.area.addDock(self.dstatus, 'bottom', self.dparams)
+
+        self.dmainImage.addWidget(self.camWidget)
+        self.dmessage.addWidget(self.messageWidget)
+        self.dparams.addWidget(self.config)
+
+    def docksVisible(self):
+        self.dmainImage.setV
+
+    def bufferStatus(self):
+        """Starts or stops the buffer accumulation.
+        """
+        if self.accumulateBuffer:
+            self.accumulateBuffer = False
+            self.logMessage.append('<b>Info:</b> Stopped the buffer accumulation')
+        else:
+            self.accumulateBuffer = True
+            self.logMessage.append('<b>Info:</b> Started the buffer accumulation')
+
 
     def getData(self,data,origin):
         """Gets the data that is being gathered by the working thread.
@@ -445,30 +467,16 @@ class cameraMain(QtGui.QMainWindow):
         new_time = time.time()
         self.fps = new_time-self.lastRefresh
         self.lastRefresh = new_time
-        # if self.q.qsize()/200*100 > 75:
-        #     self.camWidget.memory.setStyleSheet(self.camWidget.RED_STYLE)
-        # elif self.q.qsize()/200*100 > 50:
-        #     self.camWidget.memory.setStyleSheet(self.camWidget.YELLOW_STYLE)
-        # else:
-        #     self.camWidget.memory.setStyleSheet(self.camWidget.DEFAULT_STYLE)
-        # if psutil.cpu_percent() > 75:
-        #     self.camWidget.processor.setStyleSheet(self.camWidget.RED_STYLE)
-        # else:
-        #     self.camWidget.processor.setStyleSheet(self.camWidget.DEFAULT_STYLE)
-        #
-        # self.camWidget.memory.setValue(self.q.qsize()/200*100)#psutil.virtual_memory().percent*4
-        # self.camWidget.processor.setValue(psutil.cpu_percent())
-        # self.camWidget.message.setHtml('<b>Buffer time:</b> %0.2f ms <br /> \
-        #     <b>Refresh time:</b> %0.2f ms <br /> \
-        #     <b>Acquired Frames</b> %i <br /> \
-        #     <b>Frames in buffer</b> %i'%(self.bufferTime*1000,self.fps*1000,self.totalFrames,self.q.qsize()))
-        #
-        # self.logMessage = self.logMessage[-100:]
-        # logs = ''
-        # for msg in self.logMessage[::-1]:
-        #     logs+=msg
-        #     logs+='<br />'
-        # self.camWidget.log.setHtml(logs)
+        self.messageWidget.updateMemory(self.q.qsize()/200*100) #TODO: Make it depend on the real size of the Queue
+        self.messageWidget.updateProcessor(psutil.cpu_percent())
+
+        msg = '''<b>Buffer time:</b> %0.2f ms <br />
+        #     <b>Refresh time:</b> %0.2f ms <br />
+        #     <b>Acquired Frames</b> %i <br />
+        #     <b>Frames in buffer</b> %i'''%(self.bufferTime*1000,self.fps*1000,self.totalFrames,self.q.qsize())
+        self.messageWidget.updateMessage(msg)
+        self.messageWidget.updateLog(self.logMessage)
+        self.logMessage = []
 
     def updateSession(self,session):
         """Updates the session variables passed by the config window.

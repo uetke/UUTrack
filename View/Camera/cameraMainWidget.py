@@ -14,7 +14,7 @@ class cameraMainWidget(QtGui.QWidget):
 
         # Settings for the image
         self.viewport = GraphicsLayoutWidget()
-        self.view = self.viewport.addViewBox(colspan=3, rowspan=3, lockAspect = True, enableMenu=True)
+        self.view = self.viewport.addViewBox(colspan=3, rowspan=3, lockAspect = True, enableMenu=False)
 
         self.img = pg.ImageItem()
         self.img2 = pg.ImageItem() # To overlay another image if needed.
@@ -38,17 +38,13 @@ class cameraMainWidget(QtGui.QWidget):
         self.view.addItem(self.vline2)
 
         # Settings for the histogram
-        # self.vp = GraphicsLayoutWidget()
         self.h = self.viewport.addViewBox(enableMenu=False, colspan=3)
         self.hist = pg.HistogramLUTItem(image=self.img,fillHistogram=False)
         self.hist.setImageItem(self.img)
         self.h.addItem(self.hist)
 
-
-
         # Add everything to the widget
         self.layout.addWidget(self.viewport)
-        # self.layout.addWidget(self.vp)
         self.setLayout(self.layout)
 
 

@@ -9,10 +9,9 @@ class cameraMainWidget(QtGui.QWidget):
     """
     def __init__(self,parent=None):
         QtGui.QWidget.__init__(self, parent)
-        # General layout of the widget to hold an image and a histogram
+        # General layout of the widget to hold an image and a histogra
+
         self.layout = QtGui.QHBoxLayout(self)
-
-
 
         # Settings for the image
         self.viewport = GraphicsLayoutWidget()
@@ -30,7 +29,7 @@ class cameraMainWidget(QtGui.QWidget):
         self.crosshair.append(pg.InfiniteLine(angle=0, movable=False, pen={'color': 124, 'width': 4}))
         self.crosshair.append(pg.InfiniteLine(angle=90, movable=False, pen={'color': 124, 'width': 4}))
         self.showCrosshair = False
-        self.viewport.scene().sigMouseMoved.connect(self.mouseMoved)
+
 
         self.view.addItem(self.img)
         self.view.addItem(self.img2)
@@ -47,13 +46,13 @@ class cameraMainWidget(QtGui.QWidget):
         self.h.addItem(self.hist)
 
         self.imv = pg.ImageView(view=self.view,imageItem=self.img)
-
+        #self.imv.scene().sigMouseMoved.connect(self.mouseMoved)
         # Add everything to the widget
         self.layout.addWidget(self.imv)
         # self.layout.addWidget(self.vp)
         self.setLayout(self.layout)
-
-
+        self.img.acceptHoverEvents()
+        self.setMouseTracking(True)
 
     def keyPressEvent(self,key):
         """Triggered when there is a key press with some modifier.
@@ -74,16 +73,17 @@ class cameraMainWidget(QtGui.QWidget):
             if key.key() == 86: # For letter V
                 self.emit(QtCore.SIGNAL('stopSpecialTask'))
 
-    def mouseMoved(self,arg):
+    def mouseMoveEvent(self,arg):
         """Updates the position of the cross hair. The mouse has to be moved while pressing down the Ctrl button."""
         modifiers = QtGui.QApplication.keyboardModifiers()
         if modifiers == QtCore.Qt.ControlModifier:
+            print(arg.pos())
             if not self.showCrosshair:
                 for c in self.crosshair:
                     self.view.addItem(c)
                 self.showCrosshair = True
-            self.crosshair[1].setValue(int(self.img.mapFromScene(arg).x()))
-            self.crosshair[0].setValue(int(self.img.mapFromScene(arg).y()))
+            self.crosshair[1].setValue(int(self.img.mapFromScene(arg.pos()).x()))
+            self.crosshair[0].setValue(int(self.img.mapFromScene(arg.pos()).y()))
 
     # def updateImage(self,img):
     #     """Updates the image being displayed.
