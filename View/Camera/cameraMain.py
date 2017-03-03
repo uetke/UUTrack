@@ -23,6 +23,7 @@ from View.Camera.clearQueueThread import clearQueueThread
 from View.Camera.configWidget import configWidget
 from View.Camera.waterfallWidget import waterfallWidget
 from View.Camera.messageWidget import messageWidget
+from View.Camera.trajectoryWidget import trajectoryWidget
 
 class cameraMain(QtGui.QMainWindow):
     """ Displays the camera.
@@ -51,17 +52,13 @@ class cameraMain(QtGui.QMainWindow):
         self.camWidget = cameraMainWidget()
         self.messageWidget = messageWidget()
         self.config = configWidget(self._session)
-        self.area.mouseMoveEvent = self.camWidget.mouseMoveEvent
+        self.trajectoryWidget = trajectoryWidget()
 
-        # self.movieTimer = QtCore.QTimer()
-        # self.connect(self.movieTimer,QtCore.SIGNAL("timeout()"),self.movieData)
 
         self.refreshTimer = QtCore.QTimer()
         self.connect(self.refreshTimer,QtCore.SIGNAL('timeout()'),self.updateGUI)
 
         self.refreshTimer.start(self._session.refreshTime)
-
-        # self.connect(self.workerThread,QtCore.SIGNAL('Image'),self.getData)
 
         # Worker thread for clearing the queue.
         self.clearWorker = clearQueueThread(self.q)
@@ -269,14 +266,14 @@ class cameraMain(QtGui.QMainWindow):
         """Resets the roi to the full image.
         """
         if not self.acquiring:
-            X = np.array((1,self.maxSize[0]))
-            Y = np.array((1,self.maxSize[1]))
+            X = np.array((1,self.maxSizex))
+            Y = np.array((1,self.maxSizey))
             Nx,Ny = self.camera.setROI(X,Y) # Is this correct?
-            self.tempImage = np.zeros((self.maxSize[0],self.maxSize[1]))
+            self.tempImage = np.zeros((self.maxSizex,self.maxSizey))
             self.camWidget.hline1.setValue(1)
             self.camWidget.vline1.setValue(1)
-            self.camWidget.vline2.setValue(self.maxSize[0])
-            self.camWidget.hline2.setValue(self.maxSize[1])
+            self.camWidget.vline2.setValue(self.maxSizex)
+            self.camWidget.hline2.setValue(self.maxSizey)
             if self.showWaterfall:
                 self.watData = np.zeros((self._session.lengthWaterfall,Nx))
         else:
@@ -397,20 +394,21 @@ class cameraMain(QtGui.QMainWindow):
         self.dparams = Dock("Parameters", size=(100, 3))
         self.dmainImage = Dock("Main Image", size=(500, 500))
 
-        self.dlog = Dock("Log", size=(200, 2))
+        self.dtraj = Dock("Trajectory", size=(200, 2))
         self.dmessage = Dock("Messages", size=(200, 2))
         self.dstatus = Dock("Status", size=(100, 3))
         self.dwaterfall = Dock("Waterfall", size=(250, 250))
 
         self.area.addDock(self.dparams)
         self.area.addDock(self.dmainImage, 'right')
-        self.area.addDock(self.dlog, 'right')
-        self.area.addDock(self.dmessage, 'bottom', self.dlog)
+        self.area.addDock(self.dtraj, 'right')
+        self.area.addDock(self.dmessage, 'bottom', self.dtraj)
         self.area.addDock(self.dstatus, 'bottom', self.dparams)
 
         self.dmainImage.addWidget(self.camWidget)
         self.dmessage.addWidget(self.messageWidget)
         self.dparams.addWidget(self.config)
+        self.dtraj.addWidget(self.trajectoryWidget)
 
     def docksVisible(self):
         self.dmainImage.setV
@@ -459,6 +457,7 @@ class cameraMain(QtGui.QMainWindow):
 
         if len(self.centroidX) >= 1:
             self.camWidget.img2.setImage(self.trajectories)
+            self.trajectoryWidget.plot.setData(self.centroidX,self.centroidY)
 
         if self.showWaterfall:
             self.watData  = self.watData[:self._session.lengthWaterfall,:]

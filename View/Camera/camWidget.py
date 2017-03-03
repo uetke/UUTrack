@@ -36,13 +36,6 @@ class cameraMainWidget(QtGui.QWidget):
         self.view.addItem(self.vline1)
         self.view.addItem(self.vline2)
 
-        # Settings for the histogram
-        # self.vp = GraphicsLayoutWidget()
-        # self.h = self.viewport.addViewBox(enableMenu=False, colspan=3)
-        # self.hist = pg.HistogramLUTItem(image=self.img,fillHistogram=False)
-        # self.hist.setImageItem(self.img)
-        # self.h.addItem(self.hist)
-
         self.imv = pg.ImageView(view=self.view,imageItem=self.img)
         self.imv.setMouseTracking(True)
         self.imv.getImageItem().scene().sigMouseMoved.connect(self.mouseMoved)
@@ -70,17 +63,15 @@ class cameraMainWidget(QtGui.QWidget):
             if key.key() == 86: # For letter V
                 self.emit(QtCore.SIGNAL('stopSpecialTask'))
 
-    def mouseMoveEvent(self,arg):
+    def mouseMoved(self,arg):
         """Updates the position of the cross hair. The mouse has to be moved while pressing down the Ctrl button."""
         # arg = evt.pos()
         modifiers = QtGui.QApplication.keyboardModifiers()
         if modifiers == QtCore.Qt.ControlModifier:
-            print(arg.pos())
             if not self.showCrosshair:
                 for c in self.crosshair:
                     self.view.addItem(c)
                 self.showCrosshair = True
-            print("Image position:", self.img.mapFromScene(arg))
             self.crosshair[1].setValue(int(self.img.mapFromScene(arg).x()))
             self.crosshair[0].setValue(int(self.img.mapFromScene(arg).y()))
 
