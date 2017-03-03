@@ -9,8 +9,7 @@ class cameraMainWidget(QtGui.QWidget):
     """
     def __init__(self,parent=None):
         QtGui.QWidget.__init__(self, parent)
-        # General layout of the widget to hold an image and a histogra
-
+        # General layout of the widget to hold an image and a histogram
         self.layout = QtGui.QHBoxLayout(self)
 
         # Settings for the image
@@ -30,7 +29,6 @@ class cameraMainWidget(QtGui.QWidget):
         self.crosshair.append(pg.InfiniteLine(angle=90, movable=False, pen={'color': 124, 'width': 4}))
         self.showCrosshair = False
 
-
         self.view.addItem(self.img)
         self.view.addItem(self.img2)
         self.view.addItem(self.hline1)
@@ -40,19 +38,18 @@ class cameraMainWidget(QtGui.QWidget):
 
         # Settings for the histogram
         # self.vp = GraphicsLayoutWidget()
-        self.h = self.viewport.addViewBox(enableMenu=False, colspan=3)
-        self.hist = pg.HistogramLUTItem(image=self.img,fillHistogram=False)
-        self.hist.setImageItem(self.img)
-        self.h.addItem(self.hist)
+        # self.h = self.viewport.addViewBox(enableMenu=False, colspan=3)
+        # self.hist = pg.HistogramLUTItem(image=self.img,fillHistogram=False)
+        # self.hist.setImageItem(self.img)
+        # self.h.addItem(self.hist)
 
         self.imv = pg.ImageView(view=self.view,imageItem=self.img)
-        #self.imv.scene().sigMouseMoved.connect(self.mouseMoved)
+        self.imv.setMouseTracking(True)
+        self.imv.getImageItem().scene().sigMouseMoved.connect(self.mouseMoved)
+
         # Add everything to the widget
         self.layout.addWidget(self.imv)
-        # self.layout.addWidget(self.vp)
         self.setLayout(self.layout)
-        self.img.acceptHoverEvents()
-        self.setMouseTracking(True)
 
     def keyPressEvent(self,key):
         """Triggered when there is a key press with some modifier.
@@ -75,6 +72,7 @@ class cameraMainWidget(QtGui.QWidget):
 
     def mouseMoveEvent(self,arg):
         """Updates the position of the cross hair. The mouse has to be moved while pressing down the Ctrl button."""
+        # arg = evt.pos()
         modifiers = QtGui.QApplication.keyboardModifiers()
         if modifiers == QtCore.Qt.ControlModifier:
             print(arg.pos())
@@ -82,8 +80,9 @@ class cameraMainWidget(QtGui.QWidget):
                 for c in self.crosshair:
                     self.view.addItem(c)
                 self.showCrosshair = True
-            self.crosshair[1].setValue(int(self.img.mapFromScene(arg.pos()).x()))
-            self.crosshair[0].setValue(int(self.img.mapFromScene(arg.pos()).y()))
+            print("Image position:", self.img.mapFromScene(arg))
+            self.crosshair[1].setValue(int(self.img.mapFromScene(arg).x()))
+            self.crosshair[0].setValue(int(self.img.mapFromScene(arg).y()))
 
     # def updateImage(self,img):
     #     """Updates the image being displayed.
