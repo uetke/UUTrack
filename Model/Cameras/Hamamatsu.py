@@ -1,12 +1,13 @@
 """Hamamatsu.py
 Model class for controlling Hamamatsu cameras via de DCAM-API.
 """
+from Controller.devices.hamamatsu.hamamatsu_camera import HamamatsuCamera
 
 class camera():
     MODE_CONTINUOUS = 1
     MODE_SINGLE_SHOT = 0
     def __init__(self,camera):
-        self.camera = camera
+        self.camera = HamamatsuCamera(camera)
         self.running = False
 
     def initializeCamera(self):
@@ -18,7 +19,7 @@ class camera():
         """Triggers the camera.
         """
 
-   def setAcquisitionMode(self, mode):
+    def setAcquisitionMode(self, mode):
         """ Set the readout mode of the camera: Single or continuous.
         Parameters
         ==========
@@ -76,6 +77,7 @@ class camera():
         The CCD width in pixels
 
         """
+        return self.camera.max_width
 
     def GetCCDHeight(self):
         """
@@ -84,6 +86,7 @@ class camera():
         The CCD height in pixels
 
         """
+        return self.camera.max_height
 
 
     def stopCamera(self):
