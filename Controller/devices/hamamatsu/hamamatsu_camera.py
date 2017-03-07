@@ -102,7 +102,10 @@ class DCAM_PARAM_PROPERTYVALUETEXT(ctypes.Structure):
 # @return The regularized property name.
 #
 def convertPropertyName(p_name):
-    return p_name.lower().replace(" ", "_")
+    a = p_name.decode('ascii')
+    b = a.lower()
+    c = b.replace(" ","_")
+    return c
 
 
 ## DCAMException
@@ -508,7 +511,7 @@ class HamamatsuCamera():
     # @return [the property value, the property type]
     #
     def getPropertyValue(self, property_name):
-
+        print(self.properties)
         # Check if the property exists.
         if not (property_name in self.properties):
             print(" unknown property name: %s"%property_name)
@@ -838,9 +841,9 @@ class HamamatsuCameraMR(HamamatsuCamera):
 #
 if __name__ == "__main__":
     print('MAIN')
-    # import time
-    #
-    # print "found:", n_cameras, "cameras"
+    import time
+
+    print ("found: %s cameras"%n_cameras)
     # if (n_cameras > 0):
     #
     #     hcam = HamamatsuCameraMR(0)
