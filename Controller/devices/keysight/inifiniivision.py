@@ -1,5 +1,3 @@
-from __future__ import division
-
 from lantz.messagebased import MessageBasedDriver
 from lantz import Action
 from lantz import Feat, DictFeat
@@ -8,15 +6,16 @@ from lantz import Feat, DictFeat
 import numpy as np
 
 
-class funcgen(MessageBasedDriver):
+class Funcgen(MessageBasedDriver):
     """The agilent 33220a function generator"""
 
-    MANUFACTURER_ID = '0x0957'
-    MODEL_CODE = '0x0407'
+    MANUFACTURER_ID = '0x15BC'
+    MODEL_CODE = '0x1518'
+
 
     DEFAULTS = {'USB': {'write_termination': '\n',
                         'read_termination': '\n',
-                        'timeout': 2000,
+                        'timeout': 500000,
                         'encoding': 'ascii'
                         }}
     @Feat()
@@ -76,6 +75,7 @@ class funcgen(MessageBasedDriver):
         """ Turns the output on or off.
         """
         self.write('OUTP {}'.format(value))
+
     # def apply(self,func=None,freq=None,ampl=None,offset=None):
     #     if not func==None:
     #         self.set_function_type(func)
@@ -109,4 +109,6 @@ class funcgen(MessageBasedDriver):
     #     return self.query('APPL?')
 
 if __name__ == '__main__':
-funcgen2 = funcgen(0x0957)
+    inst = Funcgen.via_usb()
+    inst.initialize()
+    print(inst.idn)
