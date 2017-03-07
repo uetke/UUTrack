@@ -3,7 +3,8 @@
 # Default parameters for the Tracking program
 # All parameters can be changed to accomodate user needs.
 # All parameters can be changed at runtime with the appropriate config
-
+User:
+  name: Aquiles
 Saving:
   auto_save: False
   directory: ''
@@ -16,6 +17,7 @@ GUI:
 
 Camera:
   camera: dummyCamera # the camera to use
+  model: dummy
   exposure_time: 50 # Initial exposure time (in ms)
   binning_y: 1 # Binning
   binning_y: 1

@@ -33,7 +33,7 @@ class cameraMain(QtGui.QMainWindow):
         self.setMouseTracking(True)
         self._session = session
         self.camera = cam
-        self._session.camera['camera'] = self.camera
+        # self._session.camera['camera'] = self.camera
 
         self.fileDir = self._session.saveDirectory
         self.fileName = self._session.filenamePhoto
@@ -58,7 +58,7 @@ class cameraMain(QtGui.QMainWindow):
         self.refreshTimer = QtCore.QTimer()
         self.connect(self.refreshTimer,QtCore.SIGNAL('timeout()'),self.updateGUI)
 
-        self.refreshTimer.start(self._session.refreshTime)
+        self.refreshTimer.start(self._session.GUI['refreshTime'])
 
         # Worker thread for clearing the queue.
         self.clearWorker = clearQueueThread(self.q)
@@ -91,10 +91,10 @@ class cameraMain(QtGui.QMainWindow):
         self.camWidget.vline2.setBounds((1,self.maxSizex-1))
         self.camWidget.crosshair[0].setBounds((1,self.maxSizex-1))
         self.camWidget.crosshair[1].setBounds((1,self.maxSizey-1))
-        self._session.ROIl = 1
-        self._session.ROIr = self.maxSizex
-        self._session.ROIu = self.maxSizey
-        self._session.ROIb = 1
+        self._session.Camera['roi_x'][0] = 1
+        self._session.Camera['roi_x'][1] = self.maxSizex
+        self._session.Camera['roi_y'][1] = self.maxSizey
+        self._session.Camera['roi_y'][0] = 1
 
         self.lastBuffer = time.time()
         self.lastRefresh = time.time()
@@ -184,8 +184,8 @@ class cameraMain(QtGui.QMainWindow):
             # is passed through the Queue. (self.q.put('exit'))
             to_save = os.path.join(self.fileDir,self.movieName)
             metaData = {}
-            metaData['User'] = self._session.user
-            metaData['exposureTime'] = self._session.exposureTime
+            metaData['User'] = self._session.User['name']
+            metaData['exposureTime'] = self._session.Camera['exposure_time']
             self.p = Process(target=workerSaver,args=(to_save,metaData,self.q,))
             self.p.start()
             self.continousSaving = True
@@ -217,7 +217,7 @@ class cameraMain(QtGui.QMainWindow):
             self.dwaterfall.addWidget(self.watWidget)
             self.showWaterfall = True
             Sx,Sy = self.camera.getSize()
-            self.watData = np.zeros((self._session.lengthWaterfall,Sx))
+            self.watData = np.zeros((self._session.GUI['length_waterfall'],Sx))
             self.watWidget.img.setImage(np.transpose(self.watData))
             self.logMessage.append('<b>Info:</b> Waterfall opened')
         else:
@@ -247,10 +247,10 @@ class cameraMain(QtGui.QMainWindow):
             x2 = np.int(self.camWidget.vline2.value())
             X = np.sort((x1,x2))
             Y = np.sort((y1,y2))
-            self._session.ROIl = X[0]
-            self._session.ROIr = X[1]
-            self._session.ROIu = Y[1]
-            self._session.ROIb = Y[0]
+            self._session.Camera['roi_x'][0] = X[0]
+            self._session.Camera['roi_x'][1] = X[1]
+            self._session.Camera['roi_y'][1] = Y[1]
+            self._session.Camera['roi_y'][0] = Y[0]
             Nx,Ny = self.camera.setROI(X,Y)
             self.tempImage = np.zeros((Nx,Ny))
             self.camWidget.hline1.setValue(1)
@@ -275,7 +275,7 @@ class cameraMain(QtGui.QMainWindow):
             self.camWidget.vline2.setValue(self.maxSizex)
             self.camWidget.hline2.setValue(self.maxSizey)
             if self.showWaterfall:
-                self.watData = np.zeros((self._session.lengthWaterfall,Nx))
+                self.watData = np.zeros((self._session.GUI['length_waterfall'],Nx))
         else:
             self.logMessage.append('<b>Error: <b> Cannot change ROI while acquiring.')
 
@@ -460,7 +460,7 @@ class cameraMain(QtGui.QMainWindow):
             self.trajectoryWidget.plot.setData(self.centroidX,self.centroidY)
 
         if self.showWaterfall:
-            self.watData  = self.watData[:self._session.lengthWaterfall,:]
+            self.watData  = self.watData[:self._session.GUI['length_waterfall'],:]
             self.watWidget.img.setImage(np.transpose(self.watData[::-1,:]))
 
         new_time = time.time()
