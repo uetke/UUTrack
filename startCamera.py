@@ -5,7 +5,7 @@ from PyQt4.Qt import QApplication
 from datetime import datetime
 
 from Model._session import _session
-from Model.Cameras.Hamamatsu import camera
+from Model.Cameras.dummyCamera import camera
 from View.Camera.cameraMain import cameraMain
 
 if __name__ == '__main__':
@@ -23,12 +23,7 @@ if __name__ == '__main__':
     if not os.path.exists(savedir):
         os.makedirs(savedir)
 
-    session.saveDirectory = savedir
-    session.filenameVideo = data['saving']['filenameVideo']
-    session.filenamePhoto = data['saving']['filenameVideo']
-    session.refreshTime = data['GUI']['refreshTime']
-    session.lengthWaterfall = data['GUI']['lengthWaterfall']
-    session.exposureTime = data['Camera']['exposureTime']
+    session.Saving['directory'] = savedir
 
     cam = camera(0)
 

@@ -28,7 +28,7 @@ class cameraViewer(QtGui.QMainWindow):
         self.tempImage = []
 
         self.refreshTimer = QtCore.QTimer()
-        self.refreshTimer.start(self._session.refreshTime) # In milliseconds
+        self.refreshTimer.start(self._session.GUI['refresh_time']) # In milliseconds
 
         self.connect(self.refreshTimer,QtCore.SIGNAL("timeout()"),self.updateGUI)
 

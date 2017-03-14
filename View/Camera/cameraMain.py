@@ -58,7 +58,7 @@ class cameraMain(QtGui.QMainWindow):
         self.refreshTimer = QtCore.QTimer()
         self.connect(self.refreshTimer,QtCore.SIGNAL('timeout()'),self.updateGUI)
 
-        self.refreshTimer.start(self._session.GUI['refreshTime'])
+        self.refreshTimer.start(self._session.GUI['refresh_time'])
 
         # Worker thread for clearing the queue.
         self.clearWorker = clearQueueThread(self.q)

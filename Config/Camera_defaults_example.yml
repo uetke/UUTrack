@@ -5,9 +5,10 @@
 # All parameters can be changed at runtime with the appropriate config
 User:
   name: Aquiles
+
 Saving:
   auto_save: False
-  directory: ''
+  directory: C:\data\nanoCET
   filename_video: Video.hdf5 # Can be the same filename for video and photo
   filename_photo: Snap.hdf5
 
