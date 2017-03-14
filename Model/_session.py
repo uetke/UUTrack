@@ -1,13 +1,11 @@
 """Best place to store variables that can be shared between different classes.
 """
 import yaml
-from PyQt4.QtCore import QObject, pyqtSignal
+from PyQt4.QtCore import QObject, pyqtSignal, SIGNAL
 
 class _session(QObject):
     """Stores variables and other classes that are common to several UI or instances of the code.
     """
-    UPDATESIGNAL = pyqtSignal()
-    NEWSIGNAL = pyqtSignal()
     params = {}
     def __init__(self,file=None):
         """The class is prepared to load values from a Yaml file"""
@@ -22,19 +20,17 @@ class _session(QObject):
         if key not in self.params:
             self.params[key] = dict()
             self.__setattr__(key,value)
+            print('AA')
         else:
             for k in value:
                 if k in self.params[key]:
                     val = value[k]
                     self.params[key][k] = value[k] # Update value
-                    self.UPDATESIGNAL.emit()
-                    print('Update')
-
+                    self.emit(SIGNAL('Updated'))
                 else:
                     self.params[key][k] = value[k]
-                    self.NEWSIGNAL.emit()
-                    print('New new')
-                    print(key)
+                    self.emit(SIGNAL('New'))
+
             super(_session, self).__setattr__(k, value[k])
 
     def __getattr__(self, item):
@@ -51,9 +47,32 @@ class _session(QObject):
                 s+= '\t%s: %s\n'%(kkey,self.params[key][kkey])
         return s
 
+    def getParams(self):
+        """Special class for setting up the ParamTree from PyQtGraph. It saves the iterating over all the variables directly
+        on the GUI."""
+        p = []
+        for k in self.params:
+            c = []
+            for m in self.params[k]:
+                s = {'name': m.replace('_', ' '), 'type': type(self.params[k][m]).__name__, 'value': self.params[k][m]}
+                c.append(s)
+
+            a = {'name': k.replace('_', ' '), 'type': 'group', 'children': c}
+            p.append(a)
+        return p
+
+
 
 
 if __name__ == '__main__':
     s = _session(file='../Config/Camera_defaults_example.yml')
-    print(s.Camera)
-    print(s)
+    print('NEW')
+    s.Camera = {'new': 'New'}
+    print('OLD')
+    s.Camera = {'model': 'Old'}
+    #print(s.Camera)
+    for k in s.params:
+        print(k)
+        for m in s.params[k]:
+            print('   %s:  %s'%(m,s.params[k][m]))
+   # print(s.params)
