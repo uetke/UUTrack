@@ -143,7 +143,7 @@ class HCamData():
     # @param size The size of the data object in bytes.
     #
     def __init__(self, size):
-        self.np_array = numpy.ascontiguousarray(numpy.empty(size/2, dtype=numpy.uint16))
+        self.np_array = numpy.empty(int(size/2), dtype=numpy.uint16)
         self.size = size
 
     ## __getitem__
@@ -233,6 +233,8 @@ class HamamatsuCamera():
         if (self.dcam.dcam_init(None, ctypes.byref(self.temp), None) != DCAMERR_NOERROR):
             raise DCAMException("DCAM initialization failed.")
         self.n_cameras = self.temp.value
+        
+        self.captureSetup()
     ## captureSetup
     #
     # Capture setup (internal use only). This is called at the start
@@ -789,7 +791,7 @@ class HamamatsuCameraMR(HamamatsuCamera):
         #
         if (self.old_frame_bytes != self.frame_bytes):
 
-            n_buffers = int((2.0 * 1024 * 1024 * 1024)/self.frame_bytes)
+            n_buffers = int((0.1 * 1024 * 1024 * 1024)/self.frame_bytes)
             self.number_image_buffers = n_buffers
 
             # Allocate new image buffers.
@@ -851,7 +853,7 @@ if __name__ == "__main__":
         print("camera 0 model:", hcam.getModelInfo(0))
 
         # List support properties.
-        if 1:
+        if 0:
             print("Supported properties:")
             props = hcam.getProperties()
             for i, id_name in enumerate(sorted(props.keys())):
@@ -870,7 +872,7 @@ if __name__ == "__main__":
                         print("         %s/%s"%(key,text_values[key]))
 
         # Test setting & getting some parameters.
-        if 0:
+        if 1:
             print(hcam.setPropertyValue("exposure_time", 0.001))
 
             #print(hcam.setPropertyValue("subarray_hsize", 2048))
@@ -884,8 +886,8 @@ if __name__ == "__main__":
             print(hcam.setPropertyValue("readout_speed", 2))
 
             hcam.setSubArrayMode()
-            #hcam.startAcquisition()
-            #hcam.stopAcquisition()
+            hcam.startAcquisition()
+            hcam.stopAcquisition()
 
             params = ["internal_frame_rate",
                       "timing_readout_time",

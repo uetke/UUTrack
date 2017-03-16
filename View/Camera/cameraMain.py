@@ -139,7 +139,7 @@ class cameraMain(QtGui.QMainWindow):
             self.connect(self.workerThread,QtCore.SIGNAL('Image'),self.getData)
             self.workerThread.origin = 'snap'
             self.workerThread.start()
-
+            #self.workerThread.keep_acquiring = False
             self.acquiring = True
 
     def saveImage(self):

@@ -1,14 +1,15 @@
 """Hamamatsu.py
 Model class for controlling Hamamatsu cameras via de DCAM-API.
 """
-from Controller.devices.hamamatsu.hamamatsu_camera import HamamatsuCamera
+import numpy as np
+from Controller.devices.hamamatsu.hamamatsu_camera import *
 
 class camera():
     MODE_CONTINUOUS = 1
     MODE_SINGLE_SHOT = 0
     def __init__(self,camera):
         self.cam_id = camera # Camera ID
-        self.camera = HamamatsuCamera(camera)
+        self.camera = HamamatsuCameraMR(camera)
         self.running = False
         self.mode = self.MODE_SINGLE_SHOT
 
@@ -21,10 +22,14 @@ class camera():
         """Triggers the camera.
         """
         if self.getAcquisitionMode() == self.MODE_CONTINUOUS:
+            print('Cont Acq')
             self.camera.startAcquisition()
         else:
+            print('Shot')
             self.camera.startAcquisition()
-            self.camera.stopAcquisition()
+            print('End shot')
+            #self.camera.stopAcquisition()
+            print('Stop shot')
 
     def setAcquisitionMode(self, mode):
         """ Set the readout mode of the camera: Single or continuous.
@@ -60,7 +65,9 @@ class camera():
         """Reads the camera
         """
         [frames, dims] = self.camera.getFrames()
-        return frames
+        img = frames[-1].getData()
+        img = np.reshape(img,(dims[0],dims[1]))
+        return img.T
 
     def setROI(self,X,Y):
         """Sets up the ROI. Not all cameras are 0-indexed, so this is an important

@@ -18,15 +18,11 @@ class configWidget(QtGui.QWidget):
         for param, change, data in changes:
             to_update = param.name().replace(' ','_')
             path = self.p.childPath(param)[0]
-            print(path)
-            print(to_update)
-            print(data)
             self._session.params[path][to_update] = data
             self.emit(QtCore.SIGNAL('updateSession'), self._session)
 
     def populateTree(self):
         params = self._session.getParams()
-        print(params)
         self.p = Parameter.create(name='params', type='group', children=params)
         self.t.setParameters(self.p, showTop=False)
 
