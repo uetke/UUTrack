@@ -5,9 +5,10 @@
 # All parameters can be changed at runtime with the appropriate config
 User:
   name: Aquiles
+
 Saving:
   auto_save: False
-  directory: ''
+  directory: C:\data\nanoCET
   filename_video: Video.hdf5 # Can be the same filename for video and photo
   filename_photo: Snap.hdf5
 
@@ -21,12 +22,10 @@ Camera:
   exposure_time: 50 # Initial exposure time (in ms)
   binning_y: 1 # Binning
   binning_y: 1
-  roi_x:
-    - 0 # Leave at 0 for full camera
-    - 0
-  roi_y:
-    - 0
-    - 0
+  roi_x1: 0 # Leave at 0 for full camera
+  roi_x2: 0
+  roi_y1: 0
+  roi_y2: 0
   background: '' # Full path to background file, or empty for none.
 
 Tracking: # Not yet implemented, will show up in the config window

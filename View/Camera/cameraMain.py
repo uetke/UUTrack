@@ -52,13 +52,15 @@ class cameraMain(QtGui.QMainWindow):
         self.camWidget = cameraMainWidget()
         self.messageWidget = messageWidget()
         self.config = configWidget(self._session)
+        self.connect(self._session, QtCore.SIGNAL('Updated'), self.config.populateTree)
+
         self.trajectoryWidget = trajectoryWidget()
 
 
         self.refreshTimer = QtCore.QTimer()
         self.connect(self.refreshTimer,QtCore.SIGNAL('timeout()'),self.updateGUI)
 
-        self.refreshTimer.start(self._session.GUI['refreshTime'])
+        self.refreshTimer.start(self._session.GUI['refresh_time'])
 
         # Worker thread for clearing the queue.
         self.clearWorker = clearQueueThread(self.q)
@@ -91,10 +93,10 @@ class cameraMain(QtGui.QMainWindow):
         self.camWidget.vline2.setBounds((1,self.maxSizex-1))
         self.camWidget.crosshair[0].setBounds((1,self.maxSizex-1))
         self.camWidget.crosshair[1].setBounds((1,self.maxSizey-1))
-        self._session.Camera['roi_x'][0] = 1
-        self._session.Camera['roi_x'][1] = self.maxSizex
-        self._session.Camera['roi_y'][1] = self.maxSizey
-        self._session.Camera['roi_y'][0] = 1
+        self._session.Camera = {'roi_x1': 1}
+        self._session.Camera = {'roi_x2': self.maxSizex}
+        self._session.Camera = {'roi_y1': 1}
+        self._session.Camera = {'roi_y2': self.maxSizey}
 
         self.lastBuffer = time.time()
         self.lastRefresh = time.time()
@@ -116,6 +118,7 @@ class cameraMain(QtGui.QMainWindow):
         self.connect(self.camWidget, QtCore.SIGNAL('specialTask'), self.startSpecialTask)
         self.connect(self.camWidget, QtCore.SIGNAL('stopSpecialTask'), self.stopSpecialTask)
 
+
     def snap(self):
         """Function for acquiring a single frame from the camera. It is triggered by the user.
         It gets the data the GUI will be updated at a fixed framerate.
@@ -136,7 +139,7 @@ class cameraMain(QtGui.QMainWindow):
             self.connect(self.workerThread,QtCore.SIGNAL('Image'),self.getData)
             self.workerThread.origin = 'snap'
             self.workerThread.start()
-
+            #self.workerThread.keep_acquiring = False
             self.acquiring = True
 
     def saveImage(self):
@@ -247,10 +250,11 @@ class cameraMain(QtGui.QMainWindow):
             x2 = np.int(self.camWidget.vline2.value())
             X = np.sort((x1,x2))
             Y = np.sort((y1,y2))
-            self._session.Camera['roi_x'][0] = X[0]
-            self._session.Camera['roi_x'][1] = X[1]
-            self._session.Camera['roi_y'][1] = Y[1]
-            self._session.Camera['roi_y'][0] = Y[0]
+            self._session.Camera = {'roi_x1': int(X[0])}
+            self._session.Camera = {'roi_x2': int(X[1])}
+            self._session.Camera = {'roi_y1': int(Y[0])}
+            self._session.Camera = {'roi_y2': int(Y[1])}
+
             Nx,Ny = self.camera.setROI(X,Y)
             self.tempImage = np.zeros((Nx,Ny))
             self.camWidget.hline1.setValue(1)
@@ -266,14 +270,15 @@ class cameraMain(QtGui.QMainWindow):
         """Resets the roi to the full image.
         """
         if not self.acquiring:
-            X = np.array((1,self.maxSizex))
-            Y = np.array((1,self.maxSizey))
-            Nx,Ny = self.camera.setROI(X,Y) # Is this correct?
-            self.tempImage = np.zeros((self.maxSizex,self.maxSizey))
+            # X = np.array((1,self.maxSizex))
+            # Y = np.array((1,self.maxSizey))
+            # Nx,Ny = self.camera.setROI(X,Y) # Is this correct?
+            # self.tempImage = np.zeros((self.maxSizex,self.maxSizey))
             self.camWidget.hline1.setValue(1)
             self.camWidget.vline1.setValue(1)
             self.camWidget.vline2.setValue(self.maxSizex)
             self.camWidget.hline2.setValue(self.maxSizey)
+            self.setROI()
             if self.showWaterfall:
                 self.watData = np.zeros((self._session.GUI['length_waterfall'],Nx))
         else:
@@ -396,14 +401,14 @@ class cameraMain(QtGui.QMainWindow):
 
         self.dtraj = Dock("Trajectory", size=(200, 2))
         self.dmessage = Dock("Messages", size=(200, 2))
-        self.dstatus = Dock("Status", size=(100, 3))
+        # self.dstatus = Dock("Status", size=(100, 3))
         self.dwaterfall = Dock("Waterfall", size=(250, 250))
 
         self.area.addDock(self.dparams)
         self.area.addDock(self.dmainImage, 'right')
         self.area.addDock(self.dtraj, 'right')
         self.area.addDock(self.dmessage, 'bottom', self.dtraj)
-        self.area.addDock(self.dstatus, 'bottom', self.dparams)
+        # self.area.addDock(self.dstatus, 'bottom', self.dparams)
 
         self.dmainImage.addWidget(self.camWidget)
         self.dmessage.addWidget(self.messageWidget)
