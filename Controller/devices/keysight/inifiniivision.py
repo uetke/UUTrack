@@ -1,21 +1,25 @@
 from lantz.messagebased import MessageBasedDriver
 from lantz import Action
 from lantz import Feat, DictFeat
-# from lantz import Q_
+from lantz import Q_
+
+#TODO: Acquire waveform
+#TODO: Function generation
+#TODO: All the functions of the func. gen.
 
 import numpy as np
 
 
 class Funcgen(MessageBasedDriver):
     """The agilent 33220a function generator"""
-
-    MANUFACTURER_ID = '0x15BC'
-    MODEL_CODE = '0x1518'
-
+    volt = Q_('volt')
+    hertz = Q_('hertz')
+    MANUFACTURER_ID = '0x0957'
+    MODEL_CODE = '0x1797'
 
     DEFAULTS = {'USB': {'write_termination': '\n',
                         'read_termination': '\n',
-                        'timeout': 500000,
+                        'timeout': 5000,
                         'encoding': 'ascii'
                         }}
     @Feat()
@@ -76,6 +80,53 @@ class Funcgen(MessageBasedDriver):
         """
         self.write('OUTP {}'.format(value))
 
+    ### Functions related to the function generator and not to the oscilloscope are prepended
+    ### with the word wgen.
+
+    @Feat(units='hertz')
+    def wgen_frequency(self):
+        """gets the frequency of the function generator
+        :params -- frequency (in Hz)
+        """
+        return self.query(':WGEN:FREQuency?')
+
+    @wgen_frequency.setter
+    def wgen_frequency(self,freq):
+        self.write(':WGEN:FREQuency %s'%freq)
+
+    @DictFeat(values={'SIN':'SIN', 'SQU':'SQU', 'RAMP':'RAMP', 'PULS':'PULS', 'NOIS':'NOIS', 'DC':'DC'})
+    def wgen_function(self):
+        """Gets the function pased to the function generator"""
+        return self.query(':WGEN:FUN?')
+
+    @wgen_function.setter
+    def wgen_function(self,fun):
+        """Sets the function of the function generator"""
+        self.write(':WGEN:FUN %s'%fun)
+
+    ### Functions related to the oscilloscope and not to the function generator are prepended
+    ### with the word measure.
+
+    def measure_VPP(self, chan):
+        """Gets the Voltage peak to peak from the oscilloscope in the desired channel"""
+        return self.query(':MEAS:VPP? CHAN%s'%chan)*Q_('volt')
+
+    def measure_Vmin(self,chan):
+        """Measures the minimum voltage from the selected channel. """
+        return self.query(':MEAS:VMIN? CHAN%s' % chan) * Q_('volt')
+
+    def measure_Vmax(self,chan):
+        """Measures the maximum voltage from the selected channel. """
+        return self.query(':MEAS:VMAX? CHAN%s' % chan) * Q_('volt')
+
+    def measure_frequency(self,chan):
+        """Measures the frequency from the selected channel. """
+        return self.query(':MEAS:FREQ? CHAN%s' % chan) * Q_('hertz')
+
+    def measure_clear(self):
+        """Clears all the measurements from the screen."""
+        self.write(':MEASure:CLEar')
+        return True
     # def apply(self,func=None,freq=None,ampl=None,offset=None):
     #     if not func==None:
     #         self.set_function_type(func)
@@ -109,6 +160,21 @@ class Funcgen(MessageBasedDriver):
     #     return self.query('APPL?')
 
 if __name__ == '__main__':
-    inst = Funcgen.via_usb()
-    inst.initialize()
-    print(inst.idn)
+    with Funcgen.via_usb() as inst:
+        inst.initialize()
+
+        print(inst.idn)
+        print('++++++++++++++++++++')
+        print("VPP in channel 1: %s" % inst.measure_VPP(1))
+        print("VMax in channel 1: %s" % inst.measure_Vmax(1))
+        print("VMin in channel 1: %s" % inst.measure_Vmin(1))
+        print("Freq in channel 1: %s" % inst.measure_frequency(1))
+        print('++++++++++++++++++++')
+        # inst.test()
+        # print('Current Frequency: %s'%inst.wgen_frequency)
+        # inst.wgen_frequency = 20
+        # print('Updated Frequency: %s'%inst.wgen_frequency)
+
+        inst.measure_clear()
+        print(inst.wgen_frequency)
+        inst.wgen_frequency = 20
