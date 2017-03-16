@@ -5,7 +5,7 @@ from PyQt4.Qt import QApplication
 from datetime import datetime
 
 from Model._session import _session
-from Model.Cameras.dummyCamera import camera
+
 from View.Camera.cameraMain import cameraMain
 
 if __name__ == '__main__':
@@ -23,10 +23,18 @@ if __name__ == '__main__':
     if not os.path.exists(savedir):
         os.makedirs(savedir)
 
-    session.Saving['directory'] = savedir
+    session.Saving = {'directory': savedir}
+
+    if session.Camera['camera'] == 'dummyCamera':
+        from Model.Cameras.dummyCamera import camera
+    elif session.Camera['camera'] == 'Hamamatsu':
+        from Model.Cameras.Hamamatsu import camera
+    elif session.Camera['camera'] == 'PSI':
+        from Model.Cameras.PSI import camera
+    else:
+        raise Exception('That particular camera has not been implemented yet.\n Please check your config file')
 
     cam = camera(0)
-
     cam.initializeCamera()
     app = QApplication(sys.argv)
     win = cameraMain(session,cam)
