@@ -10,13 +10,19 @@ class _session(QObject):
         """The class is prepared to load values from a Yaml file"""
         super(_session, self).__init__()
         super().__setattr__('params', dict())
-        if file != None and type(file) == type('path'):
-            with open(file,'r') as f:
-                data = yaml.load(f)
-                for d in data:
-                    self.__setattr__(d,data[d])
-        elif file != None and type(file) == type({}):
-            data = file
+        if file != None:
+            if type(file) == type('path'):
+                try:
+                    with open(file,'r') as f:
+                        data = yaml.load(f)
+                except:
+                    print('STRING YAML')
+                    print(file)
+                    data = yaml.load(file)
+                    print('LOADED STRING')
+            elif type(file) == type({}):
+                data = file
+
             for d in data:
                 self.__setattr__(d, data[d])
 
@@ -26,7 +32,6 @@ class _session(QObject):
         if key not in self.params:
             self.params[key] = dict()
             self.__setattr__(key,value)
-            print('AA')
         else:
             for k in value:
                 if k in self.params[key]:
@@ -48,10 +53,13 @@ class _session(QObject):
     def __str__(self):
         s = ''
         for key in self.params:
-            s += '%s\n'%key
+            s += '%s:\n'%key
             for kkey in self.params[key]:
-                s+= '\t%s: %s\n'%(kkey,self.params[key][kkey])
+                s+= '  %s: %s\n'%(kkey,self.params[key][kkey])
         return s
+
+    def serialize(self):
+        return self.__str__()
 
     def getParams(self):
         """Special class for setting up the ParamTree from PyQtGraph. It saves the iterating over all the variables directly
@@ -72,7 +80,6 @@ class _session(QObject):
 
     def copy(self):
         """Copies this class"""
-        _session.params = {}
         print('Copying')
         return _session(self.params)
 
@@ -85,14 +92,16 @@ if __name__ == '__main__':
     print('OLD')
     s.Camera = {'model': 'Old'}
     #print(s.Camera)
-    for k in s.params:
-        print(k)
-        for m in s.params[k]:
-            print('   %s:  %s'%(m,s.params[k][m]))
-    print(s)
+    # for k in s.params:
+    #     print(k)
+    #     for m in s.params[k]:
+    #         print('   %s:  %s'%(m,s.params[k][m]))
+    # print(s)
 
-    for k in s.params['Camera']:
-        print(k)
+    print('SERIALIZE')
+    ss = s.serialize()
+    print(ss)
 
-    for m in s.Camera:
-        print(m)
+    session2 = _session(ss)
+    print('=========SESSION2=============')
+    print(session2)

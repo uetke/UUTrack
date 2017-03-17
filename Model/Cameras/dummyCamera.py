@@ -61,9 +61,12 @@ class camera():
         """Reads the camera
         """
         X,Y = self.getSize()
-        sample = np.random.normal(size=(X,Y))
-        img = np.reshape(sample,(X,Y))
-        return img
+        try:
+            sample = np.random.normal(size=(X,Y))
+        except:
+            sample = np.zeros((X,Y))
+        # img = np.reshape(sample,(X,Y))
+        return sample
 
     def setROI(self,X,Y):
         """Sets up the ROI. Not all cameras are 0-indexed, so this is an important

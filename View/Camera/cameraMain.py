@@ -8,14 +8,13 @@ import psutil
 import time
 import h5py
 
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Queue, get_context
 from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.dockarea import *
 from PyQt4.Qt import QApplication
-
+from datetime import datetime
 
 from Model import workerSaver
-from Model import _session
 from View.Camera.cameraMainWidget import cameraMainWidget
 from View.Camera.cameraViewer import cameraViewer
 from View.Camera.workerThread import workThread
@@ -35,13 +34,11 @@ class cameraMain(QtGui.QMainWindow):
         self.setMouseTracking(True)
         self._session = session.copy()
         self.camera = cam
-
+        self.workerSaver = workerSaver
 
         # Queue of images. multiprocessing takes care of handling the data in and out
         # and the sharing between parent and child processes.
         self.q = Queue(0)
-
-
 
         self.area = DockArea()
         self.setCentralWidget(self.area)
@@ -82,19 +79,22 @@ class cameraMain(QtGui.QMainWindow):
         self.lastBuffer = time.time()
         self.lastRefresh = time.time()
 
+        # Program variables
         self.tempImage = []
-        self.saveRunning = False
-        self.accumulateBuffer = False
         self.bufferTime = 0
         self.bufferTimes = []
         self.refreshTimes = []
         self.totalFrames = 0
-        self.continuousSaving = False
-        self.showWaterfall = False
-
-        self.specialTaskRunning = False
         self.centroidX = []
         self.centroidY = []
+
+        # Program status
+        self.continuousSaving = False
+        self.showWaterfall = False
+        self.saveRunning = False
+        self.accumulateBuffer = False
+        self.specialTaskRunning = False
+
 
         self.setupActions()
         self.setupToolbar()
@@ -134,14 +134,18 @@ class cameraMain(QtGui.QMainWindow):
         """Saves the image that is being displayed to the user.
         """
         if len(self.tempImage) >= 1:
-            # Not overwrite the file
-            i=1
-            filename = '%s_%s.hdf5' % (self.fileName,i)
-            while os.path.exists(os.path.join(self.fileDir,filename)):
-                i += 1
-                filename = '%s_%s.hdf5' % (self.fileDir,i)
-            f = h5py.File(os.path.join(self.fileDir,filename), "w")
-            dset = f.create_dataset('image', data=self.tempImage)
+            # Data will be appended to existing file
+            fn = self._session.Saving['filename_photo']
+            filename = '%s.hdf5' % (fn)
+            fileDir = self._session.Saving['directory']
+            if not os.path.exists(fileDir):
+                os.makedirs(fileDir)
+
+            f = h5py.File(os.path.join(fileDir,filename), "a")
+            now = str(datetime.now())
+            g = f.create_group(now)
+            dset = g.create_dataset('image', data=self.tempImage)
+            meta = g.create_dataset('metadata',data=self._session.serialize())
 
     def startMovie(self):
         if self.acquiring:
@@ -173,11 +177,16 @@ class cameraMain(QtGui.QMainWindow):
         if not self.continuousSaving:
             # Child process to save the data. It runs continuously until and exit flag
             # is passed through the Queue. (self.q.put('exit'))
-            to_save = os.path.join(self.fileDir,self.movieName)
-            metaData = {}
-            metaData['User'] = self._session.User['name']
-            metaData['exposureTime'] = self._session.Camera['exposure_time']
-            self.p = Process(target=workerSaver,args=(to_save,metaData,self.q,))
+            fn = self._session.Saving['filename_video']
+            filename = '%s.hdf5' % (fn)
+            fileDir = self._session.Saving['directory']
+            if not os.path.exists(fileDir):
+                os.makedirs(fileDir)
+            to_save = os.path.join(fileDir, filename)
+            metaData = self._session.serialize() # This prints a YAML-ready version of the session.
+            self.p = Process(target=self.workerSaver, args=(to_save, metaData, self.q,))
+            print(to_save)
+            print(metaData)
             self.p.start()
             self.continuousSaving = True
             self.logMessage.append('<b>Info:</b> Started the Continuous savings')
@@ -428,7 +437,10 @@ class cameraMain(QtGui.QMainWindow):
             self.workerThread.keep_acquiring = False
         self.tempImage = data
         if self.accumulateBuffer:
-            self.q.put(data)
+            try:
+                self.q.put(data)
+            except:
+                print('Not enough memory!')
 
         if self.showWaterfall:
             d = np.array([np.sum(data,1)])

@@ -8,9 +8,9 @@ User:
 
 Saving:
   auto_save: False
-  directory: C:\data\nanoCET
-  filename_video: Video.hdf5 # Can be the same filename for video and photo
-  filename_photo: Snap.hdf5
+  directory: C:\Users\Aquiles\Data
+  filename_video: Video # Can be the same filename for video and photo
+  filename_photo: Snap
 
 GUI:
   length_waterfall: 100 # Total length of the Waterfall (lines)
