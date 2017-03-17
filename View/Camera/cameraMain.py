@@ -14,7 +14,7 @@ from pyqtgraph.dockarea import *
 from PyQt4.Qt import QApplication
 from datetime import datetime
 
-from Model import workerSaver
+from Model.workerSaver import workerSaver
 from View.Camera.cameraMainWidget import cameraMainWidget
 from View.Camera.cameraViewer import cameraViewer
 from View.Camera.workerThread import workThread
@@ -34,8 +34,6 @@ class cameraMain(QtGui.QMainWindow):
         self.setMouseTracking(True)
         self._session = session.copy()
         self.camera = cam
-        self.workerSaver = workerSaver
-
         # Queue of images. multiprocessing takes care of handling the data in and out
         # and the sharing between parent and child processes.
         self.q = Queue(0)
@@ -107,6 +105,7 @@ class cameraMain(QtGui.QMainWindow):
         self.fileName = self._session.Saving['filename_photo']
         self.movieName = self._session.Saving['filename_video']
         ###
+
     def snap(self):
         """Function for acquiring a single frame from the camera. It is triggered by the user.
         It gets the data the GUI will be updated at a fixed framerate.
@@ -184,9 +183,7 @@ class cameraMain(QtGui.QMainWindow):
                 os.makedirs(fileDir)
             to_save = os.path.join(fileDir, filename)
             metaData = self._session.serialize() # This prints a YAML-ready version of the session.
-            self.p = Process(target=self.workerSaver, args=(to_save, metaData, self.q,))
-            print(to_save)
-            print(metaData)
+            self.p = Process(target=workerSaver, args=(to_save, metaData, self.q,))  #
             self.p.start()
             self.continuousSaving = True
             self.logMessage.append('<b>Info:</b> Started the Continuous savings')
@@ -205,6 +202,10 @@ class cameraMain(QtGui.QMainWindow):
     def emptyQueue(self):
         """Clears the queue.
         """
+        try:
+            self.p.terminate()
+        except:
+            raise Warning('Process not running')
         self.clearWorker.start()
 
     def startWaterfall(self):

@@ -8,7 +8,6 @@ def workerSaver(fileData, meta, q):
     meta -- A string with metadata. It is kept as a string in order to provide flexibility for other programs.
     q -- Queue that will store all the images to be saved to disk.
     """
-    print('In Worker')
     f = h5py.File(fileData, "a") # This will append the file.
     now = str(datetime.now())
     g = f.create_group(now)
@@ -25,7 +24,7 @@ def workerSaver(fileData, meta, q):
             elif i == 0: # First time it runs, creates the dataset
                 x = img.shape[0]
                 y = img.shape[1]
-                dset = g.create_dataset('timelapse', (x,y,allocate), maxshape=(x,y,None), compression="gzip")  # The images are going to be stacked along the z-axis.
+                dset = g.create_dataset('timelapse', (x,y,allocate), maxshape=(x,y,None))  # The images are going to be stacked along the z-axis.
                 dset[:,:,i] = img                                                                 # The shape along the z axis will be increased as the number of images increase.
                 i+=1
             else:

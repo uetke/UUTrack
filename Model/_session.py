@@ -80,7 +80,6 @@ class _session(QObject):
 
     def copy(self):
         """Copies this class"""
-        print('Copying')
         return _session(self.params)
 
 
