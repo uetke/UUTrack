@@ -11,6 +11,7 @@ import h5py
 from multiprocessing import Process, Queue, get_context
 from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.dockarea import *
+from pyqtgraph import ProgressDialog
 from PyQt4.Qt import QApplication
 from datetime import datetime
 
@@ -202,10 +203,6 @@ class cameraMain(QtGui.QMainWindow):
     def emptyQueue(self):
         """Clears the queue.
         """
-        try:
-            self.p.terminate()
-        except:
-            raise Warning('Process not running')
         self.clearWorker.start()
 
     def startWaterfall(self):
@@ -574,6 +571,17 @@ class cameraMain(QtGui.QMainWindow):
         self.emit(QtCore.SIGNAL('CloseAll'))
         self.camera.stopCamera()
         self.movieSaveStop()
+        # Checks if the process P exists and tries to close it.
+        if self.p.is_alive():
+            qs = self.q.qsize()
+            with ProgressDialog("Finish saving data...", 0, qs) as dlg:
+                while self.q.qsize()>1:
+                    dlg.setValue(qs-self.q.qsize())
+                    time.sleep(0.5)
+        try:
+            self.p.join()
+        except AttributeError:
+            pass
         self.emptyQueue()
         self.close()
 

@@ -63,6 +63,7 @@ class camera():
         X,Y = self.getSize()
         try:
             sample = np.random.normal(size=(X,Y))
+            sample = sample.astype('uint16')
         except:
             sample = np.zeros((X,Y))
         # img = np.reshape(sample,(X,Y))
