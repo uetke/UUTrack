@@ -8,103 +8,104 @@ import psutil
 import time
 import h5py
 
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Queue, get_context
 from pyqtgraph.Qt import QtGui, QtCore
+from pyqtgraph.dockarea import *
+from pyqtgraph import ProgressDialog
 from PyQt4.Qt import QApplication
+from datetime import datetime
 
-
-from Model import workerSaver
-from View.Camera.cameraWidget import cameraWidget
+from Model.workerSaver import workerSaver
+from View.Camera.cameraMainWidget import cameraMainWidget
 from View.Camera.cameraViewer import cameraViewer
 from View.Camera.workerThread import workThread
 from View.Camera.specialTaskWorker import specialTaskWorker
 from View.Camera.clearQueueThread import clearQueueThread
 from View.Camera.configWidget import configWidget
 from View.Camera.waterfallWidget import waterfallWidget
+from View.Camera.messageWidget import messageWidget
+from View.Camera.trajectoryWidget import trajectoryWidget
 
 class cameraMain(QtGui.QMainWindow):
     """ Displays the camera.
     """
-    def __init__(self,session,cam,parent=None):
+    def __init__(self, session, cam):
         super(cameraMain,self).__init__()
-        self._session = session
+        self.setWindowTitle('Camera Monitor')
+        self.setMouseTracking(True)
+        self._session = session.copy()
         self.camera = cam
-        self._session.camera['camera'] = self.camera
-
-        self.fileDir = self._session.saveDirectory
-        self.fileName = self._session.filenamePhoto
-        self.movieName = self._session.filenameVideo
         # Queue of images. multiprocessing takes care of handling the data in and out
         # and the sharing between parent and child processes.
         self.q = Queue(0)
 
-        self.setWindowTitle('Camera Monitor')
-        self.camWidget = cameraWidget()
-        self.setCentralWidget(self.camWidget)
+        self.area = DockArea()
+        self.setCentralWidget(self.area)
+        self.resize(800,800)
+        self.area.setMouseTracking(True)
 
-        # self.movieTimer = QtCore.QTimer()
-        # self.connect(self.movieTimer,QtCore.SIGNAL("timeout()"),self.movieData)
+        # Main widget
+        self.camWidget = cameraMainWidget([self.camera.maxWidth,self.camera.maxHeight])
+        # Widget for displaying information to the user
+        self.messageWidget = messageWidget()
+        # Small window to display the results of the special task
+        self.trajectoryWidget = trajectoryWidget()
+        # Window for the camera viewer
+        self.camViewer = cameraViewer(self._session, self.camera, parent=self)
+        # Configuration widget with a parameter tree
+        self.config = configWidget(self._session)
 
         self.refreshTimer = QtCore.QTimer()
         self.connect(self.refreshTimer,QtCore.SIGNAL('timeout()'),self.updateGUI)
-
-        self.refreshTimer.start(self._session.refreshTime)
-
-        # self.connect(self.workerThread,QtCore.SIGNAL('Image'),self.getData)
+        self.refreshTimer.start(self._session.GUI['refresh_time'])
 
         # Worker thread for clearing the queue.
         self.clearWorker = clearQueueThread(self.q)
 
-        # Window for the camera viewer
-        self.camViewer = cameraViewer(self._session,self.camera,parent=self)
-        self.connect(self.camViewer,QtCore.SIGNAL('Stop_MainAcquisition'),self.stopMovie)
-        self.connect(self,QtCore.SIGNAL('stopChildMovie'),self.camViewer.stopCamera)
-        self.connect(self,QtCore.SIGNAL('CloseAll'),self.camViewer.closeViewer)
 
-        self.config = configWidget(self._session)
-        self.connect(self.config,QtCore.SIGNAL('updateConfig'),self.updateSession)
-        self.connect(self,QtCore.SIGNAL('CloseAll'),self.config.close)
-        self.setupActions()
-        self.setupToolbar()
-        self.setupMenubar()
         self.acquiring = False
         self.logMessage = []
 
         ### Initialize the camera and the camera related things ###
         self.maxSizex = self.camera.GetCCDWidth()
         self.maxSizey = self.camera.GetCCDHeight()
-        self.camWidget.vline2.setValue(self.maxSizex-1)
-        self.camWidget.hline2.setValue(self.maxSizey-1)
-        self.camWidget.hline1.setBounds((1,self.maxSizey-1))
-        self.camWidget.hline2.setBounds((1,self.maxSizey-1))
-        self.camWidget.vline1.setBounds((1,self.maxSizex-1))
-        self.camWidget.vline2.setBounds((1,self.maxSizex-1))
-        self.camWidget.crosshair[0].setBounds((1,self.maxSizex-1))
-        self.camWidget.crosshair[0].setBounds((1,self.maxSizey-1))
-        self._session.ROIl = 1
-        self._session.ROIr = self.maxSizex
-        self._session.ROIu = self.maxSizey
-        self._session.ROIb = 1
+
+        self._session.Camera = {'roi_x1': 1}
+        self._session.Camera = {'roi_x2': self.maxSizex}
+        self._session.Camera = {'roi_y1': 1}
+        self._session.Camera = {'roi_y2': self.maxSizey}
 
         self.lastBuffer = time.time()
         self.lastRefresh = time.time()
 
+        # Program variables
         self.tempImage = []
-        self.saveRunning = False
-        self.accumulateBuffer = False
         self.bufferTime = 0
         self.bufferTimes = []
         self.refreshTimes = []
         self.totalFrames = 0
-        self.continousSaving = False
-        self.showWaterfall = False
-
-        self.specialTaskRunning = False
         self.centroidX = []
         self.centroidY = []
 
-        self.connect(self.camWidget, QtCore.SIGNAL('specialTask'), self.startSpecialTask)
-        self.connect(self.camWidget, QtCore.SIGNAL('stopSpecialTask'), self.stopSpecialTask)
+        # Program status
+        self.continuousSaving = False
+        self.showWaterfall = False
+        self.saveRunning = False
+        self.accumulateBuffer = False
+        self.specialTaskRunning = False
+
+
+        self.setupActions()
+        self.setupToolbar()
+        self.setupMenubar()
+        self.setupDocks()
+        self.setupSignals()
+
+        ### This block can be erased if one relies exclusively on Session variables.
+        self.fileDir = self._session.Saving['directory']
+        self.fileName = self._session.Saving['filename_photo']
+        self.movieName = self._session.Saving['filename_video']
+        ###
 
     def snap(self):
         """Function for acquiring a single frame from the camera. It is triggered by the user.
@@ -126,21 +127,25 @@ class cameraMain(QtGui.QMainWindow):
             self.connect(self.workerThread,QtCore.SIGNAL('Image'),self.getData)
             self.workerThread.origin = 'snap'
             self.workerThread.start()
-
+            #self.workerThread.keep_acquiring = False
             self.acquiring = True
 
     def saveImage(self):
         """Saves the image that is being displayed to the user.
         """
         if len(self.tempImage) >= 1:
-            # Not overwrite the file
-            i=1
-            filename = '%s_%s.hdf5'%(self.fileName,i)
-            while os.path.exists(os.path.join(self.fileDir,filename)):
-                i += 1
-                filename = '%s_%s.hdf5' %(self.fileDir,i)
-            f = h5py.File(os.path.join(self.fileDir,filename), "w")
-            dset = f.create_dataset('image', data=self.tempImage)
+            # Data will be appended to existing file
+            fn = self._session.Saving['filename_photo']
+            filename = '%s.hdf5' % (fn)
+            fileDir = self._session.Saving['directory']
+            if not os.path.exists(fileDir):
+                os.makedirs(fileDir)
+
+            f = h5py.File(os.path.join(fileDir,filename), "a")
+            now = str(datetime.now())
+            g = f.create_group(now)
+            dset = g.create_dataset('image', data=self.tempImage)
+            meta = g.create_dataset('metadata',data=self._session.serialize())
 
     def startMovie(self):
         if self.acquiring:
@@ -169,16 +174,19 @@ class cameraMain(QtGui.QMainWindow):
     def movieSave(self):
         """Saves the data accumulated in the queue continuously.
         """
-        if not self.continousSaving:
+        if not self.continuousSaving:
             # Child process to save the data. It runs continuously until and exit flag
             # is passed through the Queue. (self.q.put('exit'))
-            to_save = os.path.join(self.fileDir,self.movieName)
-            metaData = {}
-            metaData['User'] = self._session.user
-            metaData['exposureTime'] = self._session.exposureTime
-            self.p = Process(target=workerSaver,args=(to_save,metaData,self.q,))
+            fn = self._session.Saving['filename_video']
+            filename = '%s.hdf5' % (fn)
+            fileDir = self._session.Saving['directory']
+            if not os.path.exists(fileDir):
+                os.makedirs(fileDir)
+            to_save = os.path.join(fileDir, filename)
+            metaData = self._session.serialize() # This prints a YAML-ready version of the session.
+            self.p = Process(target=workerSaver, args=(to_save, metaData, self.q,))  #
             self.p.start()
-            self.continousSaving = True
+            self.continuousSaving = True
             self.logMessage.append('<b>Info:</b> Started the Continuous savings')
         else:
             self.logMessage.append('<b>WARNING</b>: Continuous savings already triggered')
@@ -186,11 +194,11 @@ class cameraMain(QtGui.QMainWindow):
     def movieSaveStop(self):
         """Stops the saving to disk. It will however flush the queue.
         """
-        if self.continousSaving:
+        if self.continuousSaving:
             self.q.put('Stop')
             #self.p.join()
             self.logMessage.append('<b>Info:</b> Stopped the Continuous savings')
-            self.continousSaving = False
+            self.continuousSaving = False
 
     def emptyQueue(self):
         """Clears the queue.
@@ -203,11 +211,11 @@ class cameraMain(QtGui.QMainWindow):
         """
         if not self.showWaterfall:
             self.watWidget = waterfallWidget()
-            self.camWidget.layout.addWidget(self.watWidget)
+            self.area.addDock(self.dwaterfall, 'bottom', self.dmainImage)
+            self.dwaterfall.addWidget(self.watWidget)
             self.showWaterfall = True
             Sx,Sy = self.camera.getSize()
-            print(Sx,Sy)
-            self.watData = np.zeros((self._session.lengthWaterfall,Sx))
+            self.watData = np.zeros((self._session.GUI['length_waterfall'],Sx))
             self.watWidget.img.setImage(np.transpose(self.watData))
             self.logMessage.append('<b>Info:</b> Waterfall opened')
         else:
@@ -228,7 +236,7 @@ class cameraMain(QtGui.QMainWindow):
             self.logMessage.append('<b>Info:</b> Waterfall closed')
 
     def setROI(self):
-        """Gets the ROI from the lines on the image. It also updates the GUI to accomodate the changes.
+        """Gets the ROI from the lines on the image. It also updates the GUI to accommodate the changes.
         """
         if not self.acquiring:
             y1 = np.int(self.camWidget.hline1.value())
@@ -237,10 +245,11 @@ class cameraMain(QtGui.QMainWindow):
             x2 = np.int(self.camWidget.vline2.value())
             X = np.sort((x1,x2))
             Y = np.sort((y1,y2))
-            self._session.ROIl = X[0]
-            self._session.ROIr = X[1]
-            self._session.ROIu = Y[1]
-            self._session.ROIb = Y[0]
+            self._session.Camera = {'roi_x1': int(X[0])}
+            self._session.Camera = {'roi_x2': int(X[1])}
+            self._session.Camera = {'roi_y1': int(Y[0])}
+            self._session.Camera = {'roi_y2': int(Y[1])}
+
             Nx,Ny = self.camera.setROI(X,Y)
             self.tempImage = np.zeros((Nx,Ny))
             self.camWidget.hline1.setValue(1)
@@ -256,16 +265,13 @@ class cameraMain(QtGui.QMainWindow):
         """Resets the roi to the full image.
         """
         if not self.acquiring:
-            X = np.array((1,self.maxSize[0]))
-            Y = np.array((1,self.maxSize[1]))
-            Nx,Ny = self.camera.setROI(X,Y) # Is this correct?
-            self.tempImage = np.zeros((self.maxSize[0],self.maxSize[1]))
             self.camWidget.hline1.setValue(1)
             self.camWidget.vline1.setValue(1)
-            self.camWidget.vline2.setValue(self.maxSize[0])
-            self.camWidget.hline2.setValue(self.maxSize[1])
+            self.camWidget.vline2.setValue(self.maxSizex)
+            self.camWidget.hline2.setValue(self.maxSizey)
+            self.setROI()
             if self.showWaterfall:
-                self.watData = np.zeros((self._session.lengthWaterfall,Nx))
+                self.watData = np.zeros((self._session.GUI['length_waterfall'],Nx))
         else:
             self.logMessage.append('<b>Error: <b> Cannot change ROI while acquiring.')
 
@@ -334,6 +340,9 @@ class cameraMain(QtGui.QMainWindow):
         self.configAction = QtGui.QAction('Config Window',self)
         self.configAction.triggered.connect(self.config.show)
 
+        self.dockAction = QtGui.QAction('Restore Docks', self)
+        self.dockAction.triggered.connect(self.setupDocks)
+
     def setupToolbar(self):
         """Setups the toolbar with the desired icons. It's placed into a function
         to make it easier to reuse in other windows.
@@ -351,16 +360,6 @@ class cameraMain(QtGui.QMainWindow):
         self.toolbar4.addAction(self.startWaterfallAction)
         self.toolbar4.addAction(self.setROIAction)
         self.toolbar4.addAction(self.clearROIAction)
-
-    def bufferStatus(self):
-        """Starts or stops the buffer accumulation.
-        """
-        if self.accumulateBuffer:
-            self.accumulateBuffer = False
-            self.logMessage.append('<b>Info:</b> Stopped the buffer accumulation')
-        else:
-            self.accumulateBuffer = True
-            self.logMessage.append('<b>Info:</b> Started the buffer accumulation')
 
     def setupMenubar(self):
         """Setups the menubar.
@@ -384,6 +383,48 @@ class cameraMain(QtGui.QMainWindow):
         self.configMenu.addAction(self.clearBufferAction)
         self.configMenu.addAction(self.viewerAction)
         self.configMenu.addAction(self.configAction)
+        self.configMenu.addAction(self.dockAction)
+
+    def setupDocks(self):
+        """Setups the docks in order to recover the initial configuration if one gets closed."""
+        self.dparams = Dock("Parameters", size=(100, 3))
+        self.dmainImage = Dock("Main Image", size=(500, 500))
+
+        self.dtraj = Dock("Trajectory", size=(200, 2))
+        self.dmessage = Dock("Messages", size=(200, 2))
+        # self.dstatus = Dock("Status", size=(100, 3))
+        self.dwaterfall = Dock("Waterfall", size=(250, 250))
+
+        self.area.addDock(self.dparams)
+        self.area.addDock(self.dmainImage, 'right')
+        self.area.addDock(self.dtraj, 'right')
+        self.area.addDock(self.dmessage, 'bottom', self.dtraj)
+        # self.area.addDock(self.dstatus, 'bottom', self.dparams)
+
+        self.dmainImage.addWidget(self.camWidget)
+        self.dmessage.addWidget(self.messageWidget)
+        self.dparams.addWidget(self.config)
+        self.dtraj.addWidget(self.trajectoryWidget)
+
+    def setupSignals(self):
+        """Setups all the signals that are going to be handled during the excution of the program."""
+        self.connect(self._session, QtCore.SIGNAL('Updated'), self.config.populateTree)
+        self.connect(self.config, QtCore.SIGNAL('updateSession'), self.updateSession)
+        self.connect(self.camWidget, QtCore.SIGNAL('specialTask'), self.startSpecialTask)
+        self.connect(self.camWidget, QtCore.SIGNAL('stopSpecialTask'), self.stopSpecialTask)
+        self.connect(self.camViewer, QtCore.SIGNAL('Stop_MainAcquisition'), self.stopMovie)
+        self.connect(self, QtCore.SIGNAL('stopChildMovie'), self.camViewer.stopCamera)
+        self.connect(self, QtCore.SIGNAL('CloseAll'), self.camViewer.closeViewer)
+
+    def bufferStatus(self):
+        """Starts or stops the buffer accumulation.
+        """
+        if self.accumulateBuffer:
+            self.accumulateBuffer = False
+            self.logMessage.append('<b>Info:</b> Stopped the buffer accumulation')
+        else:
+            self.accumulateBuffer = True
+            self.logMessage.append('<b>Info:</b> Started the buffer accumulation')
 
     def getData(self,data,origin):
         """Gets the data that is being gathered by the working thread.
@@ -394,7 +435,10 @@ class cameraMain(QtGui.QMainWindow):
             self.workerThread.keep_acquiring = False
         self.tempImage = data
         if self.accumulateBuffer:
-            self.q.put(data)
+            try:
+                self.q.put(data)
+            except:
+                print('Not enough memory!')
 
         if self.showWaterfall:
             d = np.array([np.sum(data,1)])
@@ -414,61 +458,80 @@ class cameraMain(QtGui.QMainWindow):
         """Updates the image displayed to the user.
         """
         if len(self.tempImage) >= 1:
-            self.camWidget.img.setImage(self.tempImage)
+            self.camWidget.img.setImage(self.tempImage,autoLevels=False,autoRange=False,autoHistogramRange=False)
 
         if len(self.centroidX) >= 1:
             self.camWidget.img2.setImage(self.trajectories)
+            self.trajectoryWidget.plot.setData(self.centroidX,self.centroidY)
 
         if self.showWaterfall:
-            self.watData  = self.watData[:self._session.lengthWaterfall,:]
+            self.watData  = self.watData[:self._session.GUI['length_waterfall'],:]
             self.watWidget.img.setImage(np.transpose(self.watData[::-1,:]))
 
         new_time = time.time()
         self.fps = new_time-self.lastRefresh
         self.lastRefresh = new_time
-        if self.q.qsize()/200*100 > 75:
-            self.camWidget.memory.setStyleSheet(self.camWidget.RED_STYLE)
-        elif self.q.qsize()/200*100 > 50:
-            self.camWidget.memory.setStyleSheet(self.camWidget.YELLOW_STYLE)
-        else:
-            self.camWidget.memory.setStyleSheet(self.camWidget.DEFAULT_STYLE)
-        if psutil.cpu_percent() > 75:
-            self.camWidget.processor.setStyleSheet(self.camWidget.RED_STYLE)
-        else:
-            self.camWidget.processor.setStyleSheet(self.camWidget.DEFAULT_STYLE)
+        self.messageWidget.updateMemory(self.q.qsize()/200*100) #TODO: Make it depend on the real size of the Queue
+        self.messageWidget.updateProcessor(psutil.cpu_percent())
 
-        self.camWidget.memory.setValue(self.q.qsize()/200*100)#psutil.virtual_memory().percent*4
-        self.camWidget.processor.setValue(psutil.cpu_percent())
-        self.camWidget.message.setHtml('<b>Buffer time:</b> %0.2f ms <br /> \
-            <b>Refresh time:</b> %0.2f ms <br /> \
-            <b>Acquired Frames</b> %i <br /> \
-            <b>Frames in buffer</b> %i'%(self.bufferTime*1000,self.fps*1000,self.totalFrames,self.q.qsize()))
+        msg = '''<b>Buffer time:</b> %0.2f ms <br />
+        #     <b>Refresh time:</b> %0.2f ms <br />
+        #     <b>Acquired Frames</b> %i <br />
+        #     <b>Frames in buffer</b> %i'''%(self.bufferTime*1000,self.fps*1000,self.totalFrames,self.q.qsize())
+        self.messageWidget.updateMessage(msg)
+        self.messageWidget.updateLog(self.logMessage)
+        self.logMessage = []
 
-        self.logMessage = self.logMessage[-100:]
-        logs = ''
-        for msg in self.logMessage[::-1]:
-            logs+=msg
-            logs+='<br />'
-        self.camWidget.log.setHtml(logs)
-
-    def updateSession(self,session):
+    def updateSession(self, session):
         """Updates the session variables passed by the config window.
         """
-        if self.acquiring:
-            self.stopMovie()
-            self.camera.setExposure(session.exposureTime)
-            self.startMovie()
-        else:
-            self.camera.setExposure(session.exposureTime)
-        self.refreshTimer.stop()
-        self.refreshTimer.start(session.refreshTime)
+        print(session)
+        print(self._session)
+        update_cam = False
+        update_roi = False
+        update_exposure = False
+        update_binning = True
+        for k in session.params['Camera']:
+            print('Update %s' % k)
+            new_prop = session.params['Camera'][k]
+            old_prop = self._session.params['Camera'][k]
+            print('  New prop: %s' % new_prop)
+            print('  Old prop: %s' % old_prop)
+            if new_prop != old_prop:
+                print('Update: %s'%k)
+                update_cam = True
+                if k in ['roi_x1', 'roi_x2', 'roi_y1', 'roi_y2']:
+                    update_roi = True
+                elif k == 'exposure_time':
+                    update_exposure = True
+                elif k in ['binning_x', 'binnin_y']:
+                    update_binning = True
 
-        self.camWidget.vline2.setValue(session.ROIl)
-        self.camWidget.vline1.setValue(session.ROIr)
-        self.camWidget.hline2.setValue(session.ROIu)
-        self.camWidget.hline1.setValue(session.ROIb)
         self.logMessage.append('<b>Info:</b> Updated the parameters')
         self._session = session
+
+        if update_cam:
+            if self.acquiring:
+                self.stopMovie()
+
+            if update_roi:
+                self.camWidget.vline2.setValue(session.Camera['roi_x1'])
+                self.camWidget.vline1.setValue(session.Camera['roi_x2'])
+                self.camWidget.hline2.setValue(session.Camera['roi_y1'])
+                self.camWidget.hline1.setValue(session.Camera['roi_y2'])
+                self.setROI()
+
+            if update_exposure:
+                self.camera.setExposure(session.Camera['exposure_time'])
+
+            if update_binning:
+                self.camera.setBinning(session.Camera['binning_x'],session.Camera['binning_y'])
+
+            if self.acquiring:
+                self.startMovie()
+
+        self.refreshTimer.stop()
+        self.refreshTimer.start(session.GUI['refresh_time'])
 
     def startSpecialTask(self):
         """Starts a special task. This is triggered by the user with a special combination of actions, for example clicking
@@ -508,6 +571,17 @@ class cameraMain(QtGui.QMainWindow):
         self.emit(QtCore.SIGNAL('CloseAll'))
         self.camera.stopCamera()
         self.movieSaveStop()
+        # Checks if the process P exists and tries to close it.
+        if self.p.is_alive():
+            qs = self.q.qsize()
+            with ProgressDialog("Finish saving data...", 0, qs) as dlg:
+                while self.q.qsize()>1:
+                    dlg.setValue(qs-self.q.qsize())
+                    time.sleep(0.5)
+        try:
+            self.p.join()
+        except AttributeError:
+            pass
         self.emptyQueue()
         self.close()
 

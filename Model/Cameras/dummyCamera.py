@@ -17,6 +17,8 @@ class camera():
         """Initializes the camera.
         """
         print('Initializing camera')
+        self.maxWidth = self.GetCCDWidth()
+        self.maxHeight = self.GetCCDHeight()
         return True
 
     def triggerCamera(self):
@@ -59,9 +61,13 @@ class camera():
         """Reads the camera
         """
         X,Y = self.getSize()
-        sample = np.random.normal(size=(X,Y))
-        img = np.reshape(sample,(X,Y))
-        return img
+        try:
+            sample = np.random.normal(size=(X,Y))
+            sample = sample.astype('uint16')
+        except:
+            sample = np.zeros((X,Y))
+        # img = np.reshape(sample,(X,Y))
+        return sample
 
     def setROI(self,X,Y):
         """Sets up the ROI. Not all cameras are 0-indexed, so this is an important
@@ -104,6 +110,11 @@ class camera():
         """
         return self.maxY
 
+    def setBinning(self,xbin,ybin):
+        """Sets the binning of the camera if supported. Has to check if binning in X/Y can be different or not, etc."""
+        self.xbin = xbin
+        self.ybin = ybin
+        pass
 
     def stopCamera(self):
         """Stops the acquisition and closes the connection with the camera.
