@@ -25,7 +25,7 @@ UUTrap: Main folder. Important executables should be placed here.
 
 	1. [x] live video for alignment and exposure settings
 	2. [x] selection of ROI
-	3. [ ] adjustment of mean/range min/max for grayscale viewer
+	3. [x] adjustment of mean/range min/max for grayscale viewer
 	4. [ ] selecting background correction option
 
 * tracking

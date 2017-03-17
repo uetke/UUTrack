@@ -17,6 +17,8 @@ class camera():
         """Initializes the camera.
         """
         print('Initializing camera')
+        self.maxWidth = self.GetCCDWidth()
+        self.maxHeight = self.GetCCDHeight()
         return True
 
     def triggerCamera(self):
@@ -104,6 +106,11 @@ class camera():
         """
         return self.maxY
 
+    def setBinning(self,xbin,ybin):
+        """Sets the binning of the camera if supported. Has to check if binning in X/Y can be different or not, etc."""
+        self.xbin = xbin
+        self.ybin = ybin
+        pass
 
     def stopCamera(self):
         """Stops the acquisition and closes the connection with the camera.

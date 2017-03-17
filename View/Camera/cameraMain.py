@@ -15,7 +15,8 @@ from PyQt4.Qt import QApplication
 
 
 from Model import workerSaver
-from View.Camera.camWidget import cameraMainWidget
+from Model import _session
+from View.Camera.cameraMainWidget import cameraMainWidget
 from View.Camera.cameraViewer import cameraViewer
 from View.Camera.workerThread import workThread
 from View.Camera.specialTaskWorker import specialTaskWorker
@@ -28,56 +29,43 @@ from View.Camera.trajectoryWidget import trajectoryWidget
 class cameraMain(QtGui.QMainWindow):
     """ Displays the camera.
     """
-    def __init__(self,session,cam,parent=None):
+    def __init__(self, session, cam):
         super(cameraMain,self).__init__()
+        self.setWindowTitle('Camera Monitor')
         self.setMouseTracking(True)
-        self._session = session
+        self._session = session.copy()
         self.camera = cam
-        # self._session.camera['camera'] = self.camera
 
-        self.fileDir = self._session.saveDirectory
-        self.fileName = self._session.filenamePhoto
-        self.movieName = self._session.filenameVideo
+
         # Queue of images. multiprocessing takes care of handling the data in and out
         # and the sharing between parent and child processes.
         self.q = Queue(0)
 
-        self.setWindowTitle('Camera Monitor')
+
 
         self.area = DockArea()
         self.setCentralWidget(self.area)
         self.resize(800,800)
         self.area.setMouseTracking(True)
 
-        self.camWidget = cameraMainWidget()
+        # Main widget
+        self.camWidget = cameraMainWidget([self.camera.maxWidth,self.camera.maxHeight])
+        # Widget for displaying information to the user
         self.messageWidget = messageWidget()
-        self.config = configWidget(self._session)
-        self.connect(self._session, QtCore.SIGNAL('Updated'), self.config.populateTree)
-
+        # Small window to display the results of the special task
         self.trajectoryWidget = trajectoryWidget()
-
+        # Window for the camera viewer
+        self.camViewer = cameraViewer(self._session, self.camera, parent=self)
+        # Configuration widget with a parameter tree
+        self.config = configWidget(self._session)
 
         self.refreshTimer = QtCore.QTimer()
         self.connect(self.refreshTimer,QtCore.SIGNAL('timeout()'),self.updateGUI)
-
         self.refreshTimer.start(self._session.GUI['refresh_time'])
 
         # Worker thread for clearing the queue.
         self.clearWorker = clearQueueThread(self.q)
 
-        # Window for the camera viewer
-        self.camViewer = cameraViewer(self._session,self.camera,parent=self)
-        self.connect(self.camViewer,QtCore.SIGNAL('Stop_MainAcquisition'),self.stopMovie)
-        self.connect(self,QtCore.SIGNAL('stopChildMovie'),self.camViewer.stopCamera)
-        self.connect(self,QtCore.SIGNAL('CloseAll'),self.camViewer.closeViewer)
-
-
-        self.connect(self.config,QtCore.SIGNAL('updateConfig'),self.updateSession)
-        self.connect(self,QtCore.SIGNAL('CloseAll'),self.config.close)
-        self.setupActions()
-        self.setupToolbar()
-        self.setupMenubar()
-        self.setupDocks()
 
         self.acquiring = False
         self.logMessage = []
@@ -85,14 +73,7 @@ class cameraMain(QtGui.QMainWindow):
         ### Initialize the camera and the camera related things ###
         self.maxSizex = self.camera.GetCCDWidth()
         self.maxSizey = self.camera.GetCCDHeight()
-        self.camWidget.vline2.setValue(self.maxSizex-1)
-        self.camWidget.hline2.setValue(self.maxSizey-1)
-        self.camWidget.hline1.setBounds((1,self.maxSizey-1))
-        self.camWidget.hline2.setBounds((1,self.maxSizey-1))
-        self.camWidget.vline1.setBounds((1,self.maxSizex-1))
-        self.camWidget.vline2.setBounds((1,self.maxSizex-1))
-        self.camWidget.crosshair[0].setBounds((1,self.maxSizex-1))
-        self.camWidget.crosshair[1].setBounds((1,self.maxSizey-1))
+
         self._session.Camera = {'roi_x1': 1}
         self._session.Camera = {'roi_x2': self.maxSizex}
         self._session.Camera = {'roi_y1': 1}
@@ -108,17 +89,24 @@ class cameraMain(QtGui.QMainWindow):
         self.bufferTimes = []
         self.refreshTimes = []
         self.totalFrames = 0
-        self.continousSaving = False
+        self.continuousSaving = False
         self.showWaterfall = False
 
         self.specialTaskRunning = False
         self.centroidX = []
         self.centroidY = []
 
-        self.connect(self.camWidget, QtCore.SIGNAL('specialTask'), self.startSpecialTask)
-        self.connect(self.camWidget, QtCore.SIGNAL('stopSpecialTask'), self.stopSpecialTask)
+        self.setupActions()
+        self.setupToolbar()
+        self.setupMenubar()
+        self.setupDocks()
+        self.setupSignals()
 
-
+        ### This block can be erased if one relies exclusively on Session variables.
+        self.fileDir = self._session.Saving['directory']
+        self.fileName = self._session.Saving['filename_photo']
+        self.movieName = self._session.Saving['filename_video']
+        ###
     def snap(self):
         """Function for acquiring a single frame from the camera. It is triggered by the user.
         It gets the data the GUI will be updated at a fixed framerate.
@@ -148,10 +136,10 @@ class cameraMain(QtGui.QMainWindow):
         if len(self.tempImage) >= 1:
             # Not overwrite the file
             i=1
-            filename = '%s_%s.hdf5'%(self.fileName,i)
+            filename = '%s_%s.hdf5' % (self.fileName,i)
             while os.path.exists(os.path.join(self.fileDir,filename)):
                 i += 1
-                filename = '%s_%s.hdf5' %(self.fileDir,i)
+                filename = '%s_%s.hdf5' % (self.fileDir,i)
             f = h5py.File(os.path.join(self.fileDir,filename), "w")
             dset = f.create_dataset('image', data=self.tempImage)
 
@@ -182,7 +170,7 @@ class cameraMain(QtGui.QMainWindow):
     def movieSave(self):
         """Saves the data accumulated in the queue continuously.
         """
-        if not self.continousSaving:
+        if not self.continuousSaving:
             # Child process to save the data. It runs continuously until and exit flag
             # is passed through the Queue. (self.q.put('exit'))
             to_save = os.path.join(self.fileDir,self.movieName)
@@ -191,7 +179,7 @@ class cameraMain(QtGui.QMainWindow):
             metaData['exposureTime'] = self._session.Camera['exposure_time']
             self.p = Process(target=workerSaver,args=(to_save,metaData,self.q,))
             self.p.start()
-            self.continousSaving = True
+            self.continuousSaving = True
             self.logMessage.append('<b>Info:</b> Started the Continuous savings')
         else:
             self.logMessage.append('<b>WARNING</b>: Continuous savings already triggered')
@@ -199,11 +187,11 @@ class cameraMain(QtGui.QMainWindow):
     def movieSaveStop(self):
         """Stops the saving to disk. It will however flush the queue.
         """
-        if self.continousSaving:
+        if self.continuousSaving:
             self.q.put('Stop')
             #self.p.join()
             self.logMessage.append('<b>Info:</b> Stopped the Continuous savings')
-            self.continousSaving = False
+            self.continuousSaving = False
 
     def emptyQueue(self):
         """Clears the queue.
@@ -241,7 +229,7 @@ class cameraMain(QtGui.QMainWindow):
             self.logMessage.append('<b>Info:</b> Waterfall closed')
 
     def setROI(self):
-        """Gets the ROI from the lines on the image. It also updates the GUI to accomodate the changes.
+        """Gets the ROI from the lines on the image. It also updates the GUI to accommodate the changes.
         """
         if not self.acquiring:
             y1 = np.int(self.camWidget.hline1.value())
@@ -270,10 +258,6 @@ class cameraMain(QtGui.QMainWindow):
         """Resets the roi to the full image.
         """
         if not self.acquiring:
-            # X = np.array((1,self.maxSizex))
-            # Y = np.array((1,self.maxSizey))
-            # Nx,Ny = self.camera.setROI(X,Y) # Is this correct?
-            # self.tempImage = np.zeros((self.maxSizex,self.maxSizey))
             self.camWidget.hline1.setValue(1)
             self.camWidget.vline1.setValue(1)
             self.camWidget.vline2.setValue(self.maxSizex)
@@ -415,8 +399,15 @@ class cameraMain(QtGui.QMainWindow):
         self.dparams.addWidget(self.config)
         self.dtraj.addWidget(self.trajectoryWidget)
 
-    def docksVisible(self):
-        self.dmainImage.setV
+    def setupSignals(self):
+        """Setups all the signals that are going to be handled during the excution of the program."""
+        self.connect(self._session, QtCore.SIGNAL('Updated'), self.config.populateTree)
+        self.connect(self.config, QtCore.SIGNAL('updateSession'), self.updateSession)
+        self.connect(self.camWidget, QtCore.SIGNAL('specialTask'), self.startSpecialTask)
+        self.connect(self.camWidget, QtCore.SIGNAL('stopSpecialTask'), self.stopSpecialTask)
+        self.connect(self.camViewer, QtCore.SIGNAL('Stop_MainAcquisition'), self.stopMovie)
+        self.connect(self, QtCore.SIGNAL('stopChildMovie'), self.camViewer.stopCamera)
+        self.connect(self, QtCore.SIGNAL('CloseAll'), self.camViewer.closeViewer)
 
     def bufferStatus(self):
         """Starts or stops the buffer accumulation.
@@ -427,7 +418,6 @@ class cameraMain(QtGui.QMainWindow):
         else:
             self.accumulateBuffer = True
             self.logMessage.append('<b>Info:</b> Started the buffer accumulation')
-
 
     def getData(self,data,origin):
         """Gets the data that is being gathered by the working thread.
@@ -482,24 +472,56 @@ class cameraMain(QtGui.QMainWindow):
         self.messageWidget.updateLog(self.logMessage)
         self.logMessage = []
 
-    def updateSession(self,session):
+    def updateSession(self, session):
         """Updates the session variables passed by the config window.
         """
-        if self.acquiring:
-            self.stopMovie()
-            self.camera.setExposure(session.exposureTime)
-            self.startMovie()
-        else:
-            self.camera.setExposure(session.exposureTime)
-        self.refreshTimer.stop()
-        self.refreshTimer.start(session.refreshTime)
+        print(session)
+        print(self._session)
+        update_cam = False
+        update_roi = False
+        update_exposure = False
+        update_binning = True
+        for k in session.params['Camera']:
+            print('Update %s' % k)
+            new_prop = session.params['Camera'][k]
+            old_prop = self._session.params['Camera'][k]
+            print('  New prop: %s' % new_prop)
+            print('  Old prop: %s' % old_prop)
+            if new_prop != old_prop:
+                print('Update: %s'%k)
+                update_cam = True
+                if k in ['roi_x1', 'roi_x2', 'roi_y1', 'roi_y2']:
+                    update_roi = True
+                elif k == 'exposure_time':
+                    update_exposure = True
+                elif k in ['binning_x', 'binnin_y']:
+                    update_binning = True
 
-        self.camWidget.vline2.setValue(session.ROIl)
-        self.camWidget.vline1.setValue(session.ROIr)
-        self.camWidget.hline2.setValue(session.ROIu)
-        self.camWidget.hline1.setValue(session.ROIb)
         self.logMessage.append('<b>Info:</b> Updated the parameters')
         self._session = session
+
+        if update_cam:
+            if self.acquiring:
+                self.stopMovie()
+
+            if update_roi:
+                self.camWidget.vline2.setValue(session.Camera['roi_x1'])
+                self.camWidget.vline1.setValue(session.Camera['roi_x2'])
+                self.camWidget.hline2.setValue(session.Camera['roi_y1'])
+                self.camWidget.hline1.setValue(session.Camera['roi_y2'])
+                self.setROI()
+
+            if update_exposure:
+                self.camera.setExposure(session.Camera['exposure_time'])
+
+            if update_binning:
+                self.camera.setBinning(session.Camera['binning_x'],session.Camera['binning_y'])
+
+            if self.acquiring:
+                self.startMovie()
+
+        self.refreshTimer.stop()
+        self.refreshTimer.start(session.GUI['refresh_time'])
 
     def startSpecialTask(self):
         """Starts a special task. This is triggered by the user with a special combination of actions, for example clicking

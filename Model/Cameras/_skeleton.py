@@ -13,12 +13,15 @@ class camera():
     def initializeCamera(self):
         """Initializes the camera.
         """
+        self.maxWidth = self.GetCCDWidth()
+        self.maxHeight = self.GetCCDHeight()
+        return True
 
     def triggerCamera(self):
         """Triggers the camera.
         """
 
-   def setAcquisitionMode(self, mode):
+    def setAcquisitionMode(self, mode):
         """ Set the readout mode of the camera: Single or continuous.
         Parameters
         ==========
@@ -85,6 +88,11 @@ class camera():
 
         """
 
+    def setBinning(self,xbin,ybin):
+        """Sets the binning of the camera if supported. Has to check if binning in X/Y can be different or not, etc."""
+        self.xbin = xbin
+        self.ybin = ybin
+        pass
 
     def stopCamera(self):
         """Stops the acquisition and closes the connection with the camera.

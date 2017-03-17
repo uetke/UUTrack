@@ -17,6 +17,8 @@ class camera():
         """Initializes the camera.
         """
         self.camera.initCamera()
+        self.maxWidth = self.GetCCDWidth()
+        self.maxHeight = self.GetCCDHeight()
 
     def triggerCamera(self):
         """Triggers the camera.

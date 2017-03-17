@@ -6,17 +6,23 @@ from PyQt4.QtCore import QObject, pyqtSignal, SIGNAL
 class _session(QObject):
     """Stores variables and other classes that are common to several UI or instances of the code.
     """
-    params = {}
     def __init__(self,file=None):
         """The class is prepared to load values from a Yaml file"""
         super(_session, self).__init__()
-        if file != None:
+        super().__setattr__('params', dict())
+        if file != None and type(file) == type('path'):
             with open(file,'r') as f:
                 data = yaml.load(f)
                 for d in data:
                     self.__setattr__(d,data[d])
+        elif file != None and type(file) == type({}):
+            data = file
+            for d in data:
+                self.__setattr__(d, data[d])
 
     def __setattr__(self, key, value):
+        if type(value) != type({}):
+            raise Exception('Everything passed to a session has to be a dictionary')
         if key not in self.params:
             self.params[key] = dict()
             self.__setattr__(key,value)
@@ -54,13 +60,21 @@ class _session(QObject):
         for k in self.params:
             c = []
             for m in self.params[k]:
-                s = {'name': m.replace('_', ' '), 'type': type(self.params[k][m]).__name__, 'value': self.params[k][m]}
+                if type(self.params[k][m]) == type([]):
+                    s = {'name': m.replace('_', ' '), 'type': type(self.params[k][m]).__name__,'values': self.params[k][m]}
+                else:
+                    s = {'name': m.replace('_', ' '), 'type': type(self.params[k][m]).__name__, 'value': self.params[k][m]}
                 c.append(s)
 
             a = {'name': k.replace('_', ' '), 'type': 'group', 'children': c}
             p.append(a)
         return p
 
+    def copy(self):
+        """Copies this class"""
+        _session.params = {}
+        print('Copying')
+        return _session(self.params)
 
 
 
@@ -75,4 +89,10 @@ if __name__ == '__main__':
         print(k)
         for m in s.params[k]:
             print('   %s:  %s'%(m,s.params[k][m]))
-   # print(s.params)
+    print(s)
+
+    for k in s.params['Camera']:
+        print(k)
+
+    for m in s.Camera:
+        print(m)

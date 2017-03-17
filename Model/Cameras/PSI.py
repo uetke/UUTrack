@@ -19,6 +19,8 @@ class camera():
         self.camera.EnableAutoLevel(0)
         self.camera.SetExposure(10,"Millisec")
         self.triggerCamera()
+        self.maxWidth = self.GetCCDWidth()
+        self.maxHeight = self.GetCCDHeight()
 
     def triggerCamera(self):
         """Triggers the camera.
