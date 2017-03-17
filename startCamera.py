@@ -5,7 +5,7 @@ from PyQt4.Qt import QApplication
 from datetime import datetime
 
 from Model._session import _session
-from Model.Cameras.Hamamatsu import camera
+from Model.Cameras.dummyCamera import camera
 from View.Camera.cameraMain import cameraMain
 
 if __name__ == '__main__':
