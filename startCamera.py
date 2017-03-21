@@ -1,9 +1,11 @@
 import os, sys
 from PyQt4.Qt import QApplication
 from datetime import datetime
+from lantz import Q_
 
 from Model._session import _session
 from View.Camera.cameraMain import cameraMain
+
 
 if __name__ == '__main__':
     global session
@@ -33,6 +35,7 @@ if __name__ == '__main__':
 
     cam = camera(0)
     cam.initializeCamera()
+    cam.setExposure(session.Camera['exposure_time']*Q_('ms'))
     app = QApplication(sys.argv)
     win = cameraMain(session,cam)
     win.show()

@@ -80,6 +80,8 @@ class cameraMain(QtGui.QMainWindow):
 
         # Program variables
         self.tempImage = []
+        self.trajectories = []
+        self.fps = 0
         self.bufferTime = 0
         self.bufferTimes = []
         self.refreshTimes = []
@@ -256,6 +258,10 @@ class cameraMain(QtGui.QMainWindow):
             self.camWidget.hline2.setValue(Ny)
             self.camWidget.vline1.setValue(1)
             self.camWidget.vline2.setValue(Nx)
+            self.centroidX = []
+            self.centroidY = []
+            self.trajectories = []
+            self.camWidget.img2.clear()
             if self.showWaterfall:
                 self.watData = np.zeros((self._session.lengthWaterfall,Nx))
         else:
@@ -458,7 +464,7 @@ class cameraMain(QtGui.QMainWindow):
         """Updates the image displayed to the user.
         """
         if len(self.tempImage) >= 1:
-            self.camWidget.img.setImage(self.tempImage,autoLevels=False,autoRange=False,autoHistogramRange=False)
+            self.camWidget.img.setImage(self.tempImage, autoLevels=False, autoRange=False, autoHistogramRange=False)
 
         if len(self.centroidX) >= 1:
             self.camWidget.img2.setImage(self.trajectories)
@@ -571,14 +577,14 @@ class cameraMain(QtGui.QMainWindow):
         self.emit(QtCore.SIGNAL('CloseAll'))
         self.camera.stopCamera()
         self.movieSaveStop()
-        # Checks if the process P exists and tries to close it.
-        if self.p.is_alive():
-            qs = self.q.qsize()
-            with ProgressDialog("Finish saving data...", 0, qs) as dlg:
-                while self.q.qsize()>1:
-                    dlg.setValue(qs-self.q.qsize())
-                    time.sleep(0.5)
         try:
+            # Checks if the process P exists and tries to close it.
+            if self.p.is_alive():
+                qs = self.q.qsize()
+                with ProgressDialog("Finish saving data...", 0, qs) as dlg:
+                    while self.q.qsize() > 1:
+                        dlg.setValue(qs - self.q.qsize())
+                        time.sleep(0.5)
             self.p.join()
         except AttributeError:
             pass

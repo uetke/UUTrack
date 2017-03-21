@@ -2,6 +2,10 @@
 Dummy camera class for testing GUI and other functionalities. Based on the skeleton.
 """
 import numpy as np
+import time
+
+from lantz import Q_
+
 class camera():
     MODE_CONTINUOUS = 1
     MODE_SINGLE_SHOT = 0
@@ -46,10 +50,10 @@ class camera():
         """
         return True
 
-    def setExposure(self,exposure):
+    def setExposure(self, exposure):
         """Sets the exposure of the camera.
         """
-        self.exposure = exposure
+        self.exposure = exposure*Q_('s')
         return exposure
 
     def getExposure(self):
@@ -67,6 +71,7 @@ class camera():
         except:
             sample = np.zeros((X,Y))
         # img = np.reshape(sample,(X,Y))
+        time.sleep(self.exposure.magnitude/1000)
         return sample
 
     def setROI(self,X,Y):
