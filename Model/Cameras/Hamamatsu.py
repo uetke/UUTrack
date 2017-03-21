@@ -7,6 +7,8 @@ from Controller.devices.hamamatsu.hamamatsu_camera import *
 class camera():
     MODE_CONTINUOUS = 1
     MODE_SINGLE_SHOT = 0
+    MODE_EXTERNAL = 2
+
     def __init__(self,camera):
         self.cam_id = camera # Camera ID
         self.camera = HamamatsuCameraMR(camera)
@@ -24,14 +26,10 @@ class camera():
         """Triggers the camera.
         """
         if self.getAcquisitionMode() == self.MODE_CONTINUOUS:
-            print('Cont Acq')
             self.camera.startAcquisition()
-        else:
-            print('Shot')
+        elif self.getAcquisitionMode() == self.MODE_SINGLE_SHOT:
             self.camera.startAcquisition()
-            print('End shot')
-            #self.camera.stopAcquisition()
-            print('Stop shot')
+            self.camera.fireTrigger()
 
     def setAcquisitionMode(self, mode):
         """ Set the readout mode of the camera: Single or continuous.
@@ -41,6 +39,14 @@ class camera():
             One of self.MODE_CONTINUOUS, self.MODE_SINGLE_SHOT
         """
         self.mode = mode
+        if mode == self.MODE_CONTINUOUS:
+            self.camera.setPropertyValue("trigger_source",b'INTERNAL')
+        elif mode == self.MODE_SINGLE_SHOT:
+            self.camera.setPropertyValue("trigger_source",b'SOFTWARE')
+        elif mode == self.MODE_EXTERNAL:
+            self.camera.setPropertyValue("trigger_source",b'EXTERNAL')
+        return self.getAcquisitionMode()
+
 
     def getAcquisitionMode(self):
         """Returns the acquisition mode, either continuous or single shot.
@@ -56,7 +62,7 @@ class camera():
         """Sets the exposure of the camera.
         """
         self.camera.setPropertyValue("exposure_time",exposure)
-        return exposure
+        return self.getExposure()
 
     def getExposure(self):
         """Gets the exposure time of the camera.
@@ -77,8 +83,8 @@ class camera():
         X -- array type with the coordinates for the ROI X[0], X[1]
         Y -- array type with the coordinates for the ROI Y[0], Y[1]
         """
-        self.camera.setPropertyValue("subarray_hpos",X[0])
-        self.camera.setPropertyValue("subarray_vpos",Y[0])
+        self.camera.setPropertyValue("subarray_hpos",int(X[0]))
+        self.camera.setPropertyValue("subarray_vpos",int(Y[0]))
         self.camera.setPropertyValue("subarray_hsize",int(abs(X[0]-X[1])))
         self.camera.setPropertyValue("subarray_vsize",int(abs(Y[0]-Y[1])))
         self.camera.setSubArrayMode()
@@ -121,6 +127,7 @@ class camera():
         try:
             #Closing the camera
             self.camera.stopAcquisition()
+            self.camera.shutdown()
             return True
         except:
             #Camera failed to close
