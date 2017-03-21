@@ -83,10 +83,15 @@ class camera():
         X -- array type with the coordinates for the ROI X[0], X[1]
         Y -- array type with the coordinates for the ROI Y[0], Y[1]
         """
+        print('hpos')
         self.camera.setPropertyValue("subarray_hpos",int(X[0]))
+        print('vpos')
         self.camera.setPropertyValue("subarray_vpos",int(Y[0]))
+        print('hsize')
         self.camera.setPropertyValue("subarray_hsize",int(abs(X[0]-X[1])))
+        print('vsize')
         self.camera.setPropertyValue("subarray_vsize",int(abs(Y[0]-Y[1])))
+        print('setSub')
         self.camera.setSubArrayMode()
         return self.getSize()
 
@@ -95,7 +100,7 @@ class camera():
         """
         X = self.camera.getPropertyValue("subarray_hsize")
         Y = self.camera.getPropertyValue("subarray_vsize")
-        return X,Y
+        return X, Y
 
     def getSerialNumber(self):
         """Returns the serial number of the camera.
