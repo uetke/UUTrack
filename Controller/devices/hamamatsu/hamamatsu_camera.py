@@ -117,12 +117,9 @@ class HCamData():
     bottleneck."""
 
     def __init__(self, size):
-<<<<<<< HEAD
-=======
         """Create a data object of the appropriate size.
         @param size The size of the data object in bytes."""
 
->>>>>>> master
         self.np_array = numpy.empty(int(size/2), dtype=numpy.uint16)
         self.size = size
 
@@ -206,15 +203,6 @@ class HamamatsuCamera():
         self.n_cameras = self.temp.value
         
         self.captureSetup()
-<<<<<<< HEAD
-    ## captureSetup
-    #
-    # Capture setup (internal use only). This is called at the start
-    # of new acquisition sequence to determine the current ROI and
-    # get the camera configured properly.
-
-=======
->>>>>>> master
 
     def captureSetup(self):
         """Capture setup (internal use only). This is called at the start
@@ -763,11 +751,7 @@ if __name__ == "__main__":
         print("camera 0 model:", hcam.getModelInfo(0))
 
         # List support properties.
-<<<<<<< HEAD
-        if 0:
-=======
         if 1:
->>>>>>> master
             print("Supported properties:")
             props = hcam.getProperties()
             for i, id_name in enumerate(sorted(props.keys())):
@@ -786,11 +770,7 @@ if __name__ == "__main__":
                         print("         %s/%s"%(key,text_values[key]))
 
         # Test setting & getting some parameters.
-<<<<<<< HEAD
-        if 1:
-=======
         if 0:
->>>>>>> master
             print(hcam.setPropertyValue("exposure_time", 0.001))
 
             #print(hcam.setPropertyValue("subarray_hsize", 2048))
