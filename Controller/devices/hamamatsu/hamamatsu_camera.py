@@ -51,16 +51,11 @@ DCAM_CAPTUREMODE_SEQUENCE = 1
 DCAM_DEFAULT_ARG = 0
 
 DCAM_IDPROP_EXPOSURETIME = int("0x001F0110", 0)
-
 DCAM_IDSTR_MODEL = int("0x04000104", 0)
 
-# Hamamatsu structures.
-
-## DCAM_PARAM_PROPERTYATTR
-#
-# The dcam property attribute structure.
-#
 class DCAM_PARAM_PROPERTYATTR(ctypes.Structure):
+    """The dcam property attribute structure."""
+
     _fields_ = [("cbSize", ctypes.c_int32),
                 ("iProp", ctypes.c_int32),
                 ("option", ctypes.c_int32),
@@ -80,11 +75,8 @@ class DCAM_PARAM_PROPERTYATTR(ctypes.Structure):
                 ("iProp_ArrayBase", ctypes.c_int32),
                 ("iPropStep_Element", ctypes.c_int32)]
 
-## DCAM_PARAM_PROPERTYVALUETEXT
-#
-# The dcam text property structure.
-#
 class DCAM_PARAM_PROPERTYVALUETEXT(ctypes.Structure):
+    """The dcam text property structure."""
     _fields_ = [("cbSize", ctypes.c_int32),
                 ("iProp", ctypes.c_int32),
                 ("value", ctypes.c_double),
@@ -92,27 +84,19 @@ class DCAM_PARAM_PROPERTYVALUETEXT(ctypes.Structure):
                 ("textbytes", ctypes.c_int32)]
 
 
-## convertPropertyName
-#
-# "Regularizes" a property name. We are using all lowercase names with
-# the spaces replaced by underscores.
-#
-# @param p_name The property name string to regularize.
-#
-# @return The regularized property name.
-#
 def convertPropertyName(p_name):
+    """"Regularizes" a property name. We are using all lowercase names with
+    the spaces replaced by underscores.
+    @param p_name The property name string to regularize.
+    @return The regularized property name."""
+
     a = p_name.decode('ascii')
     b = a.lower()
     c = b.replace(" ","_")
     return c
 
-
-## DCAMException
-#
-# Camera exceptions.
-#
 class DCAMException(Exception):
+    """Camera exceptions."""
     def __init__(self, message):
         Exception.__init__(self, message)
 
@@ -124,25 +108,21 @@ if (dcam.dcam_init(None, ctypes.byref(temp), None) != DCAMERR_NOERROR):
     raise DCAMException("DCAM initialization failed.")
 n_cameras = temp.value
 
-
-## HCamData
-#
-# Hamamatsu camera data object.
-#
-# Initially I tried to use create_string_buffer() to allocate storage for the
-# data from the camera but this turned out to be too slow. The software
-# kept falling behind the camera and create_string_buffer() seemed to be the
-# bottleneck.
-#
 class HCamData():
+    """Hamamatsu camera data object.
 
-    ## __init__
-    #
-    # Create a data object of the appropriate size.
-    #
-    # @param size The size of the data object in bytes.
-    #
+    Initially I tried to use create_string_buffer() to allocate storage for the
+    data from the camera but this turned out to be too slow. The software
+    kept falling behind the camera and create_string_buffer() seemed to be the
+    bottleneck."""
+
     def __init__(self, size):
+<<<<<<< HEAD
+=======
+        """Create a data object of the appropriate size.
+        @param size The size of the data object in bytes."""
+
+>>>>>>> master
         self.np_array = numpy.empty(int(size/2), dtype=numpy.uint16)
         self.size = size
 
@@ -179,24 +159,15 @@ class HCamData():
         return self.np_array.ctypes.data
 
 
-## HamamatsuCamera
-#
-# Basic camera interface class.
-#
-# This version uses the Hamamatsu library to allocate camera buffers.
-# Storage for the data from the camera is allocated dynamically and
-# copied out of the camera buffers.
-#
 class HamamatsuCamera():
+    """Basic camera interface class.
+    This version uses the Hamamatsu library to allocate camera buffers.
+    Storage for the data from the camera is allocated dynamically and
+    copied out of the camera buffers."""
 
-
-    ## __init__
-    #
-    # Open the connection to the camera specified by camera_id.
-    #
-    # @param camera_id The id of the camera (an integer).
-    #
     def __init__(self, camera_id):
+        """Open the connection to the camera specified by camera_id.
+        @param camera_id The id of the camera (an integer)."""
 
         self.buffer_index = 0
         self.camera_id = camera_id
@@ -235,14 +206,21 @@ class HamamatsuCamera():
         self.n_cameras = self.temp.value
         
         self.captureSetup()
+<<<<<<< HEAD
     ## captureSetup
     #
     # Capture setup (internal use only). This is called at the start
     # of new acquisition sequence to determine the current ROI and
     # get the camera configured properly.
 
+=======
+>>>>>>> master
 
     def captureSetup(self):
+        """Capture setup (internal use only). This is called at the start
+        of new acquisition sequence to determine the current ROI and
+        get the camera configured properly."""
+
         self.buffer_index = -1
         self.last_frame_number = 0
 
@@ -259,14 +237,12 @@ class HamamatsuCamera():
                                               ctypes.c_int(DCAM_CAPTUREMODE_SEQUENCE)),
                          "dcam_precapture")
 
-    ## checkStatus
-    #
-    # Check return value of the dcam function call.
-    # Throw an error if not as expected?
-    #
-    # @return The return value of the function.
-    #
+
     def checkStatus(self, fn_return, fn_name= "unknown"):
+        """Check return value of the dcam function call.
+        Throw an error if not as expected?
+        @return The return value of the function."""
+
         #if (fn_return != DCAMERR_NOERROR) and (fn_return != DCAMERR_ERROR):
         #    raise DCAMException("dcam error: " + fn_name + " returned " + str(fn_return))
         if (fn_return == DCAMERR_ERROR):
@@ -279,14 +255,11 @@ class HamamatsuCamera():
             #print "dcam error", fn_name, c_buf.value
         return fn_return
 
-    ## getCameraProperties
-    #
-    # Return the ids & names of all the properties that the camera supports. This
-    # is used at initialization to populate the self.properties attribute.
-    #
-    # @return A python dictionary of camera properties.
-    #
     def getCameraProperties(self):
+        """Return the ids & names of all the properties that the camera supports. This
+        is used at initialization to populate the self.properties attribute.
+        @return A python dictionary of camera properties."""
+
         c_buf_len = 64
         c_buf = ctypes.create_string_buffer(c_buf_len)
         properties = {}
@@ -313,7 +286,7 @@ class HamamatsuCamera():
 
         # Get the rest of the properties.
         last = -1
-        while (prop_id.value != last):
+        while prop_id.value != last:
             last = prop_id.value
             properties[convertPropertyName(c_buf.value)] = prop_id.value
             ret = dcam.dcam_getnextpropertyid(self.camera_handle,
@@ -328,16 +301,16 @@ class HamamatsuCamera():
                              "dcam_getpropertyname")
         return properties
 
-    ## getFrames
-    #
-    # Gets all of the available frames.
-    #
-    # This will block waiting for new frames even if
-    # there new frames available when it is called.
-    #
-    # @return [frames, [frame x size, frame y size]]
-    #
+    def fireTrigger(self):
+        """Triggers the camera when in software mode."""
+        self.dcam.dcam_firetrigger(self.camera_handle)
+
     def getFrames(self):
+        """Gets all of the available frames.
+        This will block waiting for new frames even if
+        there new frames available when it is called.
+        @return [frames, [frame x size, frame y size]]."""
+
         frames = []
         for n in self.newFrames():
 
@@ -365,15 +338,11 @@ class HamamatsuCamera():
 
         return [frames, [self.frame_x, self.frame_y]]
 
-    ## getModelInfo
-    #
-    # Returns the model of the camera
-    #
-    # @param camera_id The (integer) camera id number.
-    #
-    # @return A string containing the camera name.
-    #
     def getModelInfo(self, camera_id):
+        """Returns the model of the camera
+        @param camera_id The (integer) camera id number.
+        @return A string containing the camera name."""
+
         c_buf_len = 20
         c_buf = ctypes.create_string_buffer(c_buf_len)
         self.checkStatus(dcam.dcam_getmodelinfo(ctypes.c_int32(camera_id),
@@ -383,27 +352,19 @@ class HamamatsuCamera():
                          "dcam_getmodelinfo")
         return c_buf.value
 
-    ## getProperties
-    #
-    # Return the list of camera properties. This is the one to call if you
-    # want to know the camera properties.
-    #
-    # @return A dictionary of camera properties.
-    #
     def getProperties(self):
+        """Return the list of camera properties. This is the one to call if you
+        want to know the camera properties.
+        @return A dictionary of camera properties."""
+
         return self.properties
 
-    ## getPropertyAttribute
-    #
-    # Return the attribute structure of a particular property.
-    #
-    # FIXME (OPTIMIZATION): Keep track of known attributes?
-    #
-    # @param property_name The name of the property to get the attributes of.
-    #
-    # @return A DCAM_PARAM_PROPERTYATTR object.
-    #
     def getPropertyAttribute(self, property_name):
+        """Return the attribute structure of a particular property.
+        FIXME (OPTIMIZATION): Keep track of known attributes?
+        @param property_name The name of the property to get the attributes of.
+        @return A DCAM_PARAM_PROPERTYATTR object."""
+
         p_attr = DCAM_PARAM_PROPERTYATTR()
         p_attr.cbSize = ctypes.sizeof(p_attr)
         p_attr.iProp = self.properties[property_name]
@@ -416,15 +377,11 @@ class HamamatsuCamera():
         else:
             return p_attr
 
-    ## getPropertyText
-    #
-    # Return the text options of a property (if any).
-    #
-    # @param property_name The name of the property to get the text values of.
-    #
-    # @return A dictionary of text properties (which may be empty).
-    #
     def getPropertyText(self, property_name):
+        """Return the text options of a property (if any).
+        @param property_name The name of the property to get the text values of.
+        @return A dictionary of text properties (which may be empty)."""
+
         prop_attr = self.getPropertyAttribute(property_name)
         if not (prop_attr.attribute & DCAMPROP_ATTR_HASVALUETEXT):
             return {}
@@ -459,20 +416,16 @@ class HamamatsuCamera():
                                                    ctypes.byref(v),
                                                    ctypes.c_int32(DCAMPROP_OPTION_NEXT))
                 prop_text.value = v
-                if (ret == 0):
+                if ret == 0:
                     done = True
 
             return text_options
 
-    ## getPropertyRange
-    #
-    # Return the range for an attribute.
-    #
-    # @param property_name The name of the property (as a string).
-    #
-    # @return [minimum value, maximum value]
-    #
     def getPropertyRange(self, property_name):
+        """Return the range for an attribute.
+        @param property_name The name of the property (as a string).
+        @return [minimum value, maximum value]."""
+
         prop_attr = self.getPropertyAttribute(property_name)
         temp = prop_attr.attribute & DCAMPROP_TYPE_MASK
         if (temp == DCAMPROP_TYPE_REAL):
@@ -480,13 +433,10 @@ class HamamatsuCamera():
         else:
             return [int(prop_attr.valuemin), int(prop_attr.valuemax)]
 
-    ## getPropertyRW
-    #
-    # Return if a property is readable / writeable.
-    #
-    # @return [True/False (readable), True/False (writeable)]
-    #
     def getPropertyRW(self, property_name):
+        """Return if a property is readable / writeable.
+        @return [True/False (readable), True/False (writeable)]."""
+
         prop_attr = self.getPropertyAttribute(property_name)
         rw = []
 
@@ -504,16 +454,12 @@ class HamamatsuCamera():
 
         return rw
 
-    ## getPropertyVale
-    #
-    # Return the current setting of a particular property.
-    #
-    # @param property_name The name of the property.
-    #
-    # @return [the property value, the property type]
-    #
+
     def getPropertyValue(self, property_name):
-        print(self.properties)
+        """Return the current setting of a particular property.
+        @param property_name The name of the property.
+        @return [the property value, the property type]."""
+
         # Check if the property exists.
         if not (property_name in self.properties):
             print(" unknown property name: %s"%property_name)
@@ -547,29 +493,24 @@ class HamamatsuCamera():
 
         return [prop_value, prop_type]
 
-    ## isCameraProperty
-    #
-    # Check if a property name is supported by the camera.
-    #
-    # @param property_name The name of the property.
-    #
-    # @return True/False if property_name is a supported camera property.
-    #
     def isCameraProperty(self, property_name):
+        """Check if a property name is supported by the camera.
+        @param property_name The name of the property.
+
+        return True/False if property_name is a supported camera property.
+        """
+
         if (property_name in self.properties):
             return True
         else:
             return False
 
-    ## newFrames
-    #
-    # Return a list of the ids of all the new frames since the last check.
-    #
-    # This will block waiting for at least one new frame.
-    #
-    # @return [id of the first frame, .. , id of the last frame]
-    #
+
     def newFrames(self):
+        """Return a list of the ids of all the new frames since the last check.
+        This will block waiting for at least one new frame.
+        @return [id of the first frame, .. , id of the last frame]
+        """
 
         # Wait for a new frame.
         dwait = ctypes.c_int(DCAMCAP_EVENT_FRAMEREADY)
@@ -616,14 +557,11 @@ class HamamatsuCamera():
 
         return new_frames
 
-    ## setPropertyValue
-    #
-    # Set the value of a property.
-    #
-    # @param property_name The name of the property.
-    # @param property_value The value to set the property to.
-    #
     def setPropertyValue(self, property_name, property_value):
+        """Set the value of a property.
+        @param property_name The name of the property.
+        @param property_value The value to set the property to.
+        """
 
         # Check if the property exists.
         if not (property_name in self.properties):
@@ -643,7 +581,7 @@ class HamamatsuCamera():
         # Check that the property is within range.
         [pv_min, pv_max] = self.getPropertyRange(property_name)
         if (property_value < pv_min):
-            print(" set property value %s is less than minimum of %s %ssetting to minimum"%(property_value,pv_min,property_name))
+            print(" set property value %s is less than minimum of %s %s setting to minimum"%(property_value,pv_min,property_name))
             property_value = pv_min
         if (property_value > pv_max):
             print( " set property value %s is greater than maximum of %s %s setting to maximum"%(property_value,pv_min,property_name))
@@ -659,11 +597,8 @@ class HamamatsuCamera():
                          "dcam_setgetpropertyvalue")
         return p_value.value
 
-    ## setSubArrayMode
-    #
-    # This sets the sub-array mode as appropriate based on the current ROI.
-    #
     def setSubArrayMode(self):
+        """This sets the sub-array mode as appropriate based on the current ROI."""
 
         # Check ROI properties.
         roi_w = self.getPropertyValue("subarray_hsize")[0]
@@ -671,15 +606,12 @@ class HamamatsuCamera():
 
         # If the ROI is smaller than the entire frame turn on subarray mode
         if ((roi_w == self.max_width) and (roi_h == self.max_height)):
-            self.setPropertyValue("subarray_mode", "OFF")
+            self.setPropertyValue("subarray_mode", b"OFF")
         else:
-            self.setPropertyValue("subarray_mode", "ON")
+            self.setPropertyValue("subarray_mode", b"ON")
 
-    ## startAcquisition
-    #
-    # Start data acquisition.
-    #
     def startAcquisition(self):
+        """ Start data acquisition."""
         self.captureSetup()
 
         #
@@ -696,13 +628,9 @@ class HamamatsuCamera():
         self.checkStatus(dcam.dcam_capture(self.camera_handle),
                          "dcam_capture")
 
-    ## stopAcquisition
-    #
-    # Stop data acquisition.
-    #
     def stopAcquisition(self):
+        """Stop data acquisition."""
 
-        # Stop acquisition.
         self.checkStatus(dcam.dcam_idle(self.camera_handle),
                          "dcam_idle")
 
@@ -714,43 +642,34 @@ class HamamatsuCamera():
         self.checkStatus(dcam.dcam_freeframe(self.camera_handle),
                          "dcam_freeframe")
 
-    ## shutdown
-    #
-    # Close down the connection to the camera.
-    #
     def shutdown(self):
+        """Close down the connection to the camera."""
         self.checkStatus(dcam.dcam_close(self.camera_handle),
                          "dcam_close")
 
 
-## HamamatsuCameraMR
-#
-# Memory recycling camera class.
-#
-# This version allocates "user memory" for the Hamamatsu camera
-# buffers. This memory is also the location of the storage for
-# the np_array element of a HCamData() class. The memory is
-# allocated once at the beginning, then recycled. This means
-# that there is a lot less memory allocation & shuffling compared
-# to the basic class, which performs one allocation and (I believe)
-# two copies for each frame that is acquired.
-#
-# WARNING: There is the potential here for chaos. Since the memory
-#   is now shared there is the possibility that downstream code
-#   will try and access the same bit of memory at the same time
-#   as the camera and this could end badly.
-#
-# FIXME: Use lockbits (and unlockbits) to avoid memory clashes?
-#   This would probably also involve some kind of reference counting
-#   scheme.
-#
 class HamamatsuCameraMR(HamamatsuCamera):
+    """# Memory recycling camera class.
+    This version allocates "user memory" for the Hamamatsu camera
+    buffers. This memory is also the location of the storage for
+    the np_array element of a HCamData() class. The memory is
+    allocated once at the beginning, then recycled. This means
+    that there is a lot less memory allocation & shuffling compared
+    to the basic class, which performs one allocation and (I believe)
+    two copies for each frame that is acquired.
 
-    ## __init__
-    #
-    # @param camera_id The id of the camera.
-    #
+    WARNING: There is the potential here for chaos. Since the memory
+      is now shared there is the possibility that downstream code
+      will try and access the same bit of memory at the same time
+      as the camera and this could end badly.
+
+    FIXME: Use lockbits (and unlockbits) to avoid memory clashes?
+      This would probably also involve some kind of reference counting
+      scheme."""
+
     def __init__(self, camera_id):
+        """@param camera_id The id of the camera."""
+
         HamamatsuCamera.__init__(self, camera_id)
 
         self.hcam_data = []
@@ -759,36 +678,28 @@ class HamamatsuCameraMR(HamamatsuCamera):
 
         self.setPropertyValue("output_trigger_kind[0]", 2)
 
-    ## getFrames
-    #
-    # Gets all of the available frames.
-    #
-    # This will block waiting for new frames even if there new frames
-    # available when it is called.
-    #
-    # FIXME: It does not always seem to block? The length of frames can
-    #   be zero. Are frames getting dropped? Some sort of race condition?
-    #
-    # @return [frames, [frame x size, frame y size]]
-    #
     def getFrames(self):
+        """Gets all of the available frames.
+        This will block waiting for new frames even if there new frames
+        available when it is called.
+        FIXME: It does not always seem to block? The length of frames can
+               be zero. Are frames getting dropped? Some sort of race condition?
+
+        return [frames, [frame x size, frame y size]]
+        """
+
         frames = []
         for n in self.newFrames():
             frames.append(self.hcam_data[n])
 
         return [frames, [self.frame_x, self.frame_y]]
 
-    ## startAcquisition
-    #
-    # Allocate as many frames as will fit in 2GB of memory and start data acquisition.
-    #
     def startAcquisition(self):
+        """Allocate as many frames as will fit in 2GB of memory and start data acquisition."""
         self.captureSetup()
 
-        #
         # Allocate new image buffers if necessary.
         # Allocate as many frames as can fit in 2GB of memory.
-        #
         if (self.old_frame_bytes != self.frame_bytes):
 
             n_buffers = int((0.1 * 1024 * 1024 * 1024)/self.frame_bytes)
@@ -819,11 +730,10 @@ class HamamatsuCameraMR(HamamatsuCamera):
         self.checkStatus(dcam.dcam_capture(self.camera_handle),
                          "dcam_capture")
 
-    ## stopAcquisition
-    #
-    # Stop data acquisition and release the memory associates with the frames.
-    #
+
+
     def stopAcquisition(self):
+        """Stops the acquisition and releases the memory associated with the frames."""
 
         # Stop acquisition.
         self.checkStatus(dcam.dcam_idle(self.camera_handle),
@@ -838,12 +748,12 @@ class HamamatsuCameraMR(HamamatsuCamera):
         self.max_backlog = 0
 
 
+
 #
 # Testing.
 #
 if __name__ == "__main__":
     print('MAIN')
-    import time
 
     print ("found: %s cameras"%n_cameras)
     if (n_cameras > 0):
@@ -853,7 +763,11 @@ if __name__ == "__main__":
         print("camera 0 model:", hcam.getModelInfo(0))
 
         # List support properties.
+<<<<<<< HEAD
         if 0:
+=======
+        if 1:
+>>>>>>> master
             print("Supported properties:")
             props = hcam.getProperties()
             for i, id_name in enumerate(sorted(props.keys())):
@@ -872,7 +786,11 @@ if __name__ == "__main__":
                         print("         %s/%s"%(key,text_values[key]))
 
         # Test setting & getting some parameters.
+<<<<<<< HEAD
         if 1:
+=======
+        if 0:
+>>>>>>> master
             print(hcam.setPropertyValue("exposure_time", 0.001))
 
             #print(hcam.setPropertyValue("subarray_hsize", 2048))

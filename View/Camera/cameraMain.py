@@ -80,12 +80,15 @@ class cameraMain(QtGui.QMainWindow):
 
         # Program variables
         self.tempImage = []
+        self.trajectories = []
+        self.fps = 0
         self.bufferTime = 0
         self.bufferTimes = []
         self.refreshTimes = []
         self.totalFrames = 0
         self.centroidX = []
         self.centroidY = []
+        self.watData = []
 
         # Program status
         self.continuousSaving = False
@@ -93,7 +96,6 @@ class cameraMain(QtGui.QMainWindow):
         self.saveRunning = False
         self.accumulateBuffer = False
         self.specialTaskRunning = False
-
 
         self.setupActions()
         self.setupToolbar()
@@ -146,6 +148,8 @@ class cameraMain(QtGui.QMainWindow):
             g = f.create_group(now)
             dset = g.create_dataset('image', data=self.tempImage)
             meta = g.create_dataset('metadata',data=self._session.serialize())
+            f.flush()
+            f.close()
 
     def startMovie(self):
         if self.acquiring:
@@ -158,7 +162,6 @@ class cameraMain(QtGui.QMainWindow):
             self.connect(self.workerThread,QtCore.SIGNAL('Image'),self.getData)
             self.workerThread.start()
             self.acquiring = True
-
 
     def stopMovie(self):
         if self.acquiring:
@@ -256,8 +259,13 @@ class cameraMain(QtGui.QMainWindow):
             self.camWidget.hline2.setValue(Ny)
             self.camWidget.vline1.setValue(1)
             self.camWidget.vline2.setValue(Nx)
+            self.centroidX = []
+            self.centroidY = []
+            self.trajectories = []
+            self.camWidget.img2.clear()
             if self.showWaterfall:
-                self.watData = np.zeros((self._session.lengthWaterfall,Nx))
+                self.watData = np.zeros((self._session.lengthWaterfall, Nx))
+            self.logMessage.append('<i>Info: </i> Updated the ROI')
         else:
             self.logMessage.append('<b>Error: <b> Cannot change ROI while acquiring.')
 
@@ -432,7 +440,8 @@ class cameraMain(QtGui.QMainWindow):
         if origin == 'snap': #Single snap.
             self.acquiring=False
             self.workerThread.origin = None
-            self.workerThread.keep_acquiring = False
+            # self.workerThread.keep_acquiring = False # This already happens in the worker thread itself.
+
         self.tempImage = data
         if self.accumulateBuffer:
             try:
@@ -443,6 +452,7 @@ class cameraMain(QtGui.QMainWindow):
         if self.showWaterfall:
             d = np.array([np.sum(data,1)])
             self.watData = np.concatenate((d,self.watData),axis=0)
+
         self.totalFrames+=1
         new_time = time.time()
         self.bufferTime = new_time - self.lastBuffer
@@ -458,7 +468,7 @@ class cameraMain(QtGui.QMainWindow):
         """Updates the image displayed to the user.
         """
         if len(self.tempImage) >= 1:
-            self.camWidget.img.setImage(self.tempImage,autoLevels=False,autoRange=False,autoHistogramRange=False)
+            self.camWidget.img.setImage(self.tempImage, autoLevels=False, autoRange=False, autoHistogramRange=False)
 
         if len(self.centroidX) >= 1:
             self.camWidget.img2.setImage(self.trajectories)
@@ -466,7 +476,8 @@ class cameraMain(QtGui.QMainWindow):
 
         if self.showWaterfall:
             self.watData  = self.watData[:self._session.GUI['length_waterfall'],:]
-            self.watWidget.img.setImage(np.transpose(self.watData[::-1,:]))
+            self.watWidget.img.setImage(np.flipud(np.transpose(self.watData[::-1,:])))
+
 
         new_time = time.time()
         self.fps = new_time-self.lastRefresh
@@ -571,14 +582,14 @@ class cameraMain(QtGui.QMainWindow):
         self.emit(QtCore.SIGNAL('CloseAll'))
         self.camera.stopCamera()
         self.movieSaveStop()
-        # Checks if the process P exists and tries to close it.
-        if self.p.is_alive():
-            qs = self.q.qsize()
-            with ProgressDialog("Finish saving data...", 0, qs) as dlg:
-                while self.q.qsize()>1:
-                    dlg.setValue(qs-self.q.qsize())
-                    time.sleep(0.5)
         try:
+            # Checks if the process P exists and tries to close it.
+            if self.p.is_alive():
+                qs = self.q.qsize()
+                with ProgressDialog("Finish saving data...", 0, qs) as dlg:
+                    while self.q.qsize() > 1:
+                        dlg.setValue(qs - self.q.qsize())
+                        time.sleep(0.5)
             self.p.join()
         except AttributeError:
             pass

@@ -16,10 +16,13 @@ class workThread(QtCore.QThread):
     def run(self):
         """ Triggers the Camera to acquire a new Image.
         """
+        first = True
         while self.keep_acquiring:
             if self.origin == 'snap':
                 self.keep_acquiring = False
-            self.camera.triggerCamera()
+            if first:
+                self.camera.triggerCamera() # Triggers the camera only once
+                first = False
             img = self.camera.readCamera()
             self.emit( QtCore.SIGNAL('Image'), img, self.origin)
         return
