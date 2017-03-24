@@ -103,6 +103,7 @@ class DCAMException(Exception):
 
 
 dcam = ctypes.windll.dcamapi
+
 temp = ctypes.c_int32(0)
 if (dcam.dcam_init(None, ctypes.byref(temp), None) != DCAMERR_NOERROR):
     raise DCAMException("DCAM initialization failed.")
@@ -192,6 +193,13 @@ class HamamatsuCamera():
         self.max_width = self.getPropertyValue("image_width")[0]
         self.max_height = self.getPropertyValue("image_height")[0]
 
+    def settrigger(self,mode):
+        TRIGMODE = ctypes.c_int32(mode)
+        self.checkStatus(dcam.dcam_settriggermode(self.camera_handle,TRIGMODE),'settriggermode')
+        DCAM_TRIGGERMODE = ctypes.c_int32(0)
+        self.checkStatus(dcam.dcam_gettriggermode(self.camera_handle,ctypes.byref(DCAM_TRIGGERMODE)),'gettrigermode')
+        return DCAM_TRIGGERMODE.value
+
     def initCamera(self):
         #
         # Initialization
@@ -201,7 +209,7 @@ class HamamatsuCamera():
         if (self.dcam.dcam_init(None, ctypes.byref(self.temp), None) != DCAMERR_NOERROR):
             raise DCAMException("DCAM initialization failed.")
         self.n_cameras = self.temp.value
-        
+
         self.captureSetup()
 
     def captureSetup(self):
@@ -291,8 +299,9 @@ class HamamatsuCamera():
 
     def fireTrigger(self):
         """Triggers the camera when in software mode."""
-        self.dcam.dcam_firetrigger(self.camera_handle)
-
+        self.checkStatus(self.dcam.dcam_firetrigger(self.camera_handle),"dcam_firetrigger")
+        print('TRIG')
+        
     def getFrames(self):
         """Gets all of the available frames.
         This will block waiting for new frames even if
@@ -593,10 +602,10 @@ class HamamatsuCamera():
         roi_h = self.getPropertyValue("subarray_vsize")[0]
 
         # If the ROI is smaller than the entire frame turn on subarray mode
-        if ((roi_w == self.max_width) and (roi_h == self.max_height)):
-            self.setPropertyValue("subarray_mode", b"OFF")
+        if roi_w == self.max_width and roi_h == self.max_height:
+            self.setPropertyValue("subarray_mode", 1)  # OFF
         else:
-            self.setPropertyValue("subarray_mode", b"ON")
+            self.setPropertyValue("subarray_mode", 2)  # ON
 
     def startAcquisition(self):
         """ Start data acquisition."""
@@ -736,7 +745,6 @@ class HamamatsuCameraMR(HamamatsuCamera):
         self.max_backlog = 0
 
 
-
 #
 # Testing.
 #
@@ -751,7 +759,7 @@ if __name__ == "__main__":
         print("camera 0 model:", hcam.getModelInfo(0))
 
         # List support properties.
-        if 1:
+        if 0:
             print("Supported properties:")
             props = hcam.getProperties()
             for i, id_name in enumerate(sorted(props.keys())):
@@ -804,7 +812,9 @@ if __name__ == "__main__":
                 print(param, hcam.getPropertyValue(param)[0])
 
         # Test acquisition.
-        if 0:
+        if 1:
+            import numpy as np
+            import matplotlib.pyplot as plt
             hcam.startAcquisition()
             cnt = 1
             for i in range(300):
@@ -814,6 +824,9 @@ if __name__ == "__main__":
                     cnt += 1
 
             hcam.stopAcquisition()
+            plt.imshow(aframe)
+            plt.show()
+
 
 #
 # The MIT License

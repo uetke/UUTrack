@@ -56,7 +56,7 @@ class cameraMain(QtGui.QMainWindow):
         self.config = configWidget(self._session)
 
         self.refreshTimer = QtCore.QTimer()
-        self.connect(self.refreshTimer,QtCore.SIGNAL('timeout()'),self.updateGUI)
+        self.connect(self.refreshTimer, QtCore.SIGNAL('timeout()'), self.updateGUI)
         self.refreshTimer.start(self._session.GUI['refresh_time'])
 
         # Worker thread for clearing the queue.
@@ -70,10 +70,16 @@ class cameraMain(QtGui.QMainWindow):
         self.maxSizex = self.camera.GetCCDWidth()
         self.maxSizey = self.camera.GetCCDHeight()
 
-        self._session.Camera = {'roi_x1': 1}
-        self._session.Camera = {'roi_x2': self.maxSizex}
-        self._session.Camera = {'roi_y1': 1}
-        self._session.Camera = {'roi_y2': self.maxSizey}
+        if self._session.Camera['roi_x1'] == 0:
+            self._session.Camera = {'roi_x1': 1}
+        if self._session.Camera['roi_x2'] == 0 or self._session.Camera['roi_x2'] > self.maxSizex:
+            self._session.Camera = {'roi_x2': self.maxSizex}
+        if self._session.Camera['roi_y1'] == 0:
+            self._session.Camera = {'roi_y1': 1}
+        if self._session.Camera['roi_y2'] == 0 or self._session.Camera['roi_y2'] > self.maxSizey:
+            self._session.Camera = {'roi_y2': self.maxSizey}
+
+        self.config.populateTree(self._session)
 
         self.lastBuffer = time.time()
         self.lastRefresh = time.time()
@@ -129,7 +135,6 @@ class cameraMain(QtGui.QMainWindow):
             self.connect(self.workerThread,QtCore.SIGNAL('Image'),self.getData)
             self.workerThread.origin = 'snap'
             self.workerThread.start()
-            #self.workerThread.keep_acquiring = False
             self.acquiring = True
 
     def saveImage(self):
@@ -159,14 +164,18 @@ class cameraMain(QtGui.QMainWindow):
             self.logMessage.append('<b>Info: </b>Started free run movie')
             # Worker thread to acquire images. Specially useful for long exposure time images
             self.workerThread = workThread(self._session,self.camera)
-            self.connect(self.workerThread,QtCore.SIGNAL('Image'),self.getData)
+            self.connect(self.workerThread, QtCore.SIGNAL('Image'), self.getData)
+            self.connect(self.workerThread, QtCore.SIGNAL("finished()"), self.done)
             self.workerThread.start()
             self.acquiring = True
 
     def stopMovie(self):
         if self.acquiring:
             self.workerThread.keep_acquiring = False
+            while self.workerThread.isRunning():
+                print('Waiting for Thread to finish')
             self.acquiring = False
+            self.camera.stopAcq()
             self.logMessage.append('<b>Info: </b>Stopped free run movie')
 
     def movieData(self):
@@ -437,23 +446,35 @@ class cameraMain(QtGui.QMainWindow):
     def getData(self,data,origin):
         """Gets the data that is being gathered by the working thread.
         """
+        print('Getting data')
         if origin == 'snap': #Single snap.
             self.acquiring=False
             self.workerThread.origin = None
-            # self.workerThread.keep_acquiring = False # This already happens in the worker thread itself.
+            self.workerThread.keep_acquiring = False # This already happens in the worker thread itself.
+            self.camera.stopAcq()
+        if type(data) == type([]):
+            for d in data:
+                if self.accumulateBuffer:
+                    try:
+                        self.q.put(d)
+                    except:
+                        print('Not enough memory!')
+            self.tempImage = d
+            self.totalFrames+=1
 
-        self.tempImage = data
-        if self.accumulateBuffer:
-            try:
-                self.q.put(data)
-            except:
-                print('Not enough memory!')
+        else:
+            self.tempImage = data
+            if self.accumulateBuffer:
+                try:
+                    self.q.put(data)
+                except:
+                    print('Not enough memory!')
 
-        if self.showWaterfall:
-            d = np.array([np.sum(data,1)])
-            self.watData = np.concatenate((d,self.watData),axis=0)
+            if self.showWaterfall:
+                d = np.array([np.sum(data,1)])
+                self.watData = np.concatenate((d,self.watData),axis=0)
 
-        self.totalFrames+=1
+            self.totalFrames+=1
         new_time = time.time()
         self.bufferTime = new_time - self.lastBuffer
         self.lastBuffer = new_time
@@ -567,8 +588,9 @@ class cameraMain(QtGui.QMainWindow):
             self.specialTaskWorker.keep_running = False
             self.specialTaskRunning = False
 
-    def done(self,msg):
-        self.saveRunning = False
+    def done(self):
+        #self.saveRunning = False
+        self.acquiring = False
 
     def exitSafe(self):
         self.close()

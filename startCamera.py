@@ -11,13 +11,13 @@ if __name__ == '__main__':
     global session
 
     base_dir = os.getcwd()
-    camera_config = os.path.join(base_dir,'Config','Camera_defaults_example.yml')
+    camera_config = os.path.join(base_dir, 'Config', 'Camera_defaults_example.yml')
     session = _session(camera_config)
 
     if session.Saving['directory'] == '':
         savedir =os.path.join(base_dir, str(datetime.now().date()))
     else:
-        savedir = os.path.join(session.Saving['directory'],str(datetime.now().date()))
+        savedir = os.path.join(session.Saving['directory'], str(datetime.now().date()))
 
     if not os.path.exists(savedir):
         os.makedirs(savedir)
@@ -36,6 +36,7 @@ if __name__ == '__main__':
     cam = camera(0)
     cam.initializeCamera()
     cam.setExposure(session.Camera['exposure_time'])
+
     app = QApplication(sys.argv)
     win = cameraMain(session,cam)
     win.show()

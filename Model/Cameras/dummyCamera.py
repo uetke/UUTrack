@@ -6,7 +6,9 @@ import time
 
 from lantz import Q_
 
-class camera():
+from ._skeleton import cameraBase
+
+class camera(cameraBase):
     MODE_CONTINUOUS = 1
     MODE_SINGLE_SHOT = 0
     def __init__(self,camera):

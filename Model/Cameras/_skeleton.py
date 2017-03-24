@@ -3,7 +3,7 @@ Camera class with the skeleton functions. Important to keep track of the methods
 exposed to the View. Ideally copy/paste and start developing from here.
 """
 
-class camera():
+class cameraBase():
     MODE_CONTINUOUS = 1
     MODE_SINGLE_SHOT = 0
     def __init__(self,camera):
@@ -87,6 +87,10 @@ class camera():
         The CCD height in pixels
 
         """
+
+    def stopAcq(self):
+        """Stops the acquisition without closing the connection to the camera."""
+        return True
 
     def setBinning(self,xbin,ybin):
         """Sets the binning of the camera if supported. Has to check if binning in X/Y can be different or not, etc."""

@@ -1,8 +1,10 @@
 """Classes and methods for working with cameras. It should provide an abstraction
 layer for the most common uses of cameras.
 """
+from ._skeleton import cameraBase
 
-class camera():
+
+class camera(cameraBase):
     NUMPY_MODES = {"L":np.uint8, "I;16":np.uint16}
     def __init__(self,camera):
         self.camera = camera
