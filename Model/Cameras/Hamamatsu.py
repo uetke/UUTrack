@@ -97,14 +97,16 @@ class camera(cameraBase):
         Y -- array type with the coordinates for the ROI Y[0], Y[1]
         """
         # Because of how Orca Flash 4 works, all the ROI parameters have to be multiple of 4.
-        hpos = int(X[0]/4)*4
-        self.camera.setPropertyValue("subarray_hpos", hpos)
-        vpos = int(Y[0]/4)*4
-        self.camera.setPropertyValue("subarray_vpos", vpos)
+        X-=1
+        Y-=1
         hsize = int(abs(X[0]-X[1])/4)*4
-        self.camera.setPropertyValue("subarray_hsize", hsize)
+        hpos = int(X[0]/4)*4
         vsize = int(abs(Y[0]-Y[1])/4)*4
-        self.camera.setPropertyValue("subarray_vsize", vsize)
+        vpos = int(Y[0]/4)*4
+        self.camera.setPropertyValue("subarray_vpos", hpos)
+        self.camera.setPropertyValue("subarray_hpos", vpos)
+        self.camera.setPropertyValue("subarray_vsize", hsize)
+        self.camera.setPropertyValue("subarray_hsize", vsize)
         self.camera.setSubArrayMode()
         return self.getSize()
 
@@ -113,7 +115,7 @@ class camera(cameraBase):
         """
         X = self.camera.getPropertyValue("subarray_hsize")
         Y = self.camera.getPropertyValue("subarray_vsize")
-        return X, Y
+        return Y[0], X[0]
 
     def getSerialNumber(self):
         """Returns the serial number of the camera.

@@ -46,6 +46,7 @@ class cameraMain(QtGui.QMainWindow):
         self.area.setMouseTracking(True)
 
         # Main widget
+        print([self.camera.maxWidth, self.camera.maxHeight])
         self.camWidget = cameraMainWidget([self.camera.maxWidth, self.camera.maxHeight])
         # Widget for displaying information to the user
         self.messageWidget = messageWidget()
@@ -462,7 +463,6 @@ class cameraMain(QtGui.QMainWindow):
     def getData(self,data,origin):
         """Gets the data that is being gathered by the working thread.
         """
-        print('Getting data')
         if origin == 'snap': #Single snap.
             self.acquiring=False
             self.workerThread.origin = None
@@ -544,7 +544,6 @@ class cameraMain(QtGui.QMainWindow):
                 update_cam = True
                 if k in ['roi_x1', 'roi_x2', 'roi_y1', 'roi_y2']:
                     update_roi = True
-                    print('UUPdate ROI')
                 elif k == 'exposure_time':
                     update_exposure = True
                 elif k in ['binning_x', 'binning_y']:

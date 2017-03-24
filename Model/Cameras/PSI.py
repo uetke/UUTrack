@@ -1,13 +1,15 @@
 """Classes and methods for working with cameras. It should provide an abstraction
 layer for the most common uses of cameras.
 """
+import numpy as np
 from ._skeleton import cameraBase
+from Controller.devices.PhotonicScience.scmoscam import GEVSCMOS
 
-
+NUMPY_MODES = {"L":np.uint8, "I;16":np.uint16}
 class camera(cameraBase):
-    NUMPY_MODES = {"L":np.uint8, "I;16":np.uint16}
     def __init__(self,camera):
-        self.camera = camera
+        self.cam_num = camera
+        self.camera = GEVSCMOS('C:\\Users\\Experimentor\\Programs\\UUTrack\\Controller\\devices\\PhotonicScience','SCMOS')
         self.running = False
 
     def initializeCamera(self):
@@ -21,8 +23,9 @@ class camera(cameraBase):
         self.camera.EnableAutoLevel(0)
         self.camera.SetExposure(10,"Millisec")
         self.triggerCamera()
-        self.maxWidth = self.GetCCDWidth()
-        self.maxHeight = self.GetCCDHeight()
+        size = self.getSize()
+        self.maxWidth = size[0]
+        self.maxHeight = size[1]
 
     def triggerCamera(self):
         """Triggers the camera.
@@ -81,6 +84,13 @@ class camera(cameraBase):
         Returns: dict = keyword => value.
         """
         pass
+
+    def GetCCDWidth(self):
+        return self.getSize()[0]
+
+    def GetCCDHeight(self):
+        return self.getSize()[1]
+
 
     def stopCamera(self):
         """Stops the acquisition
