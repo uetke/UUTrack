@@ -51,5 +51,5 @@ UUTrap: Main folder. Important executables should be placed here.
 
 * review
 
-	1.[ ]  possibility of reviewing a track on a separate screen
+	1. [ ]  possibility of reviewing a track on a separate screen
 
