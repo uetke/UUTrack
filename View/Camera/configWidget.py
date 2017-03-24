@@ -8,8 +8,7 @@ class configWidget(QtGui.QWidget):
     def __init__(self, session, parent=None):
         QtGui.QWidget.__init__(self, parent)
         self._session = session.copy()
-        session.Camera = {'roi_x1': 20}
-        self._session_new = session.copy()  # To store the changes until applied
+        self._session_new = self._session.copy()  # To store the changes until applied
         self.t = ParameterTree()
         self.populateTree(session)
         self.layout = QtGui.QGridLayout()
@@ -25,12 +24,20 @@ class configWidget(QtGui.QWidget):
         self.layout.addWidget(self.apply)
         self.layout.addWidget(self.cancel)
 
-    def change(self,param,changes):
+    def change(self, param, changes):
         """Updates the values while being updated"""
         for param, change, data in changes:
             to_update = param.name().replace(' ','_')
             path = self.p.childPath(param)[0]
             self._session_new.params[path][to_update] = data
+            print(self._session_new.params['Camera']['roi_x1'])
+            print(self._session_new.params['Camera']['roi_x2'])
+            print(self._session_new.params['Camera']['roi_y1'])
+            print(self._session_new.params['Camera']['roi_y2'])
+            print(self._session.params['Camera']['roi_x1'])
+            print(self._session.params['Camera']['roi_x2'])
+            print(self._session.params['Camera']['roi_y1'])
+            print(self._session.params['Camera']['roi_y2'])
 
     def updateSession(self):
         """ Updates the session and sends a signal"""
@@ -40,7 +47,9 @@ class configWidget(QtGui.QWidget):
     def populateTree(self, session=0):
         """Fills the tree with the values from the Session"""
         if type(session) != type(0):
-            self._session = session
+            print('Populate tree')
+            self._session = session.copy()
+            self._session_new = session.copy()
         params = self._session.getParams()
         self.p = Parameter.create(name='params', type='group', children=params)
         self.p.sigTreeStateChanged.connect(self.change)

@@ -36,7 +36,6 @@ if __name__ == '__main__':
     cam = camera(0)
     cam.initializeCamera()
     cam.setExposure(session.Camera['exposure_time'])
-
     app = QApplication(sys.argv)
     win = cameraMain(session,cam)
     win.show()

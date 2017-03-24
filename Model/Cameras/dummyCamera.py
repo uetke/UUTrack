@@ -5,8 +5,8 @@ import numpy as np
 import time
 
 from lantz import Q_
-
 from ._skeleton import cameraBase
+
 
 class camera(cameraBase):
     MODE_CONTINUOUS = 1
