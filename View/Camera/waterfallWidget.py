@@ -10,7 +10,7 @@ class waterfallWidget(QtGui.QWidget):
 
         self.layout = QtGui.QHBoxLayout(self)
         self.viewport = GraphicsLayoutWidget()
-        self.view = self.viewport.addViewBox(colspan=3, rowspan=3, lockAspect=False, enableMenu=True)
+        self.view = self.viewport.addViewBox(colspan=3, rowspan=3, lockAspect = False, enableMenu=True)
         self.img = pg.ImageItem()
         self.view.addItem(self.img)
 

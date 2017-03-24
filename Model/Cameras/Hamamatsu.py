@@ -3,15 +3,17 @@ Model class for controlling Hamamatsu cameras via de DCAM-API.
 """
 import numpy as np
 from Controller.devices.hamamatsu.hamamatsu_camera import *
+from ._skeleton import cameraBase
 
-class camera():
+
+class camera(cameraBase):
     MODE_CONTINUOUS = 1
     MODE_SINGLE_SHOT = 0
     MODE_EXTERNAL = 2
 
     def __init__(self,camera):
         self.cam_id = camera # Camera ID
-        self.camera = HamamatsuCameraMR(camera)
+        self.camera = HamamatsuCamera(camera)
         self.running = False
         self.mode = self.MODE_SINGLE_SHOT
 
@@ -21,6 +23,9 @@ class camera():
         self.camera.initCamera()
         self.maxWidth = self.GetCCDWidth()
         self.maxHeight = self.GetCCDHeight()
+        #This is important to not have shufled patches of the CCD.
+        #Have to check documentation!!
+        self.camera.setPropertyValue("readout_speed", 1)
 
     def triggerCamera(self):
         """Triggers the camera.
@@ -29,7 +34,7 @@ class camera():
             self.camera.startAcquisition()
         elif self.getAcquisitionMode() == self.MODE_SINGLE_SHOT:
             self.camera.startAcquisition()
-            self.camera.fireTrigger()
+            self.camera.stopAcquisition()
 
     def setAcquisitionMode(self, mode):
         """ Set the readout mode of the camera: Single or continuous.
@@ -40,13 +45,15 @@ class camera():
         """
         self.mode = mode
         if mode == self.MODE_CONTINUOUS:
-            self.camera.setPropertyValue("trigger_source",b'INTERNAL')
+            #self.camera.setPropertyValue("trigger_source", 1)
+            self.camera.settrigger(1)
         elif mode == self.MODE_SINGLE_SHOT:
-            self.camera.setPropertyValue("trigger_source",b'SOFTWARE')
+            #self.camera.setPropertyValue("trigger_source", 3)
+            self.camera.settrigger(1)
         elif mode == self.MODE_EXTERNAL:
-            self.camera.setPropertyValue("trigger_source",b'EXTERNAL')
+            #self.camera.setPropertyValue("trigger_source", 2)
+            self.camera.settrigger(2)
         return self.getAcquisitionMode()
-
 
     def getAcquisitionMode(self):
         """Returns the acquisition mode, either continuous or single shot.
@@ -61,7 +68,7 @@ class camera():
     def setExposure(self,exposure):
         """Sets the exposure of the camera.
         """
-        self.camera.setPropertyValue("exposure_time",exposure)
+        self.camera.setPropertyValue("exposure_time",exposure/1000)
         return self.getExposure()
 
     def getExposure(self):
@@ -73,9 +80,15 @@ class camera():
         """Reads the camera
         """
         [frames, dims] = self.camera.getFrames()
-        img = frames[-1].getData()
-        img = np.reshape(img,(dims[0],dims[1]))
-        return img.T
+        img = []
+        for f in frames:
+            d = f.getData()
+            d = np.reshape(d,(dims[0],dims[1]))
+            d = d.T
+            img.append(d)
+#        img = frames[-1].getData()
+#        img = np.reshape(img,(dims[0],dims[1]))
+        return img
 
     def setROI(self,X,Y):
         """Sets up the ROI. Not all cameras are 0-indexed, so this is an important
@@ -83,15 +96,15 @@ class camera():
         X -- array type with the coordinates for the ROI X[0], X[1]
         Y -- array type with the coordinates for the ROI Y[0], Y[1]
         """
-        print('hpos')
-        self.camera.setPropertyValue("subarray_hpos",int(X[0]))
-        print('vpos')
-        self.camera.setPropertyValue("subarray_vpos",int(Y[0]))
-        print('hsize')
-        self.camera.setPropertyValue("subarray_hsize",int(abs(X[0]-X[1])))
-        print('vsize')
-        self.camera.setPropertyValue("subarray_vsize",int(abs(Y[0]-Y[1])))
-        print('setSub')
+        # Because of how Orca Flash 4 works, all the ROI parameters have to be multiple of 4.
+        hpos = int(X[0]/4)*4
+        self.camera.setPropertyValue("subarray_hpos", hpos)
+        vpos = int(Y[0]/4)*4
+        self.camera.setPropertyValue("subarray_vpos", vpos)
+        hsize = int(abs(X[0]-X[1])/4)*4
+        self.camera.setPropertyValue("subarray_hsize", hsize)
+        vsize = int(abs(Y[0]-Y[1])/4)*4
+        self.camera.setPropertyValue("subarray_vsize", vsize)
         self.camera.setSubArrayMode()
         return self.getSize()
 
@@ -125,6 +138,8 @@ class camera():
         """
         return self.camera.frame_y
 
+    def stopAcq(self):
+        self.camera.stopAcquisition()
 
     def stopCamera(self):
         """Stops the acquisition and closes the connection with the camera.

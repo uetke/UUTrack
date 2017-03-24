@@ -33,7 +33,8 @@ class cameraMain(QtGui.QMainWindow):
         super(cameraMain,self).__init__()
         self.setWindowTitle('Camera Monitor')
         self.setMouseTracking(True)
-        self._session = session.copy()
+        self._session = session
+
         self.camera = cam
         # Queue of images. multiprocessing takes care of handling the data in and out
         # and the sharing between parent and child processes.
@@ -41,11 +42,11 @@ class cameraMain(QtGui.QMainWindow):
 
         self.area = DockArea()
         self.setCentralWidget(self.area)
-        self.resize(800,800)
+        self.resize(800, 800)
         self.area.setMouseTracking(True)
 
         # Main widget
-        self.camWidget = cameraMainWidget([self.camera.maxWidth,self.camera.maxHeight])
+        self.camWidget = cameraMainWidget([self.camera.maxWidth, self.camera.maxHeight])
         # Widget for displaying information to the user
         self.messageWidget = messageWidget()
         # Small window to display the results of the special task
@@ -54,27 +55,29 @@ class cameraMain(QtGui.QMainWindow):
         self.camViewer = cameraViewer(self._session, self.camera, parent=self)
         # Configuration widget with a parameter tree
         self.config = configWidget(self._session)
-
         self.refreshTimer = QtCore.QTimer()
-        self.connect(self.refreshTimer,QtCore.SIGNAL('timeout()'),self.updateGUI)
+        self.connect(self.refreshTimer, QtCore.SIGNAL('timeout()'), self.updateGUI)
         self.refreshTimer.start(self._session.GUI['refresh_time'])
 
         # Worker thread for clearing the queue.
         self.clearWorker = clearQueueThread(self.q)
 
-
         self.acquiring = False
         self.logMessage = []
 
-        ### Initialize the camera and the camera related things ###
+        ''' Initialize the camera and the camera related things '''
         self.maxSizex = self.camera.GetCCDWidth()
         self.maxSizey = self.camera.GetCCDHeight()
+        if self._session.Camera['roi_x1'] == 0:
+            self._session.Camera = {'roi_x1': 1}
+        if self._session.Camera['roi_x2'] == 0 or self._session.Camera['roi_x2'] > self.maxSizex:
+            self._session.Camera = {'roi_x2': self.maxSizex}
+        if self._session.Camera['roi_y1'] == 0:
+            self._session.Camera = {'roi_y1': 1}
+        if self._session.Camera['roi_y2'] == 0 or self._session.Camera['roi_y2'] > self.maxSizey:
+            self._session.Camera = {'roi_y2': self.maxSizey}
 
-        self._session.Camera = {'roi_x1': 1}
-        self._session.Camera = {'roi_x2': self.maxSizex}
-        self._session.Camera = {'roi_y1': 1}
-        self._session.Camera = {'roi_y2': self.maxSizey}
-
+        self.config.populateTree(self._session)
         self.lastBuffer = time.time()
         self.lastRefresh = time.time()
 
@@ -89,6 +92,10 @@ class cameraMain(QtGui.QMainWindow):
         self.centroidX = []
         self.centroidY = []
         self.watData = []
+        self.corner_roi = [] # Real coordinates of the coorner of the ROI region. (Min_x and Min_y).
+
+        self.corner_roi.append(self._session.Camera['roi_x1'])
+        self.corner_roi.append(self._session.Camera['roi_y1'])
 
         # Program status
         self.continuousSaving = False
@@ -129,8 +136,8 @@ class cameraMain(QtGui.QMainWindow):
             self.connect(self.workerThread,QtCore.SIGNAL('Image'),self.getData)
             self.workerThread.origin = 'snap'
             self.workerThread.start()
-            #self.workerThread.keep_acquiring = False
             self.acquiring = True
+            self.logMessage.append('<i>Info: </i>Snapped photo')
 
     def saveImage(self):
         """Saves the image that is being displayed to the user.
@@ -150,6 +157,7 @@ class cameraMain(QtGui.QMainWindow):
             meta = g.create_dataset('metadata',data=self._session.serialize())
             f.flush()
             f.close()
+            self.logMessage.append('<i>Info: </i>Saved photo')
 
     def startMovie(self):
         if self.acquiring:
@@ -159,14 +167,18 @@ class cameraMain(QtGui.QMainWindow):
             self.logMessage.append('<b>Info: </b>Started free run movie')
             # Worker thread to acquire images. Specially useful for long exposure time images
             self.workerThread = workThread(self._session,self.camera)
-            self.connect(self.workerThread,QtCore.SIGNAL('Image'),self.getData)
+            self.connect(self.workerThread, QtCore.SIGNAL('Image'), self.getData)
+            self.connect(self.workerThread, QtCore.SIGNAL("finished()"), self.done)
             self.workerThread.start()
             self.acquiring = True
 
     def stopMovie(self):
         if self.acquiring:
             self.workerThread.keep_acquiring = False
+            while self.workerThread.isRunning():
+                print('Waiting for Thread to finish')
             self.acquiring = False
+            self.camera.stopAcq()
             self.logMessage.append('<b>Info: </b>Stopped free run movie')
 
     def movieData(self):
@@ -209,7 +221,8 @@ class cameraMain(QtGui.QMainWindow):
         self.clearWorker.start()
 
     def startWaterfall(self):
-        """Starts the waterfall. The waterfall can be accelerated if camera supports hardware binning in the appropriate direction. If not, has to be done via software but the acquisition time cannot be improved.
+        """Starts the waterfall. The waterfall can be accelerated if camera supports hardware binning in the appropriate
+        direction. If not, has to be done via software but the acquisition time cannot be improved.
         IDEA: Fast waterfall should have separate window, since the acquisition of the full CCD will be stopped.
         """
         if not self.showWaterfall:
@@ -238,23 +251,20 @@ class cameraMain(QtGui.QMainWindow):
             del self.watData
             self.logMessage.append('<b>Info:</b> Waterfall closed')
 
-    def setROI(self):
+    def setROI(self,X,Y):
         """Gets the ROI from the lines on the image. It also updates the GUI to accommodate the changes.
         """
         if not self.acquiring:
-            y1 = np.int(self.camWidget.hline1.value())
-            y2 = np.int(self.camWidget.hline2.value())
-            x1 = np.int(self.camWidget.vline1.value())
-            x2 = np.int(self.camWidget.vline2.value())
-            X = np.sort((x1,x2))
-            Y = np.sort((y1,y2))
+            self.corner_roi[0] = X[0]
+            self.corner_roi[1] = Y[0]
+            print('Corner: %s, %s' % (self.corner_roi[0],self.corner_roi[1]))
             self._session.Camera = {'roi_x1': int(X[0])}
             self._session.Camera = {'roi_x2': int(X[1])}
             self._session.Camera = {'roi_y1': int(Y[0])}
             self._session.Camera = {'roi_y2': int(Y[1])}
 
-            Nx,Ny = self.camera.setROI(X,Y)
-            self.tempImage = np.zeros((Nx,Ny))
+            Nx, Ny = self.camera.setROI(X, Y)
+            self.tempImage = np.zeros((Nx, Ny))
             self.camWidget.hline1.setValue(1)
             self.camWidget.hline2.setValue(Ny)
             self.camWidget.vline1.setValue(1)
@@ -265,9 +275,23 @@ class cameraMain(QtGui.QMainWindow):
             self.camWidget.img2.clear()
             if self.showWaterfall:
                 self.watData = np.zeros((self._session.lengthWaterfall, Nx))
-            self.logMessage.append('<i>Info: </i> Updated the ROI')
+            self.config.populateTree(self._session)
+            self.logMessage.append('<i>Info: </i>Updated the ROI')
         else:
-            self.logMessage.append('<b>Error: <b> Cannot change ROI while acquiring.')
+            self.logMessage.append('<b>Error: <b>Cannot change ROI while acquiring.')
+
+    def getROI(self):
+        """Gets the ROI coordinates from the GUI and updates the values."""
+        y1 = np.int(self.camWidget.hline1.value())
+        y2 = np.int(self.camWidget.hline2.value())
+        x1 = np.int(self.camWidget.vline1.value())
+        x2 = np.int(self.camWidget.vline2.value())
+        X = np.sort((x1, x2))
+        Y = np.sort((y1, y2))
+        # Updates to the real values
+        X += self.corner_roi[0] - 1
+        Y += self.corner_roi[1] - 1
+        self.setROI(X,Y)
 
     def clearROI(self):
         """Resets the roi to the full image.
@@ -277,9 +301,10 @@ class cameraMain(QtGui.QMainWindow):
             self.camWidget.vline1.setValue(1)
             self.camWidget.vline2.setValue(self.maxSizex)
             self.camWidget.hline2.setValue(self.maxSizey)
-            self.setROI()
+            self.corner_roi = [1, 1]
+            self.getROI()
             if self.showWaterfall:
-                self.watData = np.zeros((self._session.GUI['length_waterfall'],Nx))
+                self.watData = np.zeros((self._session.GUI['length_waterfall'], self.maxSizex))
         else:
             self.logMessage.append('<b>Error: <b> Cannot change ROI while acquiring.')
 
@@ -325,7 +350,7 @@ class cameraMain(QtGui.QMainWindow):
         self.setROIAction = QtGui.QAction(QtGui.QIcon('View/Icons/Zoom-In-icon.png'),'Set &ROI',self)
         self.setROIAction.setShortcut('Ctrl+T')
         self.setROIAction.setStatusTip('Set ROI')
-        self.setROIAction.triggered.connect(self.setROI)
+        self.setROIAction.triggered.connect(self.getROI)
 
         self.clearROIAction = QtGui.QAction(QtGui.QIcon('View/Icons/Zoom-Out-icon.png'),'Set R&OI',self)
         self.clearROIAction.setShortcut('Ctrl+T')
@@ -437,23 +462,35 @@ class cameraMain(QtGui.QMainWindow):
     def getData(self,data,origin):
         """Gets the data that is being gathered by the working thread.
         """
+        print('Getting data')
         if origin == 'snap': #Single snap.
             self.acquiring=False
             self.workerThread.origin = None
-            # self.workerThread.keep_acquiring = False # This already happens in the worker thread itself.
+            self.workerThread.keep_acquiring = False # This already happens in the worker thread itself.
+            self.camera.stopAcq()
+        if type(data) == type([]):
+            for d in data:
+                if self.accumulateBuffer:
+                    try:
+                        self.q.put(d)
+                    except:
+                        print('Not enough memory!')
+            self.tempImage = d
+            self.totalFrames+=1
 
-        self.tempImage = data
-        if self.accumulateBuffer:
-            try:
-                self.q.put(data)
-            except:
-                print('Not enough memory!')
+        else:
+            self.tempImage = data
+            if self.accumulateBuffer:
+                try:
+                    self.q.put(data)
+                except:
+                    print('Not enough memory!')
 
-        if self.showWaterfall:
-            d = np.array([np.sum(data,1)])
-            self.watData = np.concatenate((d,self.watData),axis=0)
+            if self.showWaterfall:
+                d = np.array([np.sum(data,1)])
+                self.watData = np.concatenate((d,self.watData),axis=0)
 
-        self.totalFrames+=1
+            self.totalFrames+=1
         new_time = time.time()
         self.bufferTime = new_time - self.lastBuffer
         self.lastBuffer = new_time
@@ -478,6 +515,7 @@ class cameraMain(QtGui.QMainWindow):
             self.watData  = self.watData[:self._session.GUI['length_waterfall'],:]
             self.watWidget.img.setImage(np.flipud(np.transpose(self.watData[::-1,:])))
 
+
         new_time = time.time()
         self.fps = new_time-self.lastRefresh
         self.lastRefresh = new_time
@@ -495,41 +533,38 @@ class cameraMain(QtGui.QMainWindow):
     def updateSession(self, session):
         """Updates the session variables passed by the config window.
         """
-        print(session)
-        print(self._session)
         update_cam = False
         update_roi = False
         update_exposure = False
         update_binning = True
         for k in session.params['Camera']:
-            print('Update %s' % k)
             new_prop = session.params['Camera'][k]
             old_prop = self._session.params['Camera'][k]
-            print('  New prop: %s' % new_prop)
-            print('  Old prop: %s' % old_prop)
             if new_prop != old_prop:
-                print('Update: %s'%k)
                 update_cam = True
                 if k in ['roi_x1', 'roi_x2', 'roi_y1', 'roi_y2']:
                     update_roi = True
+                    print('UUPdate ROI')
                 elif k == 'exposure_time':
                     update_exposure = True
-                elif k in ['binning_x', 'binnin_y']:
+                elif k in ['binning_x', 'binning_y']:
                     update_binning = True
 
         self.logMessage.append('<b>Info:</b> Updated the parameters')
-        self._session = session
+        self._session = session.copy()
 
         if update_cam:
             if self.acquiring:
                 self.stopMovie()
 
             if update_roi:
-                self.camWidget.vline2.setValue(session.Camera['roi_x1'])
-                self.camWidget.vline1.setValue(session.Camera['roi_x2'])
-                self.camWidget.hline2.setValue(session.Camera['roi_y1'])
-                self.camWidget.hline1.setValue(session.Camera['roi_y2'])
-                self.setROI()
+                self.camWidget.vline1.setValue(session.Camera['roi_x1'])
+                self.camWidget.vline2.setValue(session.Camera['roi_x2'])
+                self.camWidget.hline1.setValue(session.Camera['roi_y1'])
+                self.camWidget.hline2.setValue(session.Camera['roi_y2'])
+                X = np.sort([session.Camera['roi_x1'], session.Camera['roi_x2']])
+                Y = np.sort([session.Camera['roi_y1'], session.Camera['roi_y2']])
+                self.setROI(X,Y)
 
             if update_exposure:
                 self.camera.setExposure(session.Camera['exposure_time'])
@@ -566,8 +601,9 @@ class cameraMain(QtGui.QMainWindow):
             self.specialTaskWorker.keep_running = False
             self.specialTaskRunning = False
 
-    def done(self,msg):
-        self.saveRunning = False
+    def done(self):
+        #self.saveRunning = False
+        self.acquiring = False
 
     def exitSafe(self):
         self.close()

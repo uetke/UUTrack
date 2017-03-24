@@ -1,4 +1,6 @@
 from pyqtgraph.Qt import QtCore
+from time import sleep
+
 
 class workThread(QtCore.QThread):
     """Thread for acquiring from the camera. If the exposure time is long, this is
@@ -21,6 +23,7 @@ class workThread(QtCore.QThread):
             if self.origin == 'snap':
                 self.keep_acquiring = False
             if first:
+                self.camera.setAcquisitionMode(self.camera.MODE_CONTINUOUS)
                 self.camera.triggerCamera() # Triggers the camera only once
                 first = False
             img = self.camera.readCamera()
