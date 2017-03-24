@@ -18,6 +18,9 @@ UUTrap: Main folder. Important executables should be placed here.
 
 * _View_: Houses everything related to visualization of data. View should communicate only through models to devices and should get the input from the user. Acquisition tasks should be performed in a different thread, in order not to block the GUI. A timer updates the GUI at constant intervals, while the acquisition can happen at a different rate.
 
+## Screenshot ##
+
+![Alt text](View/Icons/screenshot.png?raw=true "Optional Title")
 
 ### General Functionalities to achieve ###
 
@@ -42,8 +45,8 @@ UUTrap: Main folder. Important executables should be placed here.
 
 * electrophoresis
 
-	1. [ ] setting up function generator
-	2. [ ] programming waveforms such as ramps, etc
+	1. [x] setting up function generator
+	2. [x] programming waveforms such as ramps, etc
 	3. [ ] generating specific waveform based on tracking coordinates for feedback control
 
 * review
