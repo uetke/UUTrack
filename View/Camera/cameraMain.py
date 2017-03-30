@@ -132,7 +132,7 @@ class cameraMain(QtGui.QMainWindow):
             retval = msgBox.exec_()
             self.logMessage.append('<b>Error: </b>Tried to snap while in free run')
         else:
-            self.workerThread = workThread(self._session,self.camera)
+            self.workerThread = workThread(self._session, self.camera)
             self.connect(self.workerThread,QtCore.SIGNAL('Image'),self.getData)
             self.workerThread.origin = 'snap'
             self.workerThread.start()
@@ -176,7 +176,11 @@ class cameraMain(QtGui.QMainWindow):
         if self.acquiring:
             self.workerThread.keep_acquiring = False
             while self.workerThread.isRunning():
+<<<<<<< HEAD
                 print('Waiting for Thread to finish')
+=======
+                pass
+>>>>>>> develop
             self.acquiring = False
             self.camera.stopAcq()
             self.logMessage.append('<b>Info: </b>Stopped free run movie')
@@ -251,7 +255,11 @@ class cameraMain(QtGui.QMainWindow):
             del self.watData
             self.logMessage.append('<b>Info:</b> Waterfall closed')
 
+<<<<<<< HEAD
     def setROI(self,X,Y):
+=======
+    def setROI(self, X, Y):
+>>>>>>> develop
         """Gets the ROI from the lines on the image. It also updates the GUI to accommodate the changes.
         """
         if not self.acquiring:
@@ -291,7 +299,11 @@ class cameraMain(QtGui.QMainWindow):
         # Updates to the real values
         X += self.corner_roi[0] - 1
         Y += self.corner_roi[1] - 1
+<<<<<<< HEAD
         self.setROI(X,Y)
+=======
+        self.setROI(X, Y)
+>>>>>>> develop
 
     def clearROI(self):
         """Resets the roi to the full image.
@@ -466,18 +478,30 @@ class cameraMain(QtGui.QMainWindow):
         if origin == 'snap': #Single snap.
             self.acquiring=False
             self.workerThread.origin = None
+<<<<<<< HEAD
             self.workerThread.keep_acquiring = False # This already happens in the worker thread itself.
             self.camera.stopAcq()
         if type(data) == type([]):
+=======
+            self.workerThread.keep_acquiring = False  # This already happens in the worker thread itself.
+            self.camera.stopAcq()
+
+        if isinstance(data, list):
+>>>>>>> develop
             for d in data:
                 if self.accumulateBuffer:
                     try:
                         self.q.put(d)
                     except:
                         print('Not enough memory!')
+<<<<<<< HEAD
             self.tempImage = d
             self.totalFrames+=1
 
+=======
+            self.tempImage = data[-1]
+            self.totalFrames+=1
+>>>>>>> develop
         else:
             self.tempImage = data
             if self.accumulateBuffer:
@@ -558,13 +582,9 @@ class cameraMain(QtGui.QMainWindow):
                 self.stopMovie()
 
             if update_roi:
-                self.camWidget.vline1.setValue(session.Camera['roi_x1'])
-                self.camWidget.vline2.setValue(session.Camera['roi_x2'])
-                self.camWidget.hline1.setValue(session.Camera['roi_y1'])
-                self.camWidget.hline2.setValue(session.Camera['roi_y2'])
                 X = np.sort([session.Camera['roi_x1'], session.Camera['roi_x2']])
                 Y = np.sort([session.Camera['roi_y1'], session.Camera['roi_y2']])
-                self.setROI(X,Y)
+                self.setROI(X, Y)
 
             if update_exposure:
                 self.camera.setExposure(session.Camera['exposure_time'])
@@ -630,12 +650,6 @@ class cameraMain(QtGui.QMainWindow):
             pass
         self.emptyQueue()
         self.close()
-
-
-
-
-
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

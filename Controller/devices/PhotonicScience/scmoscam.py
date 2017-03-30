@@ -14,7 +14,9 @@ import os, sys
 import ctypes as C
 from _ctypes import LoadLibrary,FreeLibrary
 from ctypes import windll
+import numpy
 
+NUMPY_MODES = {"L":numpy.uint8, "I;16":numpy.uint16}
 class GEVSCMOS:
     def __init__(self, cwd_path, name):
         self.cwd_path = cwd_path #working directory

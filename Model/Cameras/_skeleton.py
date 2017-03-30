@@ -9,6 +9,8 @@ class cameraBase():
     def __init__(self,camera):
         self.camera = camera
         self.running = False
+        self.maxWidth = 0
+        self.maxHeight = 0
 
     def initializeCamera(self):
         """Initializes the camera.
@@ -61,6 +63,10 @@ class cameraBase():
         Y -- array type with the coordinates for the ROI Y[0], Y[1]
         """
         return self.getSize()
+
+    def clearROI(self):
+        """Clears the ROI from the camera."""
+        self.setROI(self.maxWidth,self.maxHeight)
 
     def getSize(self):
         """Returns the size in pixels of the image being acquired. This is useful for checking the ROI settings.

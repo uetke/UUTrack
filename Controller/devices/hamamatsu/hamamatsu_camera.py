@@ -121,7 +121,7 @@ class HCamData():
         """Create a data object of the appropriate size.
         @param size The size of the data object in bytes."""
 
-        self.np_array = numpy.empty(int(size/2), dtype=numpy.uint16)
+        self.np_array = numpy.empty((int(size/2), 1), dtype=numpy.uint16)
         self.size = size
 
     ## __getitem__
@@ -158,6 +158,8 @@ class HCamData():
 
 
 class HamamatsuCamera():
+    CAPTUREMODE_SNAP = 0
+    CAPTUREMODE_SEQUENCE = 1
     """Basic camera interface class.
     This version uses the Hamamatsu library to allocate camera buffers.
     Storage for the data from the camera is allocated dynamically and
@@ -192,6 +194,25 @@ class HamamatsuCamera():
         # Get camera max width, height.
         self.max_width = self.getPropertyValue("image_width")[0]
         self.max_height = self.getPropertyValue("image_height")[0]
+        self.setmode(self.CAPTUREMODE_SEQUENCE) # By default is a sequence
+
+    def settrigger(self,mode):
+        TRIGMODE = ctypes.c_int32(mode)
+        self.checkStatus(dcam.dcam_settriggermode(self.camera_handle,TRIGMODE),'settriggermode')
+        DCAM_TRIGGERMODE = ctypes.c_int32(0)
+        self.checkStatus(dcam.dcam_gettriggermode(self.camera_handle,ctypes.byref(DCAM_TRIGGERMODE)),'gettrigermode')
+        return DCAM_TRIGGERMODE.value
+
+    def setmode(self, mode):
+        """Sets the acquisition mode of the camera."""
+        self.mode = mode
+
+    def settrigger(self,mode):
+        TRIGMODE = ctypes.c_int32(mode)
+        self.checkStatus(dcam.dcam_settriggermode(self.camera_handle,TRIGMODE),'settriggermode')
+        DCAM_TRIGGERMODE = ctypes.c_int32(0)
+        self.checkStatus(dcam.dcam_gettriggermode(self.camera_handle,ctypes.byref(DCAM_TRIGGERMODE)),'gettrigermode')
+        return DCAM_TRIGGERMODE.value
 
     def settrigger(self,mode):
         TRIGMODE = ctypes.c_int32(mode)
@@ -230,7 +251,7 @@ class HamamatsuCamera():
 
         # Set capture mode.
         self.checkStatus(dcam.dcam_precapture(self.camera_handle,
-                                              ctypes.c_int(DCAM_CAPTUREMODE_SEQUENCE)),
+                                              ctypes.c_int(self.mode)),
                          "dcam_precapture")
 
 
@@ -369,7 +390,7 @@ class HamamatsuCamera():
                                                          ctypes.byref(p_attr)),
                                "dcam_getpropertyattr")
         if (ret == 0):
-            print(" property %s is not supported"%property_id)
+            print(" property %s is not supported" % property_name)
             return False
         else:
             return p_attr
@@ -451,7 +472,6 @@ class HamamatsuCamera():
 
         return rw
 
-
     def getPropertyValue(self, property_name):
         """Return the current setting of a particular property.
         @param property_name The name of the property.
@@ -518,8 +538,8 @@ class HamamatsuCamera():
                          "dcam_wait")
 
         # Check how many new frames there are.
-        b_index = ctypes.c_int32(0)
-        f_count = ctypes.c_int32(0)
+        b_index = ctypes.c_int32(0)  # Is pointer to receive the number of the frame in which the most recent data is stored.
+        f_count = ctypes.c_int32(0)  # is pointer to receive the number of frames captured since the capture operation was begun. If no frames have been captured, a value of –1 is returned
         self.checkStatus(dcam.dcam_gettransferinfo(self.camera_handle,
                                                    ctypes.byref(b_index),
                                                    ctypes.byref(f_count)),
@@ -529,9 +549,9 @@ class HamamatsuCamera():
         # Keep track of the maximum backlog.
         cur_frame_number = f_count.value
         backlog = cur_frame_number - self.last_frame_number
-        if (backlog > self.number_image_buffers):
-            print( "warning: hamamatsu camera frame buffer overrun detected!")
-        if (backlog > self.max_backlog):
+        if backlog > self.number_image_buffers:
+            print("warning: hamamatsu camera frame buffer overrun detected!")
+        if backlog > self.max_backlog:
             self.max_backlog = backlog
         self.last_frame_number = cur_frame_number
 
@@ -539,7 +559,7 @@ class HamamatsuCamera():
 
         # Create a list of the new frames.
         new_frames = []
-        if (cur_buffer_index < self.buffer_index):
+        if cur_buffer_index < self.buffer_index:
             for i in range(self.buffer_index + 1, self.number_image_buffers):
                 new_frames.append(i)
             for i in range(cur_buffer_index + 1):
@@ -600,7 +620,6 @@ class HamamatsuCamera():
         # Check ROI properties.
         roi_w = self.getPropertyValue("subarray_hsize")[0]
         roi_h = self.getPropertyValue("subarray_vsize")[0]
-
         # If the ROI is smaller than the entire frame turn on subarray mode
         if roi_w == self.max_width and roi_h == self.max_height:
             self.setPropertyValue("subarray_mode", 1)  # OFF
@@ -611,10 +630,8 @@ class HamamatsuCamera():
         """ Start data acquisition."""
         self.captureSetup()
 
-        #
         # Allocate Hamamatsu image buffers.
         # We allocate enough to buffer 2 seconds of data.
-        #
         n_buffers = int(2.0*self.getPropertyValue("internal_frame_rate")[0])
         self.number_image_buffers = n_buffers
         self.checkStatus(dcam.dcam_allocframe(self.camera_handle,
@@ -631,7 +648,7 @@ class HamamatsuCamera():
         self.checkStatus(dcam.dcam_idle(self.camera_handle),
                          "dcam_idle")
 
-        print("max camera backlog was %s of %s"%(self.max_backlog,self.number_image_buffers))
+        print("max camera backlog was %s of %s"%(self.max_backlog, self.number_image_buffers))
         self.max_backlog = 0
 
         # Free image buffers.
@@ -754,7 +771,7 @@ if __name__ == "__main__":
     print ("found: %s cameras"%n_cameras)
     if (n_cameras > 0):
 
-        hcam = HamamatsuCameraMR(0)
+        hcam = HamamatsuCamera(0)
         print(hcam.setPropertyValue("defect_correct_mode", 1))
         print("camera 0 model:", hcam.getModelInfo(0))
 
@@ -778,7 +795,7 @@ if __name__ == "__main__":
                         print("         %s/%s"%(key,text_values[key]))
 
         # Test setting & getting some parameters.
-        if 0:
+        if 1:
             print(hcam.setPropertyValue("exposure_time", 0.001))
 
             #print(hcam.setPropertyValue("subarray_hsize", 2048))
@@ -797,22 +814,21 @@ if __name__ == "__main__":
 
             params = ["internal_frame_rate",
                       "timing_readout_time",
-                      "exposure_time"]
-
-            #                      "image_height",
-            #                      "image_width",
-            #                      "image_framebytes",
-            #                      "buffer_framebytes",
-            #                      "buffer_rowbytes",
-            #                      "buffer_top_offset_bytes",
-            #                      "subarray_hsize",
-            #                      "subarray_vsize",
-            #                      "binning"]
+                      "exposure_time",
+                      "image_height",
+                      "image_width",
+                      "image_framebytes",
+                      #"buffer_framebytes",
+                      #"buffer_rowbytes",
+                      #"buffer_top_offset_bytes",
+                      "subarray_hsize",
+                      "subarray_vsize",
+                      "binning"]
             for param in params:
                 print(param, hcam.getPropertyValue(param)[0])
 
         # Test acquisition.
-        if 1:
+        if 0:
             import numpy as np
             import matplotlib.pyplot as plt
             hcam.startAcquisition()

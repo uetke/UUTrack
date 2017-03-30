@@ -26,6 +26,7 @@ class camera(cameraBase):
         #This is important to not have shufled patches of the CCD.
         #Have to check documentation!!
         self.camera.setPropertyValue("readout_speed", 1)
+        self.camera.setPropertyValue("defect_correct_mode", 1)
 
     def triggerCamera(self):
         """Triggers the camera.
@@ -47,9 +48,11 @@ class camera(cameraBase):
         if mode == self.MODE_CONTINUOUS:
             #self.camera.setPropertyValue("trigger_source", 1)
             self.camera.settrigger(1)
+            self.camera.setmode(self.camera.CAPTUREMODE_SEQUENCE)
         elif mode == self.MODE_SINGLE_SHOT:
             #self.camera.setPropertyValue("trigger_source", 3)
             self.camera.settrigger(1)
+            self.camera.setmode(self.camera.CAPTUREMODE_SNAP)
         elif mode == self.MODE_EXTERNAL:
             #self.camera.setPropertyValue("trigger_source", 2)
             self.camera.settrigger(2)
@@ -83,7 +86,7 @@ class camera(cameraBase):
         img = []
         for f in frames:
             d = f.getData()
-            d = np.reshape(d,(dims[0],dims[1]))
+            d = np.reshape(d, (dims[1], dims[0]))
             d = d.T
             img.append(d)
 #        img = frames[-1].getData()
@@ -96,15 +99,24 @@ class camera(cameraBase):
         X -- array type with the coordinates for the ROI X[0], X[1]
         Y -- array type with the coordinates for the ROI Y[0], Y[1]
         """
+        # First needs to go full frame, if not, throws an error of subframe not valid
+        self.camera.setPropertyValue("subarray_vpos", 0)
+        self.camera.setPropertyValue("subarray_hpos", 0)
+        self.camera.setPropertyValue("subarray_vsize", self.camera.max_height)
+        self.camera.setPropertyValue("subarray_hsize", self.camera.max_width)
+        self.camera.setSubArrayMode()
+
+        X-=1
+        Y-=1
         # Because of how Orca Flash 4 works, all the ROI parameters have to be multiple of 4.
+        hsize = int(abs(X[0]-X[1])/4)*4
         hpos = int(X[0]/4)*4
-        self.camera.setPropertyValue("subarray_hpos", hpos)
+        vsize = int(abs(Y[0]-Y[1])/4)*4
         vpos = int(Y[0]/4)*4
         self.camera.setPropertyValue("subarray_vpos", vpos)
-        hsize = int(abs(X[0]-X[1])/4)*4
-        self.camera.setPropertyValue("subarray_hsize", hsize)
-        vsize = int(abs(Y[0]-Y[1])/4)*4
+        self.camera.setPropertyValue("subarray_hpos", hpos)
         self.camera.setPropertyValue("subarray_vsize", vsize)
+        self.camera.setPropertyValue("subarray_hsize", hsize)
         self.camera.setSubArrayMode()
         return self.getSize()
 
@@ -113,7 +125,7 @@ class camera(cameraBase):
         """
         X = self.camera.getPropertyValue("subarray_hsize")
         Y = self.camera.getPropertyValue("subarray_vsize")
-        return X, Y
+        return X[0], Y[0]
 
     def getSerialNumber(self):
         """Returns the serial number of the camera.
@@ -127,7 +139,7 @@ class camera(cameraBase):
         The CCD width in pixels
 
         """
-        return self.camera.frame_x
+        return self.camera.max_width
 
     def GetCCDHeight(self):
         """
@@ -136,7 +148,7 @@ class camera(cameraBase):
         The CCD height in pixels
 
         """
-        return self.camera.frame_y
+        return self.camera.max_height
 
     def stopAcq(self):
         self.camera.stopAcquisition()
