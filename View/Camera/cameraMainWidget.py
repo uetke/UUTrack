@@ -16,6 +16,10 @@ class cameraMainWidget(QtGui.QWidget):
         self.viewport = GraphicsLayoutWidget()
         self.view = self.viewport.addViewBox(colspan=3, rowspan=3, lockAspect = True, enableMenu=True)
 
+        self.autoScale = QtGui.QAction("Auto Range", self.view.menu)
+        self.autoScale.triggered.connect(self.doAutoScale)
+        self.view.menu.addAction(self.autoScale)
+
         self.img = pg.ImageItem()
         self.img2 = pg.ImageItem() # To overlay another image if needed.
         self.img2.setOpacity(0.5)
@@ -36,9 +40,11 @@ class cameraMainWidget(QtGui.QWidget):
         self.view.addItem(self.vline1)
         self.view.addItem(self.vline2)
 
-        self.imv = pg.ImageView(view=self.view,imageItem=self.img)
+        self.imv = pg.ImageView(view=self.view, imageItem=self.img)
         self.imv.setMouseTracking(True)
         self.imv.getImageItem().scene().sigMouseMoved.connect(self.mouseMoved)
+        self.imv.getImageItem().scene().contextMenu = None
+
 
         # Add everything to the widget
         self.layout.addWidget(self.imv)
@@ -83,6 +89,11 @@ class cameraMainWidget(QtGui.QWidget):
                 self.showCrosshair = True
             self.crosshair[1].setValue(int(self.img.mapFromScene(arg).x()))
             self.crosshair[0].setValue(int(self.img.mapFromScene(arg).y()))
+
+    def doAutoScale(self):
+        h, y = self.img.getHistogram()
+        self.imv.setLevels(min(h),max(h))
+        # self.img.HistogramLUTItem.setLevels(min(h),max(h))
 
     # def updateImage(self,img):
     #     """Updates the image being displayed.
