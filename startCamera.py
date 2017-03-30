@@ -11,7 +11,7 @@ if __name__ == '__main__':
     global session
 
     base_dir = os.getcwd()
-    camera_config = os.path.join(base_dir, 'Config', 'Camera_Dashka.yml')
+    camera_config = os.path.join(base_dir, 'Config', 'Camera_defaults_example.yml')
     session = _session(camera_config)
 
     if session.Saving['directory'] == '':
@@ -36,6 +36,7 @@ if __name__ == '__main__':
     cam = camera(0)
     cam.initializeCamera()
     cam.setExposure(session.Camera['exposure_time'])
+
     app = QApplication(sys.argv)
     win = cameraMain(session,cam)
     win.show()
