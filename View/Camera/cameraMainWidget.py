@@ -33,6 +33,9 @@ class cameraMainWidget(QtGui.QWidget):
         self.crosshair.append(pg.InfiniteLine(angle=90, movable=False, pen={'color': 124, 'width': 4}))
         self.showCrosshair = False
 
+        self.crossCut = pg.InfiniteLine(angle=0, movable=False, pen={'color': 'g', 'width': 2})
+        self.showCrossCut = False
+
         self.view.addItem(self.img)
         self.view.addItem(self.img2)
         self.view.addItem(self.hline1)
@@ -72,6 +75,9 @@ class cameraMainWidget(QtGui.QWidget):
                     for c in self.crosshair:
                         self.view.removeItem(c)
                     self.showCrosshair = False
+                if self.showCrossCut:
+                    self.view.removeItem(self.crossCut)
+                    self.showCrossCut = False
         elif modifiers == QtCore.Qt.ControlModifier:
             if key.key() == 67:
                 self.emit(QtCore.SIGNAL('specialTask'))
@@ -89,6 +95,11 @@ class cameraMainWidget(QtGui.QWidget):
                 self.showCrosshair = True
             self.crosshair[1].setValue(int(self.img.mapFromScene(arg).x()))
             self.crosshair[0].setValue(int(self.img.mapFromScene(arg).y()))
+        elif modifiers == QtCore.Qt.AltModifier:
+            if not self.showCrossCut:
+                self.view.addItem(self.crossCut)
+            self.showCrossCut = True
+            self.crossCut.setValue(int(self.img.mapFromScene(arg).y()))
 
     def doAutoScale(self):
         h, y = self.img.getHistogram()
