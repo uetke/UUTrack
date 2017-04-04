@@ -8,7 +8,6 @@ setup(
               'UUTrack.View',
               'UUTrack.View.Camera',
               'UUTrack.Model',
-              'UUTrack.Model.lib',
               'UUTrack.Model.Cameras',
               'UUTrack.Controller',
               'UUTrack.Controller.devices',
