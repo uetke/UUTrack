@@ -25,5 +25,6 @@ setup(
         'Programming Language :: Python',
     ],
     package_data={'UUTrack': ['View/Camera/Icons/*.*', 'View/Camera/Icons/*.*']},
-    include_package_data=True
+    include_package_data=True,
+    install_requires=['lantz',]
 )
