@@ -11,7 +11,7 @@ if __name__ == '__main__':
     global session
 
     base_dir = os.getcwd()
-    camera_config = os.path.join(base_dir, 'Config', 'Camera_defaults_example.yml')
+    camera_config = os.path.join(base_dir, 'Config', 'Camera_Dashka.yml')
     session = _session(camera_config)
 
     if session.Saving['directory'] == '':

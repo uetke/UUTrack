@@ -25,6 +25,8 @@ from View.Camera.configWidget import configWidget
 from View.Camera.waterfallWidget import waterfallWidget
 from View.Camera.messageWidget import messageWidget
 from View.Camera.trajectoryWidget import trajectoryWidget
+from View.Camera.crossCut import crossCutWindow
+
 
 class cameraMain(QtGui.QMainWindow):
     """ Displays the camera.
@@ -55,8 +57,13 @@ class cameraMain(QtGui.QMainWindow):
         self.camViewer = cameraViewer(self._session, self.camera, parent=self)
         # Configuration widget with a parameter tree
         self.config = configWidget(self._session)
+        # Line cut widget
+        self.crossCut = crossCutWindow(parent=self)
+
         self.refreshTimer = QtCore.QTimer()
         self.connect(self.refreshTimer, QtCore.SIGNAL('timeout()'), self.updateGUI)
+        self.connect(self.refreshTimer, QtCore.SIGNAL('timeout()'), self.crossCut.update)
+
         self.refreshTimer.start(self._session.GUI['refresh_time'])
 
         # Worker thread for clearing the queue.
@@ -176,11 +183,7 @@ class cameraMain(QtGui.QMainWindow):
         if self.acquiring:
             self.workerThread.keep_acquiring = False
             while self.workerThread.isRunning():
-<<<<<<< HEAD
-                print('Waiting for Thread to finish')
-=======
                 pass
->>>>>>> develop
             self.acquiring = False
             self.camera.stopAcq()
             self.logMessage.append('<b>Info: </b>Stopped free run movie')
@@ -255,11 +258,7 @@ class cameraMain(QtGui.QMainWindow):
             del self.watData
             self.logMessage.append('<b>Info:</b> Waterfall closed')
 
-<<<<<<< HEAD
-    def setROI(self,X,Y):
-=======
     def setROI(self, X, Y):
->>>>>>> develop
         """Gets the ROI from the lines on the image. It also updates the GUI to accommodate the changes.
         """
         if not self.acquiring:
@@ -299,11 +298,7 @@ class cameraMain(QtGui.QMainWindow):
         # Updates to the real values
         X += self.corner_roi[0] - 1
         Y += self.corner_roi[1] - 1
-<<<<<<< HEAD
-        self.setROI(X,Y)
-=======
         self.setROI(X, Y)
->>>>>>> develop
 
     def clearROI(self):
         """Resets the roi to the full image.
@@ -388,6 +383,9 @@ class cameraMain(QtGui.QMainWindow):
         self.dockAction = QtGui.QAction('Restore Docks', self)
         self.dockAction.triggered.connect(self.setupDocks)
 
+        self.crossCutAction = QtGui.QAction(QtGui.QIcon('View/Icons/Ruler-icon.png'),'Show cross cut', self)
+        self.crossCutAction.triggered.connect(self.crossCut.show)
+
     def setupToolbar(self):
         """Setups the toolbar with the desired icons. It's placed into a function
         to make it easier to reuse in other windows.
@@ -397,6 +395,7 @@ class cameraMain(QtGui.QMainWindow):
         self.toolbar2 = self.addToolBar('Image')
         self.toolbar2.addAction(self.saveAction)
         self.toolbar2.addAction(self.snapAction)
+        self.toolbar2.addAction(self.crossCutAction)
         self.toolbar3 = self.addToolBar('Movie')
         self.toolbar3.addAction(self.movieAction)
         self.toolbar3.addAction(self.movieSaveStartAction)
@@ -471,37 +470,24 @@ class cameraMain(QtGui.QMainWindow):
             self.accumulateBuffer = True
             self.logMessage.append('<b>Info:</b> Started the buffer accumulation')
 
-    def getData(self,data,origin):
+    def getData(self, data, origin):
         """Gets the data that is being gathered by the working thread.
         """
-        print('Getting data')
         if origin == 'snap': #Single snap.
             self.acquiring=False
             self.workerThread.origin = None
-<<<<<<< HEAD
-            self.workerThread.keep_acquiring = False # This already happens in the worker thread itself.
-            self.camera.stopAcq()
-        if type(data) == type([]):
-=======
             self.workerThread.keep_acquiring = False  # This already happens in the worker thread itself.
             self.camera.stopAcq()
 
         if isinstance(data, list):
->>>>>>> develop
             for d in data:
                 if self.accumulateBuffer:
                     try:
                         self.q.put(d)
                     except:
                         print('Not enough memory!')
-<<<<<<< HEAD
-            self.tempImage = d
-            self.totalFrames+=1
-
-=======
             self.tempImage = data[-1]
             self.totalFrames+=1
->>>>>>> develop
         else:
             self.tempImage = data
             if self.accumulateBuffer:
@@ -514,12 +500,12 @@ class cameraMain(QtGui.QMainWindow):
                 d = np.array([np.sum(data,1)])
                 self.watData = np.concatenate((d,self.watData),axis=0)
 
-            self.totalFrames+=1
+            self.totalFrames += 1
         new_time = time.time()
         self.bufferTime = new_time - self.lastBuffer
         self.lastBuffer = new_time
 
-    def getCoordinates(self,X,Y):
+    def getCoordinates(self, X, Y):
         """Gets the coordinates emitted by the special task worker and stores them in an array"""
         self.centroidX.append(int(X))
         self.centroidY.append(int(Y))
@@ -612,6 +598,7 @@ class cameraMain(QtGui.QMainWindow):
             self.connect(self.specialTaskWorker,QtCore.SIGNAL('Coordinates'),self.getCoordinates)
             self.specialTaskWorker.start()
             self.specialTaskRunning = True
+            self.logMessage.append('<b>Info: </b>Started special task')
         else:
             print('special task already running')
 
@@ -620,6 +607,8 @@ class cameraMain(QtGui.QMainWindow):
         if self.specialTaskRunning:
             self.specialTaskWorker.keep_running = False
             self.specialTaskRunning = False
+            self.camera.stopAcq()
+            self.logMessage.append('<b>Info: </b>Stopped special task')
 
     def done(self):
         #self.saveRunning = False
@@ -634,6 +623,8 @@ class cameraMain(QtGui.QMainWindow):
         """
         if self.acquiring:
             self.stopMovie()
+        if self.specialTaskRunning:
+            self.stopSpecialTask()
         self.emit(QtCore.SIGNAL('CloseAll'))
         self.camera.stopCamera()
         self.movieSaveStop()

@@ -18,7 +18,7 @@ class camera(cameraBase):
         self.camera.Open()
         self.maxSize = self.camera.UpdateSizeMax()
         self.camera.SetClockSpeed('50MHz')
-        self.camera.SetGainMode("gain1")
+        self.camera.SetGainMode('gain1+30_Hardware') # Do not change! It is needed for avoiding weird lines in the images. The gain can be changed at the end of this method
         self.camera.SetTrigger("FreeRunning")
         self.camera.EnableAutoLevel(0)
         self.camera.SetExposure(10,"Millisec")
@@ -26,6 +26,7 @@ class camera(cameraBase):
         size = self.getSize()
         self.maxWidth = size[0]
         self.maxHeight = size[1]
+        self.camera.SetGainMode("gain30") # Change the gain here! Check scmoscam.py for information
 
     def triggerCamera(self):
         """Triggers the camera.
@@ -36,12 +37,14 @@ class camera(cameraBase):
         """Sets the exposure of the camera.
         """
         exposure = exposure*1000 # in order to always use microseconds
-        while self.camera.GetStatus(): # Wait until exposure is finished.
-            self.camera.SetExposure(np.int(exposure), 'Microsec')
+        #while self.camera.GetStatus(): # Wait until exposure is finished.
+        self.camera.SetExposure(np.int(exposure), 'Microsec')
 
     def readCamera(self):
         """Reads the camera
         """
+        if self.getAcquisitionMode() == self.MODE_CONTINUOUS:
+            self.triggerCamera()
         size,data = self.camera.GetImage()
         w,h = size
         mode = self.camera.GetMode()
@@ -91,6 +94,8 @@ class camera(cameraBase):
     def GetCCDHeight(self):
         return self.getSize()[1]
 
+    def stopAcq(self):
+            self.camera.AbortSnap()
 
     def stopCamera(self):
         """Stops the acquisition
