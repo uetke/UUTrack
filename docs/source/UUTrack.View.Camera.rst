@@ -60,6 +60,14 @@ UUTrack.View.Camera.messageWidget module
     :undoc-members:
     :show-inheritance:
 
+UUTrack.View.Camera.resources module
+------------------------------------
+
+.. automodule:: UUTrack.View.Camera.resources
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 UUTrack.View.Camera.specialTaskWorker module
 --------------------------------------------
 

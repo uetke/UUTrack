@@ -3,7 +3,7 @@ import os
 import xml.etree.cElementTree as ET
 
 from config_dir import base_dir
-from lib import get_all_caller
+from .logger import get_all_caller
 
 
 def xmltodict(element):
