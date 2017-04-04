@@ -5,6 +5,31 @@ The GUI has the possibility to show a waterfall and change the ROI of the camera
 
 The program also allows to trigger special tasks in a separate thread. To activate this option, the user needs to move the mouse on the image while pressing the **Ctrl** button. Pressing **Ctrl+C** triggers the special task, **Ctrl+V** stops it. **Shift+C**  clears the crosshair from the screen. 
 
+To acquire a cross cut of the image and display the standard deviation to mean ratio, press the **Alt** key while moving the mouse over the image. This also works live.
+
+## Installation ##
+To install UUTrack it is important to be inside of a virtual environment. From the command line you can run 
+
+```
+pip install -U https://github.com/aquilesC/UUTrack/archive/master.zip
+```
+Remember that in this case master refers to the branch you are installing. In case you want to work with specific branches of the code, you should change it. 
+
+If you are planning to develop code (you need to change, correct a bug or whatever is present), you need to install the package in an editable way. Just run:
+
+```
+pip install -e git+git@github.com:aquilesC/UUTrack.git#egg=UUTrack 
+```
+
+This will install the package inside of your virtual environment and will generate a copy of the repository in virtualenv/src/UUTrack that you can edit and push to the repository of your choice. This is very handy when you want to test new features, etc.
+
+### Installing your own fork of the code ###
+A smarter way to install the code is to fork it to your own user and the run the previous command from there. This allows you to easily update and track changes without sending pull requests, etc.
+
+## Running the program ##
+Once you have installed
+
+
 ## Software for monitoring a CCD. ##
 The program follows the Model-View-Controller design structure. This allows a rapid exchange of different parts of the code.
 
@@ -20,7 +45,7 @@ UUTrap: Main folder. Important executables should be placed here.
 
 ## Screenshot ##
 
-![Alt text](Camera/Icons/screenshot.png?raw=true "Optional Title")
+![Alt text](docs/resources/screenshot.png?raw=true "Optional Title")
 
 ### General Functionalities to achieve ###
 
