@@ -19,3 +19,6 @@ logbook.db
 *.exe
 *.pyc
 .idea
+build
+UUTracking.egg-info
+dist

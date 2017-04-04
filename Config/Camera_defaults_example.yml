@@ -17,7 +17,7 @@ GUI:
   refresh_time: 100 # Refresh rate of the GUI (in ms)
 
 Camera:
-  camera: Hamamatsu # the camera to use
+  camera: dummyCamera # the camera to use
   model: dummy
   exposure_time: 35 # Initial exposure time (in ms)
   binning_x: 1 # Binning
