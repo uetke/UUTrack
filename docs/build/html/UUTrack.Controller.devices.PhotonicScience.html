@@ -1,0 +1,518 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>UUTrack.Controller.devices.PhotonicScience package &#8212; UUTracking 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="uutrack-controller-devices-photonicscience-package">
+<h1>UUTrack.Controller.devices.PhotonicScience package<a class="headerlink" href="#uutrack-controller-devices-photonicscience-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-UUTrack.Controller.devices.PhotonicScience.scmoscam">
+<span id="uutrack-controller-devices-photonicscience-scmoscam-module"></span><h2>UUTrack.Controller.devices.PhotonicScience.scmoscam module<a class="headerlink" href="#module-UUTrack.Controller.devices.PhotonicScience.scmoscam" title="Permalink to this headline">¶</a></h2>
+<p>&#8220;scmoscam&#8221; is a wrapper class originally written by Perceval Guillou,
+<a class="reference external" href="mailto:perceval&#37;&#52;&#48;photonic-science&#46;com">perceval<span>&#64;</span>photonic-science<span>&#46;</span>com</a> in Py2 and has been tested successfully with
+scmoscontrol.dll SCMOS Pleora (GEV) control dll (x86 )v5.6.0.0 (date modified 10/2/2013)</p>
+<p>SaFa &#64;nanoLINX has adapted the wrapper class for a camera control program.</p>
+<p>v1.0, 24 feb. 2015,
+&#64;author: SaFa <a class="reference external" href="mailto:{S&#46;Faez&#37;&#52;&#48;uu&#46;nl">{S<span>&#46;</span>Faez<span>&#64;</span>uu<span>&#46;</span>nl</a>}</p>
+<dl class="class">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS">
+<em class="property">class </em><code class="descclassname">UUTrack.Controller.devices.PhotonicScience.scmoscam.</code><code class="descname">GEVSCMOS</code><span class="sig-paren">(</span><em>cwd_path</em>, <em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.AbortSnap">
+<code class="descname">AbortSnap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.AbortSnap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.AbortSnap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.AutoBinningFilter">
+<code class="descname">AutoBinningFilter</code><span class="sig-paren">(</span><em>enable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.AutoBinningFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.AutoBinningFilter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.Close">
+<code class="descname">Close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.Close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.Close" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.Demangle">
+<code class="descname">Demangle</code><span class="sig-paren">(</span><em>image_pointer</em>, <em>Nx</em>, <em>Ny</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.Demangle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.Demangle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.EnableAutoLevel">
+<code class="descname">EnableAutoLevel</code><span class="sig-paren">(</span><em>enable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.EnableAutoLevel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.EnableAutoLevel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.EnableBestFit">
+<code class="descname">EnableBestFit</code><span class="sig-paren">(</span><em>enable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.EnableBestFit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.EnableBestFit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.EnableBinningFilter">
+<code class="descname">EnableBinningFilter</code><span class="sig-paren">(</span><em>enable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.EnableBinningFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.EnableBinningFilter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.EnableBrightPixel">
+<code class="descname">EnableBrightPixel</code><span class="sig-paren">(</span><em>enable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.EnableBrightPixel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.EnableBrightPixel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.EnableClip">
+<code class="descname">EnableClip</code><span class="sig-paren">(</span><em>enable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.EnableClip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.EnableClip" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.EnableFlatField">
+<code class="descname">EnableFlatField</code><span class="sig-paren">(</span><em>enable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.EnableFlatField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.EnableFlatField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.EnableGamma">
+<code class="descname">EnableGamma</code><span class="sig-paren">(</span><em>enable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.EnableGamma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.EnableGamma" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.EnableOffset">
+<code class="descname">EnableOffset</code><span class="sig-paren">(</span><em>enable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.EnableOffset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.EnableOffset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.EnableRemapping">
+<code class="descname">EnableRemapping</code><span class="sig-paren">(</span><em>enable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.EnableRemapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.EnableRemapping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.EnableSharpening">
+<code class="descname">EnableSharpening</code><span class="sig-paren">(</span><em>enable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.EnableSharpening"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.EnableSharpening" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.EnableSmooth">
+<code class="descname">EnableSmooth</code><span class="sig-paren">(</span><em>enable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.EnableSmooth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.EnableSmooth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.EnableStreaming">
+<code class="descname">EnableStreaming</code><span class="sig-paren">(</span><em>enable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.EnableStreaming"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.EnableStreaming" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.FreeSequence">
+<code class="descname">FreeSequence</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.FreeSequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.FreeSequence" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetDLL">
+<code class="descname">GetDLL</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.GetDLL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetDLL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetDLLName">
+<code class="descname">GetDLLName</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.GetDLLName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetDLLName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetImage">
+<code class="descname">GetImage</code><span class="sig-paren">(</span><em>imp=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.GetImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetImage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetImagePointer">
+<code class="descname">GetImagePointer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.GetImagePointer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetImagePointer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetMode">
+<code class="descname">GetMode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.GetMode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetMode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetName">
+<code class="descname">GetName</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.GetName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetOptions">
+<code class="descname">GetOptions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.GetOptions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetOptions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetPedestal">
+<code class="descname">GetPedestal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.GetPedestal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetPedestal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetRawImage">
+<code class="descname">GetRawImage</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.GetRawImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetRawImage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetRemapSize">
+<code class="descname">GetRemapSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.GetRemapSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetRemapSize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetSequencePointer">
+<code class="descname">GetSequencePointer</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.GetSequencePointer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetSequencePointer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetSize">
+<code class="descname">GetSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.GetSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetSize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetSizeMax">
+<code class="descname">GetSizeMax</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.GetSizeMax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetSizeMax" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetState">
+<code class="descname">GetState</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.GetState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetState" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetStatus">
+<code class="descname">GetStatus</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.GetStatus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetStatus" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetTemperature">
+<code class="descname">GetTemperature</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.GetTemperature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.GetTemperature" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.Has8bitGainModes">
+<code class="descname">Has8bitGainModes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.Has8bitGainModes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.Has8bitGainModes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.HasBinning">
+<code class="descname">HasBinning</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.HasBinning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.HasBinning" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.HasClockSpeedLimit">
+<code class="descname">HasClockSpeedLimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.HasClockSpeedLimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.HasClockSpeedLimit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.HasHPMapping">
+<code class="descname">HasHPMapping</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.HasHPMapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.HasHPMapping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.HasIntensifier">
+<code class="descname">HasIntensifier</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.HasIntensifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.HasIntensifier" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.HasTemperature">
+<code class="descname">HasTemperature</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.HasTemperature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.HasTemperature" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.InitFunctions">
+<code class="descname">InitFunctions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.InitFunctions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.InitFunctions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.InitSequence">
+<code class="descname">InitSequence</code><span class="sig-paren">(</span><em>imnum</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.InitSequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.InitSequence" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.IsFlipped">
+<code class="descname">IsFlipped</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.IsFlipped"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.IsFlipped" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.IsInCamCor">
+<code class="descname">IsInCamCor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.IsInCamCor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.IsInCamCor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.IsIntensifier">
+<code class="descname">IsIntensifier</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.IsIntensifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.IsIntensifier" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.LoadCamDLL">
+<code class="descname">LoadCamDLL</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.LoadCamDLL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.LoadCamDLL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.MakeFlatField">
+<code class="descname">MakeFlatField</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.MakeFlatField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.MakeFlatField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.Open">
+<code class="descname">Open</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.Open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.Open" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.OpenMap">
+<code class="descname">OpenMap</code><span class="sig-paren">(</span><em>file_name='distortion.map'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.OpenMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.OpenMap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.Remap">
+<code class="descname">Remap</code><span class="sig-paren">(</span><em>image_pointer</em>, <em>Nx</em>, <em>Ny</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.Remap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.Remap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.ResetOptions">
+<code class="descname">ResetOptions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.ResetOptions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.ResetOptions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SaveSequence">
+<code class="descname">SaveSequence</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.SaveSequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SaveSequence" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SelectIportDevice">
+<code class="descname">SelectIportDevice</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.SelectIportDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SelectIportDevice" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetALCMaxExp">
+<code class="descname">SetALCMaxExp</code><span class="sig-paren">(</span><em>maxexp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.SetALCMaxExp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetALCMaxExp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetALCWin">
+<code class="descname">SetALCWin</code><span class="sig-paren">(</span><em>l</em>, <em>t</em>, <em>r</em>, <em>b</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.SetALCWin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetALCWin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetBFPeek">
+<code class="descname">SetBFPeek</code><span class="sig-paren">(</span><em>peek</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.SetBFPeek"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetBFPeek" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetChipGain">
+<code class="descname">SetChipGain</code><span class="sig-paren">(</span><em>gain</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.SetChipGain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetChipGain" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetClockSpeed">
+<code class="descname">SetClockSpeed</code><span class="sig-paren">(</span><em>mode</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.SetClockSpeed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetClockSpeed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetExposure">
+<code class="descname">SetExposure</code><span class="sig-paren">(</span><em>expo</em>, <em>unit</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.SetExposure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetExposure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetFlatAverage">
+<code class="descname">SetFlatAverage</code><span class="sig-paren">(</span><em>average_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.SetFlatAverage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetFlatAverage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetFlickerMode">
+<code class="descname">SetFlickerMode</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.SetFlickerMode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetFlickerMode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetGainMode">
+<code class="descname">SetGainMode</code><span class="sig-paren">(</span><em>mode</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.SetGainMode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetGainMode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetGammaBright">
+<code class="descname">SetGammaBright</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.SetGammaBright"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetGammaBright" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetGammaPeak">
+<code class="descname">SetGammaPeak</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.SetGammaPeak"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetGammaPeak" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetIFDelay">
+<code class="descname">SetIFDelay</code><span class="sig-paren">(</span><em>delay</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.SetIFDelay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetIFDelay" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetIntensifierGain">
+<code class="descname">SetIntensifierGain</code><span class="sig-paren">(</span><em>gain</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.SetIntensifierGain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetIntensifierGain" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetPowerSavingMode">
+<code class="descname">SetPowerSavingMode</code><span class="sig-paren">(</span><em>mode</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.SetPowerSavingMode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetPowerSavingMode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetSoftBin">
+<code class="descname">SetSoftBin</code><span class="sig-paren">(</span><em>Sx</em>, <em>Sy</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.SetSoftBin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetSoftBin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetSubArea">
+<code class="descname">SetSubArea</code><span class="sig-paren">(</span><em>left</em>, <em>top</em>, <em>right</em>, <em>bottom</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.SetSubArea"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetSubArea" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetTemperature">
+<code class="descname">SetTemperature</code><span class="sig-paren">(</span><em>temp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.SetTemperature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetTemperature" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetTrigger">
+<code class="descname">SetTrigger</code><span class="sig-paren">(</span><em>mode</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.SetTrigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetTrigger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetVideoGain">
+<code class="descname">SetVideoGain</code><span class="sig-paren">(</span><em>gain</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.SetVideoGain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetVideoGain" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.Snap">
+<code class="descname">Snap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.Snap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.Snap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SnapAndReturn">
+<code class="descname">SnapAndReturn</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.SnapAndReturn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SnapAndReturn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SnapSequence">
+<code class="descname">SnapSequence</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.SnapSequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SnapSequence" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SoftBinImage">
+<code class="descname">SoftBinImage</code><span class="sig-paren">(</span><em>image_pointer</em>, <em>Nx</em>, <em>Ny</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.SoftBinImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SoftBinImage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.UnloadCamDLL">
+<code class="descname">UnloadCamDLL</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.UnloadCamDLL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.UnloadCamDLL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.UpdateSize">
+<code class="descname">UpdateSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.UpdateSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.UpdateSize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.UpdateSizeMax">
+<code class="descname">UpdateSizeMax</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/UUTrack/Controller/devices/PhotonicScience/scmoscam.html#GEVSCMOS.UpdateSizeMax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.UpdateSizeMax" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-UUTrack.Controller.devices.PhotonicScience">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-UUTrack.Controller.devices.PhotonicScience" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">UUTrack.Controller.devices.PhotonicScience package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-UUTrack.Controller.devices.PhotonicScience.scmoscam">UUTrack.Controller.devices.PhotonicScience.scmoscam module</a></li>
+<li><a class="reference internal" href="#module-UUTrack.Controller.devices.PhotonicScience">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/UUTrack.Controller.devices.PhotonicScience.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Aquiles Carattino.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/UUTrack.Controller.devices.PhotonicScience.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
