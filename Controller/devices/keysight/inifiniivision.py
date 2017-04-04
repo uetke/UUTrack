@@ -469,10 +469,7 @@ class Funcgen(MessageBasedDriver):
 
 
 if __name__ == '__main__':
-    from lantz.ui.app import start_test_app
-
     with Funcgen.via_usb() as inst:
-        # start_test_app(inst)
         inst.initialize()
 
         print(inst.idn)
