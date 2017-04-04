@@ -7,7 +7,6 @@ Subpackages
 .. toctree::
 
     UUTrack.Model.Cameras
-    UUTrack.Model.lib
 
 Submodules
 ----------
