@@ -7,7 +7,8 @@
 """
 import os
 
-f = """%YAML 1.2
+f = """ 
+%YAML 1.2
 ---
 # Default parameters for the Tracking program
 # All parameters can be changed to accommodate user needs.
@@ -40,7 +41,8 @@ Camera:
 
 Tracking: # Not yet implemented, will show up in the config window
   param_1: 0.
-  param_2: 0"""
+  param_2: 0
+"""
 
 if not os.path.exists('Config'):
     os.makedirs('Config')
