@@ -20,7 +20,7 @@ UUTrap: Main folder. Important executables should be placed here.
 
 ## Screenshot ##
 
-![Alt text](View/Icons/screenshot.png?raw=true "Optional Title")
+![Alt text](Camera/Icons/screenshot.png?raw=true "Optional Title")
 
 ### General Functionalities to achieve ###
 

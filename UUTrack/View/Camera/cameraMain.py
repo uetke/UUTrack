@@ -15,18 +15,18 @@ from pyqtgraph import ProgressDialog
 from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.dockarea import *
 
-from View.Camera.cameraMainWidget import cameraMainWidget
-from View.Camera.cameraViewer import cameraViewer
-from View.Camera.clearQueueThread import clearQueueThread
-from View.Camera.configWidget import configWidget
-from View.Camera.crossCut import crossCutWindow
-from View.Camera.messageWidget import messageWidget
-from View.Camera.specialTaskWorker import specialTaskWorker
-from View.Camera.waterfallWidget import waterfallWidget
-from View.Camera.workerThread import workThread
-from trajectoryWidget import trajectoryWidget
-from workerSaver import workerSaver
-
+from .cameraMainWidget import cameraMainWidget
+from .cameraViewer import cameraViewer
+from .clearQueueThread import clearQueueThread
+from .configWidget import configWidget
+from .crossCut import crossCutWindow
+from .messageWidget import messageWidget
+from .specialTaskWorker import specialTaskWorker
+from .waterfallWidget import waterfallWidget
+from .workerThread import workThread
+from .trajectoryWidget import trajectoryWidget
+from ...Model.workerSaver import workerSaver
+from . import resources
 
 class cameraMain(QtGui.QMainWindow):
     """ Displays the camera.
@@ -319,52 +319,52 @@ class cameraMain(QtGui.QMainWindow):
         """Setups the actions that the program will have. It is placed into a function
         to make it easier to reuse in other windows.
         """
-        self.exitAction = QtGui.QAction(QtGui.QIcon('View/Icons/power-icon.png'), '&Exit', self)
+        self.exitAction = QtGui.QAction(QtGui.QIcon(':Icons/power-icon.png'), '&Exit', self)
         self.exitAction.setShortcut('Ctrl+Q')
         self.exitAction.setStatusTip('Exit application')
         self.exitAction.triggered.connect(self.exitSafe)
 
-        self.saveAction = QtGui.QAction(QtGui.QIcon('View/Icons/floppy-icon.png'),'&Save image',self)
+        self.saveAction = QtGui.QAction(QtGui.QIcon(':Icons/floppy-icon.png'),'&Save image',self)
         self.saveAction.setShortcut('Ctrl+S')
         self.saveAction.setStatusTip('Save Image')
         self.saveAction.triggered.connect(self.saveImage)
 
-        self.snapAction = QtGui.QAction(QtGui.QIcon('View/Icons/snap.png'),'S&nap photo',self)
+        self.snapAction = QtGui.QAction(QtGui.QIcon(':Icons/snap.png'),'S&nap photo',self)
         self.snapAction.setShortcut(QtCore.Qt.Key_F5)
         self.snapAction.setStatusTip('Snap Image')
         self.snapAction.triggered.connect(self.snap)
 
-        self.movieAction = QtGui.QAction(QtGui.QIcon('View/Icons/video-icon.png'),'Start &movie',self)
+        self.movieAction = QtGui.QAction(QtGui.QIcon(':Icons/video-icon.png'),'Start &movie',self)
         self.movieAction.setShortcut('Ctrl+R')
         self.movieAction.setStatusTip('Start Movie')
         self.movieAction.triggered.connect(self.startMovie)
 
-        self.movieSaveStartAction = QtGui.QAction(QtGui.QIcon('View/Icons/Download-Database-icon.png'),'Continuous saves',self)
+        self.movieSaveStartAction = QtGui.QAction(QtGui.QIcon(':Icons/Download-Database-icon.png'),'Continuous saves',self)
         self.movieSaveStartAction.setShortcut('Ctrl+M')
         self.movieSaveStartAction.setStatusTip('Continuous save to disk')
         self.movieSaveStartAction.triggered.connect(self.movieSave)
 
-        self.movieSaveStopAction = QtGui.QAction(QtGui.QIcon('View/Icons/Delete-Database-icon.png'),'Stop continuous saves',self)
+        self.movieSaveStopAction = QtGui.QAction(QtGui.QIcon(':Icons/Delete-Database-icon.png'),'Stop continuous saves',self)
         self.movieSaveStopAction.setShortcut('Ctrl+N')
         self.movieSaveStopAction.setStatusTip('Stop continuous save to disk')
         self.movieSaveStopAction.triggered.connect(self.movieSaveStop)
 
-        self.startWaterfallAction = QtGui.QAction(QtGui.QIcon('View/Icons/Blue-Waterfall-icon.png'),'Start &Waterfall',self)
+        self.startWaterfallAction = QtGui.QAction(QtGui.QIcon(':Icons/Blue-Waterfall-icon.png'),'Start &Waterfall',self)
         self.startWaterfallAction.setShortcut('Ctrl+W')
         self.startWaterfallAction.setStatusTip('Start Waterfall')
         self.startWaterfallAction.triggered.connect(self.startWaterfall)
 
-        self.setROIAction = QtGui.QAction(QtGui.QIcon('View/Icons/Zoom-In-icon.png'),'Set &ROI',self)
+        self.setROIAction = QtGui.QAction(QtGui.QIcon(':Icons/Zoom-In-icon.png'),'Set &ROI',self)
         self.setROIAction.setShortcut('Ctrl+T')
         self.setROIAction.setStatusTip('Set ROI')
         self.setROIAction.triggered.connect(self.getROI)
 
-        self.clearROIAction = QtGui.QAction(QtGui.QIcon('View/Icons/Zoom-Out-icon.png'),'Set R&OI',self)
+        self.clearROIAction = QtGui.QAction(QtGui.QIcon(':Icons/Zoom-Out-icon.png'),'Set R&OI',self)
         self.clearROIAction.setShortcut('Ctrl+T')
         self.clearROIAction.setStatusTip('Clear ROI')
         self.clearROIAction.triggered.connect(self.clearROI)
 
-        self.accumulateBufferAction = QtGui.QAction(QtGui.QIcon('View/Icons/disk-save.png'),'Accumulate buffer',self)
+        self.accumulateBufferAction = QtGui.QAction(QtGui.QIcon(':Icons/disk-save.png'),'Accumulate buffer',self)
         self.accumulateBufferAction.setShortcut('Ctrl+B')
         self.accumulateBufferAction.setStatusTip('Start or stop buffer accumulation')
         self.accumulateBufferAction.triggered.connect(self.bufferStatus)
@@ -383,7 +383,7 @@ class cameraMain(QtGui.QMainWindow):
         self.dockAction = QtGui.QAction('Restore Docks', self)
         self.dockAction.triggered.connect(self.setupDocks)
 
-        self.crossCutAction = QtGui.QAction(QtGui.QIcon('View/Icons/Ruler-icon.png'),'Show cross cut', self)
+        self.crossCutAction = QtGui.QAction(QtGui.QIcon(':Icons/Ruler-icon.png'),'Show cross cut', self)
         self.crossCutAction.triggered.connect(self.crossCut.show)
 
     def setupToolbar(self):

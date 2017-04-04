@@ -124,6 +124,13 @@ class camera(cameraBase):
         self.ybin = ybin
         pass
 
+    def stopAcq(self):
+        """
+        Stops the acquisition
+        :return: bool
+        """
+        return True
+
     def stopCamera(self):
         """Stops the acquisition and closes the connection with the camera.
         """

@@ -1,4 +1,5 @@
-"""Best place to store variables that can be shared between different classes.
+"""
+    Best place to store variables that can be shared between different classes.
 """
 import yaml
 from PyQt4.QtCore import QObject, SIGNAL

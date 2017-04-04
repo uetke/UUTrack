@@ -6,8 +6,8 @@ import logging
 import os.path
 import xml.etree.cElementTree as ET
 
-from lib import get_all_caller
-from lib import xmltodict
+from .lib.logger import get_all_caller
+from .lib.xml2dict import xmltodict
 
 
 class DeviceConfig():

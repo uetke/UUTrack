@@ -3,7 +3,7 @@ layer for the most common uses of cameras.
 """
 import numpy as np
 
-from UUTrack.Controller import GEVSCMOS
+from UUTrack.Controller.devices.PhotonicScience.scmoscam import GEVSCMOS
 from ._skeleton import cameraBase
 
 NUMPY_MODES = {"L":np.uint8, "I;16":np.uint16}

@@ -1,4 +1,5 @@
 import pyqtgraph as pg
+import numpy as np
 from pyqtgraph.Qt import QtGui
 
 
@@ -21,8 +22,8 @@ class crossCutWindow(QtGui.QMainWindow):
         if self.parent != None:
             if len(self.parent.tempImage) > 0:
                 #self.cc.plot(self.parent.tempImage[:, 50])
-                slice = self.parent.camWidget.crossCut.value()
-                d = np.ascontiguousarray(self.parent.tempImage[:, slice])
+                s = self.parent.camWidget.crossCut.value()
+                d = np.ascontiguousarray(self.parent.tempImage[:, s])
                 self.p.setData(d)
                 self.text.setText(str(np.std(d)/np.mean(d)))
 

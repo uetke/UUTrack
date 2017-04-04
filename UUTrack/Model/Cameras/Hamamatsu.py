@@ -18,8 +18,11 @@ class camera(cameraBase):
         self.mode = self.MODE_SINGLE_SHOT
 
     def initializeCamera(self):
-        """Initializes the camera.
         """
+        Initializes the camera.
+        :return: 
+        """
+
         self.camera.initCamera()
         self.maxWidth = self.GetCCDWidth()
         self.maxHeight = self.GetCCDHeight()
