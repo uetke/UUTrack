@@ -14,7 +14,8 @@ setup(
               'UUTrack.Controller.devices',
               'UUTrack.Controller.devices.keysight',
               'UUTrack.Controller.devices.hamamatsu',
-              'UUTrack.Controller.devices.PhotonicScience'],
+              'UUTrack.Controller.devices.PhotonicScience',
+              'Config'],
     url='https://github.com/aquilesC/UUTrack',
     license='MIT',
     author='Aquiles',
@@ -24,7 +25,8 @@ setup(
         'Operating System :: Microsoft :: Windows',
         'Programming Language :: Python',
     ],
-    package_data={'UUTrack': ['View/Camera/Icons/*.*', 'View/Camera/Icons/*.*']},
+    package_data={'UUTrack': ['View/Camera/Icons/*.*', 'View/Camera/Icons/*.*'],
+                  'Config': ['Config/*.*', 'Config/*.*']},
     include_package_data=True,
     install_requires=['lantz',]
 )
