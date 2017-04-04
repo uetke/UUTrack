@@ -8,7 +8,7 @@ from .Model._session import _session
 from .View.Camera.cameraMain import cameraMain
 
 
-def start(configDir='Config',configFile='Camera_defaults_example.yml'):
+def start(configDir='',configFile=''):
     """
     Starts the main window of the program and loads the appropirate configuration file.
     :param str configDir: Folder where the config file is stored
@@ -17,7 +17,10 @@ def start(configDir='Config',configFile='Camera_defaults_example.yml'):
     """
     global session
 
-    base_dir = os.getcwd()
+    if configDir != '':
+        base_dir = os.getcwd()
+    else:
+        base_dir = os.path.dirname(os.path.realpath(__file__))
     print(base_dir)
     camera_config = os.path.join(base_dir, configDir, configFile)
     session = _session(camera_config)
