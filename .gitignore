@@ -19,3 +19,4 @@ logbook.db
 *.exe
 *.pyc
 .idea
+build
