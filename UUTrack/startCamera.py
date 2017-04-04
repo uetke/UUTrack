@@ -23,7 +23,7 @@ def start(configDir='',configFile=''):
         base_dir = os.path.dirname(os.path.realpath(__file__))
 
     if configFile == '':
-        from .config_dir import *
+        from . import config_dir
 
     print(base_dir)
     camera_config = os.path.join(base_dir, configDir, configFile)
