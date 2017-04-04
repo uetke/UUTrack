@@ -17,9 +17,14 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+import os
 import sys
-sys.path.insert(0, 'C:\\Users\\Aquiles\\Documents\\Programs\\UUTracking')
-
+# dir = os.path.dirname(__file__)
+# sys.path.insert(0, os.path.realpath(os.path.join(dir,'../../UUTrack')))
+sys.path.insert(0, os.path.abspath('./'))
+sys.path.insert(0, os.path.abspath('../'))
+sys.path.insert(0, os.path.abspath('./'))
+sys.path.insert(0, os.path.abspath('../../'))
 
 # -- General configuration ------------------------------------------------
 

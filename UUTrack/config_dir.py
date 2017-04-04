@@ -18,7 +18,7 @@ User:
 
 Saving:
   auto_save: False
-  directory: C:\Users\Aquiles\Data
+  directory: C:\\Users\\Aquiles\\Data
   filename_video: Video # Can be the same filename for video and photo
   filename_photo: Snap
 

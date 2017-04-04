@@ -11,6 +11,7 @@ from .View.Camera.cameraMain import cameraMain
 def start(configDir='',configFile=''):
     """
     Starts the main window of the program and loads the appropirate configuration file.
+
     :param str configDir: Folder where the config file is stored
     :param str configFile: Name of the config file
     :return: Window for the camera
