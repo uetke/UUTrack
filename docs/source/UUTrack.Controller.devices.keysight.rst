@@ -4,14 +4,9 @@ UUTrack.Controller.devices.keysight package
 Submodules
 ----------
 
-UUTrack.Controller.devices.keysight.inifiniivision module
----------------------------------------------------------
+.. toctree::
 
-.. automodule:: UUTrack.Controller.devices.keysight.inifiniivision
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   UUTrack.Controller.devices.keysight.inifiniivision
 
 Module contents
 ---------------

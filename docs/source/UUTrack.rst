@@ -13,22 +13,10 @@ Subpackages
 Submodules
 ----------
 
-UUTrack.config_dir module
--------------------------
+.. toctree::
 
-.. automodule:: UUTrack.config_dir
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-UUTrack.startCamera module
---------------------------
-
-.. automodule:: UUTrack.startCamera
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   UUTrack.config_dir
+   UUTrack.startCamera
 
 Module contents
 ---------------

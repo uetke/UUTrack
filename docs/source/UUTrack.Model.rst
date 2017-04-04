@@ -11,22 +11,10 @@ Subpackages
 Submodules
 ----------
 
-UUTrack.Model.config module
----------------------------
+.. toctree::
 
-.. automodule:: UUTrack.Model.config
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-UUTrack.Model.workerSaver module
---------------------------------
-
-.. automodule:: UUTrack.Model.workerSaver
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   UUTrack.Model.config
+   UUTrack.Model.workerSaver
 
 Module contents
 ---------------

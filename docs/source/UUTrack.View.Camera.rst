@@ -4,102 +4,20 @@ UUTrack.View.Camera package
 Submodules
 ----------
 
-UUTrack.View.Camera.cameraMain module
--------------------------------------
+.. toctree::
 
-.. automodule:: UUTrack.View.Camera.cameraMain
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-UUTrack.View.Camera.cameraMainWidget module
--------------------------------------------
-
-.. automodule:: UUTrack.View.Camera.cameraMainWidget
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-UUTrack.View.Camera.cameraViewer module
----------------------------------------
-
-.. automodule:: UUTrack.View.Camera.cameraViewer
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-UUTrack.View.Camera.clearQueueThread module
--------------------------------------------
-
-.. automodule:: UUTrack.View.Camera.clearQueueThread
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-UUTrack.View.Camera.configWidget module
----------------------------------------
-
-.. automodule:: UUTrack.View.Camera.configWidget
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-UUTrack.View.Camera.crossCut module
------------------------------------
-
-.. automodule:: UUTrack.View.Camera.crossCut
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-UUTrack.View.Camera.messageWidget module
-----------------------------------------
-
-.. automodule:: UUTrack.View.Camera.messageWidget
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-UUTrack.View.Camera.resources module
-------------------------------------
-
-.. automodule:: UUTrack.View.Camera.resources
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-UUTrack.View.Camera.specialTaskWorker module
---------------------------------------------
-
-.. automodule:: UUTrack.View.Camera.specialTaskWorker
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-UUTrack.View.Camera.trajectoryWidget module
--------------------------------------------
-
-.. automodule:: UUTrack.View.Camera.trajectoryWidget
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-UUTrack.View.Camera.waterfallWidget module
-------------------------------------------
-
-.. automodule:: UUTrack.View.Camera.waterfallWidget
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-UUTrack.View.Camera.workerThread module
----------------------------------------
-
-.. automodule:: UUTrack.View.Camera.workerThread
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   UUTrack.View.Camera.cameraMain
+   UUTrack.View.Camera.cameraMainWidget
+   UUTrack.View.Camera.cameraViewer
+   UUTrack.View.Camera.clearQueueThread
+   UUTrack.View.Camera.configWidget
+   UUTrack.View.Camera.crossCut
+   UUTrack.View.Camera.messageWidget
+   UUTrack.View.Camera.resources
+   UUTrack.View.Camera.specialTaskWorker
+   UUTrack.View.Camera.trajectoryWidget
+   UUTrack.View.Camera.waterfallWidget
+   UUTrack.View.Camera.workerThread
 
 Module contents
 ---------------

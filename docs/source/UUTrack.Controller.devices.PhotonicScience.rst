@@ -4,14 +4,9 @@ UUTrack.Controller.devices.PhotonicScience package
 Submodules
 ----------
 
-UUTrack.Controller.devices.PhotonicScience.scmoscam module
-----------------------------------------------------------
+.. toctree::
 
-.. automodule:: UUTrack.Controller.devices.PhotonicScience.scmoscam
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   UUTrack.Controller.devices.PhotonicScience.scmoscam
 
 Module contents
 ---------------
