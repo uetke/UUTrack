@@ -21,6 +21,10 @@ def start(configDir='',configFile=''):
         base_dir = os.getcwd()
     else:
         base_dir = os.path.dirname(os.path.realpath(__file__))
+
+    if configFile == '':
+        from .config_dir import *
+
     print(base_dir)
     camera_config = os.path.join(base_dir, configDir, configFile)
     session = _session(camera_config)
