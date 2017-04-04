@@ -230,7 +230,7 @@ class cameraMain(QtGui.QMainWindow):
     def startWaterfall(self):
         """Starts the waterfall. The waterfall can be accelerated if camera supports hardware binning in the appropriate
         direction. If not, has to be done via software but the acquisition time cannot be improved.
-        IDEA: Fast waterfall should have separate window, since the acquisition of the full CCD will be stopped.
+        TODO: Fast waterfall should have separate window, since the acquisition of the full CCD will be stopped.
         """
         if not self.showWaterfall:
             self.watWidget = waterfallWidget()

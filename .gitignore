@@ -20,3 +20,5 @@ logbook.db
 *.pyc
 .idea
 build
+UUTracking.egg-info
+dist
