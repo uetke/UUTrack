@@ -21,9 +21,6 @@ import os
 import sys
 # dir = os.path.dirname(__file__)
 # sys.path.insert(0, os.path.realpath(os.path.join(dir,'../../UUTrack')))
-sys.path.insert(0, os.path.abspath('./'))
-sys.path.insert(0, os.path.abspath('../'))
-sys.path.insert(0, os.path.abspath('./'))
 sys.path.insert(0, os.path.abspath('../../'))
 
 # -- General configuration ------------------------------------------------
@@ -91,7 +88,7 @@ try:
     import sphinx_rtd_theme
     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 except:
-    html_theme = 'alabaster'
+    html_theme = 'sphinxdoc'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -183,4 +180,4 @@ epub_copyright = copyright
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ['search.html']
 
-
+show_authors = True

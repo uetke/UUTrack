@@ -3,8 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-UUTracking a powerful interface for scientific cameras and instruments
-======================================
+UUTracking
+==========
+
+#A powerful interface for scientific cameras and instruments#
 
 UUtracking is shipped as a package that can be installed into a virtual environment with the use of pip. It can be both triggered with a built in function or can be included into larger projects.
 
@@ -28,13 +30,24 @@ Your own fork of the code
 
 A smarter way to install the code is to fork it to your own user and the run the previous command from there. This allows you to easily update and track changes without sending pull requests, etc.
 
+Start the program
+-----------------
+To run the program you can just import the startCamera module from the root of UUTrack and trigger it with a config file::
 
+   from UUTrack import startCamera
+
+   ConfigDir = 'Path/to/config'
+   ConfigFile = 'config.yml'
+   startCamera.start(ConfigDir, ConfigFile)
+
+Note that the splitting between the config directory and the config file is done to allow users to have different config files in the same directory, for example for different configurations of the setup. It also allows to include a pre-window to select with a GUI the desired configuration and then trigger the ```startCamera.start``` method.
 
 .. toctree::
-   :maxdepth: 8
+   :maxdepth: 2
+   :caption: Contents:
+
    modules
    python.working
-   :caption: Contents:
 
 
 
