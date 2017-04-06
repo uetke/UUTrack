@@ -1,4 +1,4 @@
-# UUTtracking v0.1 #
+# UUTtracking v0.2 #
 This program can be used for monitoring a CCD camera. The structure allows to perform high framerate acquisitions while displaying the images to the user at a configurable rate. Data can be accumulated in a queue for saving while acquiring or saving retroactively. 
 
 The GUI has the possibility to show a waterfall and change the ROI of the camera by dragging vertical and horizontal lines. 
