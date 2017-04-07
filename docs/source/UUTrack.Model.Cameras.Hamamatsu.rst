@@ -1,9 +1,7 @@
-.. _hamamatsu:
-
-Hamamatsu
-=========
-
 .. automodule:: UUTrack.Model.Cameras.Hamamatsu
     :members:
-    :undoc-members:
+    :show-inheritance:
+
+.. autoclass:: UUTrack.Model.Cameras.Hamamatsu.camera
+    :members:
     :show-inheritance:

@@ -13,11 +13,11 @@ The config file is a Yaml file that doesn't have predefined needs. Whatever is i
     # All parameters can be changed to accommodate user needs.
     # All parameters can be changed at runtime with the appropriate config window
     User:
-      name: Dashka
+      name: Test Subject
 
     Saving:
       auto_save: False
-      directory: C:\data\nanoCET
+      directory: C:\data\Testing
       filename_video: Video # Can be the same filename for video and photo
       filename_photo: Snap
 
@@ -26,8 +26,8 @@ The config file is a Yaml file that doesn't have predefined needs. Whatever is i
       refresh_time: 100 # Refresh rate of the GUI (in ms)
 
     Camera:
-      camera: Hamamatsu # the camera to use
-      model: Orca Flash
+      camera: dummyCamera # the camera to use
+      model: dummyModel # This hasn't been implemented, but is useful for metadata storing.
       exposure_time: 200 # Initial exposure time (in ms)
       binning_x: 1 # Binning
       binning_y: 1

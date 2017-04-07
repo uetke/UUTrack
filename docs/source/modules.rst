@@ -1,7 +1,9 @@
 UUTrack
 =======
 
+Here you find all the documentation.
+
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
 
    UUTrack

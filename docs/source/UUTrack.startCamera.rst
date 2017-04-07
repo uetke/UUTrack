@@ -1,5 +1,3 @@
-UUTrack.startCamera module
-==========================
 
 .. automodule:: UUTrack.startCamera
     :members:

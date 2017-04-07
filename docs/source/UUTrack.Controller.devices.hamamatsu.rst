@@ -1,17 +1,3 @@
-UUTrack.Controller.devices.hamamatsu package
-============================================
-
-Submodules
-----------
-
-.. toctree::
-
-   UUTrack.Controller.devices.hamamatsu.hamamatsu_camera
-
-Module contents
----------------
-
-.. automodule:: UUTrack.Controller.devices.hamamatsu
+.. automodule:: UUTrack.Controller.devices.hamamatsu.hamamatsu_camera
     :members:
-    :undoc-members:
     :show-inheritance:

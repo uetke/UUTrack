@@ -1,9 +1,7 @@
-.. _dummyCamera:
-
-dummyCamera
-===========
-
 .. automodule:: UUTrack.Model.Cameras.dummyCamera
     :members:
-    :undoc-members:
+    :show-inheritance:
+
+.. autoclass:: UUTrack.Model.Cameras.dummyCamera.camera
+    :members:
     :show-inheritance:

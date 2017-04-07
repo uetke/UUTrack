@@ -1,13 +1,14 @@
 UUTrack.View.Camera package
 ===========================
 
+All the visualization of the camera is centralized in this package. It defines the windows and widgets and more importantly the :mod:`Worker Thread <UUTrack.View.Camera.workerThread>`.
+
 Submodules
 ----------
 
 .. toctree::
 
    UUTrack.View.Camera.cameraMain
-   UUTrack.View.Camera.cameraMainWidget
    UUTrack.View.Camera.cameraViewer
    UUTrack.View.Camera.clearQueueThread
    UUTrack.View.Camera.configWidget
@@ -18,11 +19,3 @@ Submodules
    UUTrack.View.Camera.trajectoryWidget
    UUTrack.View.Camera.waterfallWidget
    UUTrack.View.Camera.workerThread
-
-Module contents
----------------
-
-.. automodule:: UUTrack.View.Camera
-    :members:
-    :undoc-members:
-    :show-inheritance:

@@ -5,5 +5,8 @@
 .. autoclass:: UUTrack.View.Camera.cameraMain.cameraMain
     :members:
     :special-members:
-    :undoc-members:
+    :show-inheritance:
+
+.. automodule:: UUTrack.View.Camera.cameraMainWidget
+    :members:
     :show-inheritance:
