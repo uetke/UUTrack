@@ -1,1 +1,7 @@
-#!/usr/bin/python
+"""
+    UUTrack.Controller.devices.hamamatsu
+    ====================================
+
+    :company: Hamamatsu.
+
+"""

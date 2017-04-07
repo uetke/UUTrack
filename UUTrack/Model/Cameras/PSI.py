@@ -1,5 +1,14 @@
-"""Classes and methods for working with cameras. It should provide an abstraction
-layer for the most common uses of cameras.
+"""
+    UUTrack.Model.Cameras.PSI
+    =========================
+    
+    Model for Photonic Science GEV Cameras. The model just implements the basic methods defined in the 
+    :meth:`~UUTrack.Model.Cameras._skeleton.cameraBase` using a Photonic Sicence camera. The controller for this 
+    camera is :mod:`~UUTrack.Controller.devices.PhotonicScience`
+    
+    :copyright: 2017
+    
+    .. sectionauthor:: Aquiles Carattino <aquiles@aquicarattino.com>
 """
 import numpy as np
 
@@ -8,13 +17,19 @@ from ._skeleton import cameraBase
 
 NUMPY_MODES = {"L":np.uint8, "I;16":np.uint16}
 class camera(cameraBase):
-    def __init__(self,camera):
+    def __init__(self, camera):
         self.cam_num = camera
-        self.camera = GEVSCMOS('C:\\Users\\Experimentor\\Programs\\UUTrack\\Controller\\devices\\PhotonicScience','SCMOS')
+        self.camera = GEVSCMOS(camera, 'SCMOS')
         self.running = False
 
     def initializeCamera(self):
-        """Initializes the camera.
+        """
+        Initializes the camera.
+        
+        .. todo:: :meth:`UUTrack.Controller.devices.PhotonicScience.scmoscam.GEVSCMOS.SetGainMode` behaves unexpectedly. 
+            One is forced to set the gain mode twice to have it right. So far, this is the only way to prevent the 
+            *weird lines* from appearing. Checking the meaning of the gains is a **must**.
+        
         """
         self.camera.Open()
         self.maxSize = self.camera.UpdateSizeMax()
@@ -36,6 +51,8 @@ class camera(cameraBase):
 
     def setExposure(self,exposure):
         """Sets the exposure of the camera.
+        
+        .. todo:: Include units for ensuring the proper exposure time is being set.
         """
         exposure = exposure*1000 # in order to always use microseconds
         #while self.camera.GetStatus(): # Wait until exposure is finished.
@@ -71,13 +88,16 @@ class camera(cameraBase):
         """
         return self.camera.GetSize()
 
-    def setupCamera(self,params):
+    def setupCamera(self, params):
         """Setups the camera with the given parameters.
-        -- params['exposureTime']
-        -- params['binning']
-        -- params['gain']
-        -- params['frequency']
-        -- params['ROI']
+        
+        - params['exposureTime']
+        - params['binning']
+        - params['gain']
+        - params['frequency']
+        - params['ROI']
+        
+        .. todo:: not implemented 
         """
         pass
 
@@ -85,21 +105,27 @@ class camera(cameraBase):
         """Returns all the parameters passed to the camera, such as exposure time,
         ROI, etc. Not necessarily the parameters go to the hardware, it may be
         that some are just software related.
-        Returns: dict = keyword => value.
+        
+        :return dict: keyword => value.
+        
+        .. todo:: Implement this method
         """
         pass
 
     def GetCCDWidth(self):
+        """Gets the CCD width."""
         return self.getSize()[0]
 
     def GetCCDHeight(self):
+        """Gets the CCD height."""
         return self.getSize()[1]
 
     def stopAcq(self):
-            self.camera.AbortSnap()
+        """Stop the acquisition even if ongoing."""
+        self.camera.AbortSnap()
 
     def stopCamera(self):
-        """Stops the acquisition
+        """Stops the acquisition and closes the camera. This has to be called before quitting the program.
         """
         self.camera.AbortSnap()
         self.camera.Close()

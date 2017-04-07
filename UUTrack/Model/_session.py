@@ -1,5 +1,26 @@
 """
+    UUTrack.Model._session
+    ======================
+    
     Best place to store variables that can be shared between different classes.
+    It defines an object that inherits from QObject, mainly to be able to emit signals. It overwrites the :meth:`~UUTrack.Model._session.__setattr__` for functionality, as well as the :meth:`~UUTrack.Model._session.__str__` for handy serialization. Storing of data is done via dictionaries. 
+    
+        >>> session = _session()
+        >>> session.Param1 = {'Value': 1}
+        >>> print(session)
+        Param1:
+          Value: 1
+        >>> session.Param1 = {'Value2': 2}
+        >>> print(session)
+        Param1:
+          Value: 1
+          Value2: 2
+        
+    Note that assigning a second value to Param1 does not overwrite the value, but appends it. Also note that the output of printing the session is a Yaml-ready text (2 space indentation, etc.).
+    
+    :copyright: 2017
+    
+    .. sectionauthor:: Aquiles Carattino <aquiles@aquicarattino.com>
 """
 import yaml
 from PyQt4.QtCore import QObject, SIGNAL
@@ -7,8 +28,11 @@ from PyQt4.QtCore import QObject, SIGNAL
 class _session(QObject):
     """Stores variables and other classes that are common to several UI or instances of the code.
     """
-    def __init__(self,file=None):
-        """The class is prepared to load values from a Yaml file"""
+    def __init__(self, file=None):
+        """The class is prepared to load values from a Yaml file 
+        
+        :param file: Path to the file where the config file is or a dictionary with the data to load.
+        """
         super(_session, self).__init__()
         super().__setattr__('params', dict())
         if file != None:
@@ -52,6 +76,11 @@ class _session(QObject):
             return self.params[item]
 
     def __str__(self):
+        """ Overrides the print(class).
+        
+        :return: a Yaml-ready string.
+        """
+
         s = ''
         for key in self.params:
             s += '%s:\n'%key
@@ -60,11 +89,19 @@ class _session(QObject):
         return s
 
     def serialize(self):
+        """
+        Function kept for compatibility. Now it only outputs the same information than print(class).
+        
+        :return: string Yaml-ready.
+        """
         return self.__str__()
 
     def getParams(self):
         """Special class for setting up the ParamTree from PyQtGraph. It saves the iterating over all the variables directly
-        on the GUI."""
+        on the GUI.
+        
+        :return: a list with the parameters and their types.
+        """
         p = []
         for k in self.params:
             c = []
@@ -80,7 +117,10 @@ class _session(QObject):
         return p
 
     def copy(self):
-        """Copies this class"""
+        """Copies this class. Important not to overwrite the memory of a previously created session.
+        
+        :return: a session exactly the same as this one.
+        """
         return _session(self.params)
 
 

@@ -1,5 +1,21 @@
-""" messageWidget
-created by: AJ Carattino
+""" 
+    UUTrack.View.Camera.messageWidget.py
+    ====================================
+    Simple widget that holds an HTML box to display messages to the user. Example of usage would be,
+        
+        >>> messageWidget.updateProcessor(psutil.cpu_percent())
+        >>> msg = []
+        >>> msg.append('<b>Error</b>: This is an error message.')
+        >>> msg.append('<i>Info</i>: This is a test message.')
+        >>> messageWidget.updateMessage(msg)
+        
+    The main objective of this widget is to confirm to the user that something was triggered and to have a permanent way of seeing it. 
+    
+    .. todo:: This widget capabilities could be combined with some logging capabilities.
+    
+    .. todo:: Change colors for error, info and debug messages.
+    
+    .. sectionauthor:: Aquiles Carattino <aquiles@aquicarattino.com>
 """
 from pyqtgraph.Qt import QtGui
 
@@ -87,7 +103,10 @@ class messageWidget(QtGui.QWidget):
 
     def updateMessage(self,msg):
         """Updates the message displayed to the user.
-        msg -- string or array, in which case every item will be displayed in a new line."""
+        
+        :param msg: string or array, in which case every item will be displayed in a new line.
+        :type msg: string or array.
+        """
         message = '<h1>%s</h1>'%self.messageTitle
         if type(msg) == type([]):
             for m in msg:
@@ -98,13 +117,15 @@ class messageWidget(QtGui.QWidget):
         self.message.setHtml(message)
 
     def setupLog(self):
-        """Startes the log box with a title that will always be displayed on top."""
+        """Starts the log box with a title that will always be displayed on top."""
         self.log.setHtml('<h1>%s</h1>' % self.logTitle)
         self.logText = []
 
     def updateLog(self,msg):
         """Updates the log displayed to the user by prepending the desired message to the available messages.
-        msg -- string or array, in which case every item will be displayed in a new line."""
+        
+        :param msg: every item will be displayed in a new line
+        :type msg: string or array."""
         message = '<h1>%s</h1>'%self.logTitle
 
         if type(msg) == type([]):
@@ -124,6 +145,11 @@ class messageWidget(QtGui.QWidget):
         self.log.setHtml(message)
 
     def updateMemory(self,percentage):
+        """
+        Updates the progress bar that displays how much memory is available to the user.
+        
+        :param percentage: Percentage of memory used.
+        """
         if percentage > 75:
             self.memory.setStyleSheet(self.RED_STYLE)
         elif percentage > 50:
@@ -134,6 +160,11 @@ class messageWidget(QtGui.QWidget):
         self.memory.setValue(percentage)
 
     def updateProcessor(self,percentage):
+        """
+        Updates the progress bar that displays how much of the processor is in use.
+
+        :param percentage: Percentage of memory used.
+        """
         if percentage > 75:
             self.processor.setStyleSheet(self.RED_STYLE)
         else:

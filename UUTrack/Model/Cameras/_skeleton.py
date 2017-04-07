@@ -1,12 +1,12 @@
 """
-_skeleton.py
-============
-Camera class with the skeleton functions. Important to keep track of the methods that are
-exposed to the View. The class cameraBase should be subclassed when developing new Models. This ensures that all the methods are automatically inherited and there is no breaks downstream. 
-
-**IMPORTANT**: Whatever new function is implemented in a specific model, it should be first declared in the cameraBase class. In this way the other models will have access to the method and the program will keep running (perhaps with non intended behavior though).
-
-.. sectionauthor:: Aquiles Carattino <aquiles@aquicarattino.com>
+    UUTrack.Model.Cameras._skeleton.py
+    ==================================
+    Camera class with the skeleton functions. Important to keep track of the methods that are
+    exposed to the View. The class cameraBase should be subclassed when developing new Models. This ensures that all the methods are automatically inherited and there is no breaks downstream. 
+    
+    .. note:: **IMPORTANT** Whatever new function is implemented in a specific model, it should be first declared in the cameraBase class. In this way the other models will have access to the method and the program will keep running (perhaps with non intended behavior though).
+    
+    .. sectionauthor:: Aquiles Carattino <aquiles@aquicarattino.com>
 """
 
 class cameraBase():

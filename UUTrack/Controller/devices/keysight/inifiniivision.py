@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-    infiniivision.py
-    ~~~~~~~~~~~~
+    UUTrack.Controller.devices.keysight.inifiniivision.py
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Driver for the Keysight InfiniiVision DSOX2022A oscilloscope with function generation capabilities.
+    
     Source: Programmers Guide, Version 02.39.0000 by Keysight Technologies
-    NOTE: Not all functions were implemented in the code as methods in the class. However a fair amount of the most
-    useful ones was formatted according to Lantz standards.
+    
+    .. note:: Not all functions were implemented in the code as methods in the class. However a fair amount of the most
+        useful ones was formatted according to Lantz standards.
+    
 """
 
 from lantz import Action
@@ -41,13 +44,15 @@ class Funcgen(MessageBasedDriver):
     @Action(limits=(0,9))
     def save(self,value):
         """Stores the current state of the instrument in a save register.
-        :params -- value of the save register where data will be saved """
+        
+        :params int value: of the save register where data will be saved """
         self.write('*SAV %s'%value)
 
     @Action(limits=(0,10))
     def recall(self,value):
         """Restores the state of the instrument from the specified save/recall register.
-        :params -- value of the save register from which data will be restored"""
+        
+        :params int value: of the save register from which data will be restored"""
         self.write('*RCL %s'%value)
 
     @Action()

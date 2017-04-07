@@ -1,3 +1,13 @@
+"""
+    UUTrack.View.Camera.trajectoryWidget.py
+    ========================================
+    This widget only displays the output of the special worker. It is mainly for prototyping purposes. It displays a scatter 2D plot because it is the current output of the special task worker, but in principle it can be adapted to any other need. 
+    
+    .. todo:: adapt this widget for a useful case.
+    
+    .. sectionauthor:: Aquiles Carattino <aquiles@aquicarattino.com>
+"""
+
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtGui
 

@@ -1,3 +1,15 @@
+"""
+    UUTrack.View.Camera.waterfallWidget.py
+    ========================================
+    Widget for displaying a 2D image. It shouldn't do much, but is thought for displaying a waterfall kind of image.
+
+    .. todo:: displaying 2D data is ubiquitous in this program; there should be a unified widget to such ends.
+    
+    .. todo:: Unify the 2D displaying of :mod:`camera Main <UUTrack.View.Camera.cameraMain>` and :mod:`camera Viewer <UUTrack.View.Camera.cameraViewer>`.
+
+    .. sectionauthor:: Aquiles Carattino <aquiles@aquicarattino.com>
+"""
+
 import pyqtgraph as pg
 from pyqtgraph import GraphicsLayoutWidget
 from pyqtgraph.Qt import QtGui

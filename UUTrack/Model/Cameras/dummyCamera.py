@@ -1,5 +1,9 @@
-""" dummyCamera.py
-Dummy camera class for testing GUI and other functionalities. Based on the skeleton.
+""" 
+    UUTrack.Model.Cameras.dummyCamera.py
+    ====================================
+    Dummy camera class for testing GUI and other functionalities. Based on the skeleton.
+    
+    .. sectionauthor: Aquiles Carattino <aquiles@aquicarattino.com>
 """
 import time
 

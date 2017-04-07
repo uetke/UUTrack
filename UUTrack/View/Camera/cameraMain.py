@@ -1,8 +1,8 @@
 """
-Camera Main
-===========
+    UUTrack.View.Camera.cameraMain.py
+    ========================================
 
-.. sectionauthor:: Aquiles Carattino <aquiles@aquicarattino.com>
+    .. sectionauthor:: Aquiles Carattino <aquiles@aquicarattino.com>
 """
 
 import os

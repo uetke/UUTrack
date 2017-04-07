@@ -1,6 +1,15 @@
-'''
-@author: aj carattino
-'''
+"""
+    UUTrack.View.Camera.cameraViewer.py
+    ===================================
+    Independent window for viewing the camera. It is useful since it allows to quickly check the full CCD without changing the parameters of the main window. 
+    It could have been design in such a way that can be run independently, for fast visualization without the need of controlling.
+    
+    .. todo:: The viewer should inherit from :mod:`UUTrack.Viewer.Camera.cameraMainWidget` in order to have the same interface and not replicate code.
+    
+    .. todo:: Unify the main viewer with this one.
+    
+    .. sectionauthor:: Aquiles Carattino <aquiles@aquicarattino.com>
+"""
 
 import pyqtgraph as pg
 from pyqtgraph import GraphicsLayoutWidget

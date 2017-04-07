@@ -1,5 +1,23 @@
-"""Hamamatsu.py
-Model class for controlling Hamamatsu cameras via de DCAM-API.
+"""
+    UUTrack.Model.Cameras.Hamamatsu.py
+    ==================================
+    
+    Model class for controlling Hamamatsu cameras via de DCAM-API. At the time of writing this class, 
+    little documentation on the DCAM-API was available. Hamamatsu has a different time schedule regardin support of 
+    their own API. However, Zhuang's lab Github repository had a python driver for the Orca camera and with a bit of 
+    tinkering things worked out. 
+    
+    DCAM-API relies mostly on setting parameters into the camera. The correct data type of each parameter is not well 
+    documented; however it is possible to print all the available properties and work from there. The properties are 
+    stored in a filed named params.txt next to the :mod:`Hamamatsu Driver 
+    <UUTrack.Controller.devices.hamamatsu.hamamatsu_camera>`
+    
+    .. note:: When setting the ROI, Hamamatsu only allows to set multiples of 4 for every setting (X,Y and vsize, 
+        hsize). This is checked in the function. Changing the ROI cannot be done directly, one first needs to disable it 
+        and then re-enable. 
+    
+    
+    .. sectionauthor:: Aquiles Carattino <aquiles@aquicarattino.com>
 """
 import numpy as np
 

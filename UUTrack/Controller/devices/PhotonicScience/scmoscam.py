@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-scmoscam.py
-~~~~~~~~~~~
+    UUTrack.Controller.devices.PhotonicScience.scmoscam.py
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    A wrapper class originally written by Perceval Guillou,
+    perceval@photonic-science.com in Py2 and has been tested successfully with
+    scmoscontrol.dll SCMOS Pleora (GEV) control dll (x86 )v5.6.0.0 (date modified 10/2/2013)
+    
+    SaFa @nanoLINX has adapted the wrapper class for a camera control program.
+    
+    v1.0, 24 feb. 2015
 
-A wrapper class originally written by Perceval Guillou,
-perceval@photonic-science.com in Py2 and has been tested successfully with
-scmoscontrol.dll SCMOS Pleora (GEV) control dll (x86 )v5.6.0.0 (date modified 10/2/2013)
+    .. sectionauthor:: SaFa <S.Faez@uu.nl>
 
-SaFa @nanoLINX has adapted the wrapper class for a camera control program.
-
-v1.0, 24 feb. 2015
-
-.. sectionauthor:: SaFa <S.Faez@uu.nl>
 """
 
 import ctypes as C

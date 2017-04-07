@@ -1,15 +1,16 @@
 """
-config 
-======
-- loads configuration files.
+UUTrack.Model.config 
+====================
+.. deprecated:: 0.1
 
+loads configuration files.
 It is a relic file and not used anymore.
 """
-#
+
 # import logging
 # import os.path
 # import xml.etree.cElementTree as ET
-#
+
 # from .lib.logger import get_all_caller
 # from .lib.xml2dict import xmltodict
 
