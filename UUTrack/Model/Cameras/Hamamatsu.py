@@ -41,11 +41,11 @@ class camera(cameraBase):
             self.camera.stopAcquisition()
 
     def setAcquisitionMode(self, mode):
-        """ Set the readout mode of the camera: Single or continuous.
+        """ 
+        Set the readout mode of the camera: Single or continuous.
         Parameters
-        ==========
         mode : int
-            One of self.MODE_CONTINUOUS, self.MODE_SINGLE_SHOT
+        One of self.MODE_CONTINUOUS, self.MODE_SINGLE_SHOT
         """
         self.mode = mode
         if mode == self.MODE_CONTINUOUS:
@@ -72,18 +72,21 @@ class camera(cameraBase):
         return True
 
     def setExposure(self,exposure):
-        """Sets the exposure of the camera.
+        """
+        Sets the exposure of the camera.
         """
         self.camera.setPropertyValue("exposure_time",exposure/1000)
         return self.getExposure()
 
     def getExposure(self):
-        """Gets the exposure time of the camera.
+        """
+        Gets the exposure time of the camera.
         """
         return self.camera.getPropertyValue("exposure_time")
 
     def readCamera(self):
-        """Reads the camera
+        """
+        Reads the camera
         """
         [frames, dims] = self.camera.getFrames()
         img = []
@@ -97,7 +100,8 @@ class camera(cameraBase):
         return img
 
     def setROI(self,X,Y):
-        """Sets up the ROI. Not all cameras are 0-indexed, so this is an important
+        """
+        Sets up the ROI. Not all cameras are 0-indexed, so this is an important
         place to define the proper ROI.
         X -- array type with the coordinates for the ROI X[0], X[1]
         Y -- array type with the coordinates for the ROI Y[0], Y[1]
@@ -138,7 +142,6 @@ class camera(cameraBase):
     def GetCCDWidth(self):
         """
         Returns
-        -------
         The CCD width in pixels
 
         """
@@ -147,7 +150,6 @@ class camera(cameraBase):
     def GetCCDHeight(self):
         """
         Returns
-        -------
         The CCD height in pixels
 
         """

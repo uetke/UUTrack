@@ -13,61 +13,71 @@ class cameraBase():
         self.maxHeight = 0
 
     def initializeCamera(self):
-        """Initializes the camera.
+        """
+        Initializes the camera.
         """
         self.maxWidth = self.GetCCDWidth()
         self.maxHeight = self.GetCCDHeight()
         return True
 
     def triggerCamera(self):
-        """Triggers the camera.
+        """
+        Triggers the camera.
         """
         raise NotImplementedError
 
     def setAcquisitionMode(self, mode):
-        """ Set the readout mode of the camera: Single or continuous.
-        Parameters
-        ==========
-        mode : int
-            One of self.MODE_CONTINUOUS, self.MODE_SINGLE_SHOT
+        """
+        Set the readout mode of the camera: Single or continuous.
+        :param int mode: One of self.MODE_CONTINUOUS, self.MODE_SINGLE_SHOT
+        :return: 
         """
         self.mode = mode
 
     def getAcquisitionMode(self):
-        """Returns the acquisition mode, either continuous or single shot.
+        """
+        Returns the acquisition mode, either continuous or single shot.
         """
         return self.mode
 
     def acquisitionReady(self):
-        """Checks if the acquisition in the camera is over.
+        """
+        Checks if the acquisition in the camera is over.
         """
         raise NotImplementedError
 
     def setExposure(self,exposure):
-        """Sets the exposure of the camera.
+        """
+        Sets the exposure of the camera.
         """
         raise NotImplementedError
 
     def getExposure(self):
-        """Gets the exposure time of the camera.
+        """
+        Gets the exposure time of the camera.
         """
         raise NotImplementedError
 
     def readCamera(self):
-        """Reads the camera
+        """
+        Reads the camera
         """
         raise NotImplementedError
 
     def setROI(self,X,Y):
-        """Sets up the ROI. Not all cameras are 0-indexed, so this is an important
+        """ Sets up the ROI. Not all cameras are 0-indexed, so this is an important
         place to define the proper ROI.
-        X -- array type with the coordinates for the ROI X[0], X[1]
-        Y -- array type with the coordinates for the ROI Y[0], Y[1]
+        
+        :param array X: array type with the coordinates for the ROI X[0], X[1] 
+        :param array Y: array type with the coordinates for the ROI Y[0], Y[1]
+        :return: 
         """
         raise NotImplementedError
 
     def clearROI(self):
-        """Clears the ROI from the camera."""
+        """
+        Clears the ROI from the camera.
+        """
         self.setROI(self.maxWidth, self.maxHeight)
 
     def getSize(self):
@@ -82,17 +92,13 @@ class cameraBase():
 
     def GetCCDWidth(self):
         """
-        Returns
-        -------
-        The CCD width in pixels
+        Returns the CCD width in pixels
         """
         raise NotImplementedError
 
     def GetCCDHeight(self):
         """
-        Returns
-        -------
-        The CCD height in pixels
+        Returns: the CCD height in pixels
         """
         raise NotImplementedError
 

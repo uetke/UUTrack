@@ -9,6 +9,7 @@ Submodules
    UUTrack.Model.Cameras.Hamamatsu
    UUTrack.Model.Cameras.PSI
    UUTrack.Model.Cameras.dummyCamera
+   UUTrack.Model.Cameras._skeleton
 
 Module contents
 ---------------

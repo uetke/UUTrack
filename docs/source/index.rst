@@ -6,29 +6,14 @@
 UUTracking
 ==========
 
-#A powerful interface for scientific cameras and instruments#
+**A powerful interface for scientific cameras and instruments**
 
 UUtracking is shipped as a package that can be installed into a virtual environment with the use of pip. It can be both triggered with a built in function or can be included into larger projects.
 
 Installing
 ----------
 
-To install UUTrack it is important to be inside of a virtual environment. If you want to set up a working environment, I suggest you to check :ref:`python.working`. From the command line you can run the following command::
-
-   pip install -U https://github.com/aquilesC/UUTrack/archive/master.zip
-
-Remember that in this case master refers to the branch you are installing. In case you want to work with specific branches of the code, you should change it.
-
-If you are planning to develop code (you need to change, correct a bug or whatever is present), you need to install the package in an editable way. Just run::
-
-   pip install -e git+git@github.com:aquilesC/UUTrack.git#egg=UUTrack
-
-This will install the package inside of your virtual environment and will generate a copy of the repository in virtualenv/src/UUTrack that you can edit and push to the repository of your choice. This is very handy when you want to test new features, etc. It is also possible to work with different branches, making it very easy to keep track of the changes in the upstream code.
-
-Your own fork of the code
--------------------------
-
-A smarter way to install the code is to fork it to your own user and the run the previous command from there. This allows you to easily update and track changes without sending pull requests, etc.
+The best place to look for the code of the program is the repository at ``https://github.com/aquilesC/UUTrack``. If you need further assistance with the installation of the code, please check :ref:`installing`
 
 Start the program
 -----------------
@@ -42,16 +27,26 @@ To run the program you can just import the startCamera module from the root of U
 
 Note that the splitting between the config directory and the config file is done to allow users to have different config files in the same directory, for example for different configurations of the setup. It also allows to include a pre-window to select with a GUI the desired configuration and then trigger the ```startCamera.start``` method.
 
+It is important to have a Config file ready for the program to run properly. You can check the example :ref:`config`
+
+Changing the code
+-----------------
+The program is open source and therefore you can modify all what you want. You have to remember that the code was written with a specific experiment in mind and therefore it may not fulfill or the requirements of more advanced imaging software.
+
+However the design of the program is such that would allow its expansion to meet future needs. In case you are wondering how the code can be improved you can start by reading :ref:`improving`, or directly submerge yourself in the documentation of the different classes :ref:`UUTrack`.
+
 .. toctree::
+   :hidden:
    :maxdepth: 2
    :caption: Contents:
 
    modules
-   python.working
-
-
-
-.. automodule:: UUTrack
+   config
+   python_working
+   installing
+   starting
+   improving
+   UUTrack
 
 Indices and tables
 ==================

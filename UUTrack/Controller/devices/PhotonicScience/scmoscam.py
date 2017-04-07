@@ -1,19 +1,29 @@
 # -*- coding: utf-8 -*-
 """
-"scmoscam" is a wrapper class originally written by Perceval Guillou,
+scmoscam.py
+~~~~~~~~~~~
+
+A wrapper class originally written by Perceval Guillou,
 perceval@photonic-science.com in Py2 and has been tested successfully with
 scmoscontrol.dll SCMOS Pleora (GEV) control dll (x86 )v5.6.0.0 (date modified 10/2/2013)
 
 SaFa @nanoLINX has adapted the wrapper class for a camera control program.
 
-v1.0, 24 feb. 2015,
-@author: SaFa {S.Faez@uu.nl}
+v1.0, 24 feb. 2015
+
+.. sectionauthor:: SaFa <S.Faez@uu.nl>
 """
 
 import ctypes as C
 import os
 import sys
-from _ctypes import LoadLibrary, FreeLibrary
+from sys import platform
+if platform == "linux" or platform == "linux2":
+    pass
+elif platform == "darwin":
+    pass
+elif platform == "win32":
+    from _ctypes import LoadLibrary, FreeLibrary
 
 import numpy
 

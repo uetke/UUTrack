@@ -1,3 +1,5 @@
+.. _UUTrack.Model:
+
 UUTrack.Model package
 =====================
 
