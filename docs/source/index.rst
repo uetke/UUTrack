@@ -35,6 +35,10 @@ The program is open source and therefore you can modify all what you want. You h
 
 However the design of the program is such that would allow its expansion to meet future needs. In case you are wondering how the code can be improved you can start by reading :ref:`improving`, or directly submerge yourself in the documentation of the different classes :ref:`UUTrack`.
 
+
+.. note:: The naming convention through the code is not very uniform. I've tried to use CamelCase for classes, and underscores for variables, but this has to be sanitized for making it more consistent. Sometimes classes and variables are called the same, making everything very confusing.
+
+
 .. toctree::
    :hidden:
    :maxdepth: 2

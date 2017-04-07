@@ -34,11 +34,10 @@ class camera(cameraBase):
         return True
 
     def setAcquisitionMode(self, mode):
-        """ Set the readout mode of the camera: Single or continuous.
-        Parameters
-        ==========
-        mode : int
-            One of self.MODE_CONTINUOUS, self.MODE_SINGLE_SHOT
+        """ 
+        Set the readout mode of the camera: Single or continuous.
+        
+        :param: int mode: One of self.MODE_CONTINUOUS, self.MODE_SINGLE_SHOT
         """
         print('Setting acquisition mode')
         return self.getAcquisitionMode()
@@ -65,8 +64,6 @@ class camera(cameraBase):
         return self.exposure
 
     def readCamera(self):
-        """Reads the camera
-        """
         X,Y = self.getSize()
         try:
             sample = np.random.normal(size=(X,Y))
@@ -78,10 +75,13 @@ class camera(cameraBase):
         return sample
 
     def setROI(self,X,Y):
-        """Sets up the ROI. Not all cameras are 0-indexed, so this is an important
+        """
+        Sets up the ROI. Not all cameras are 0-indexed, so this is an important
         place to define the proper ROI.
-        X -- array type with the coordinates for the ROI X[0], X[1]
-        Y -- array type with the coordinates for the ROI Y[0], Y[1]
+        
+        :param X: array type with the coordinates for the ROI X[0], X[1]
+        :param Y: array type with the coordinates for the ROI Y[0], Y[1]
+        :return: 
         """
         self.xsize = abs(X[1]-X[0])
         self.ysize = abs(Y[1]-Y[0])
@@ -89,10 +89,11 @@ class camera(cameraBase):
         return self.getSize()
 
     def getSize(self):
-        """Returns the size in pixels of the image being acquired. This is useful for checking the ROI settings.
+        """
+        :return: Returns the size in pixels of the image being acquired. This is useful for checking the ROI settings.
         """
 
-        return self.xsize,self.ysize
+        return self.xsize, self.ysize
 
     def getSerialNumber(self):
         """Returns the serial number of the camera.
@@ -101,33 +102,31 @@ class camera(cameraBase):
 
     def GetCCDWidth(self):
         """
-        Returns
-        -------
-        The CCD width in pixels
-
+        :return: The CCD width in pixels
         """
         return self.maxX
 
 
     def GetCCDHeight(self):
         """
-        Returns
-        -------
-        The CCD height in pixels
-
+        :return: The CCD height in pixels
         """
         return self.maxY
 
-    def setBinning(self,xbin,ybin):
-        """Sets the binning of the camera if supported. Has to check if binning in X/Y can be different or not, etc."""
+    def setBinning(self, xbin, ybin):
+        """Sets the binning of the camera if supported. Has to check if binning in X/Y can be different or not, etc.
+        
+        :param: xbin: binning in x
+        :param: ybin: binning in y
+        """
         self.xbin = xbin
         self.ybin = ybin
         pass
 
     def stopAcq(self):
-        """
-        Stops the acquisition
-        :return: bool
+        """ Stops the acquisition
+        
+        :return: bool True: returns true
         """
         return True
 

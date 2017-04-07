@@ -1,6 +1,10 @@
-'''
-@author: aj carattino
-'''
+"""
+Camera Main
+===========
+
+.. sectionauthor:: Aquiles Carattino <aquiles@aquicarattino.com>
+"""
+
 import os
 import sys
 import time
@@ -29,9 +33,16 @@ from ...Model.workerSaver import workerSaver
 from . import resources
 
 class cameraMain(QtGui.QMainWindow):
-    """ Displays the camera.
+    """   
+    Displays the camera   
     """
     def __init__(self, session, cam):
+        """
+        Inits the camera window
+        
+        :param: session: session
+        :param: cam: camera
+        """
         super(cameraMain,self).__init__()
         self.setWindowTitle('Camera Monitor')
         self.setMouseTracking(True)
@@ -259,7 +270,11 @@ class cameraMain(QtGui.QMainWindow):
             self.logMessage.append('<b>Info:</b> Waterfall closed')
 
     def setROI(self, X, Y):
-        """Gets the ROI from the lines on the image. It also updates the GUI to accommodate the changes.
+        """
+        Gets the ROI from the lines on the image. It also updates the GUI to accommodate the changes.
+        :param X: 
+        :param Y: 
+        :return: 
         """
         if not self.acquiring:
             self.corner_roi[0] = X[0]
@@ -318,6 +333,8 @@ class cameraMain(QtGui.QMainWindow):
     def setupActions(self):
         """Setups the actions that the program will have. It is placed into a function
         to make it easier to reuse in other windows.
+        
+        :rtype: None
         """
         self.exitAction = QtGui.QAction(QtGui.QIcon(':Icons/power-icon.png'), '&Exit', self)
         self.exitAction.setShortcut('Ctrl+Q')
@@ -472,6 +489,8 @@ class cameraMain(QtGui.QMainWindow):
 
     def getData(self, data, origin):
         """Gets the data that is being gathered by the working thread.
+        
+        .. _getData:
         """
         if origin == 'snap': #Single snap.
             self.acquiring=False
