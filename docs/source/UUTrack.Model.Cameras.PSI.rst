@@ -1,5 +1,7 @@
-UUTrack.Model.Cameras.PSI module
-================================
+.. _psi:
+
+PSI
+===
 
 .. automodule:: UUTrack.Model.Cameras.PSI
     :members:

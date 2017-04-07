@@ -1,5 +1,7 @@
-UUTrack.Model.Cameras.Hamamatsu module
-======================================
+.. _hamamatsu:
+
+Hamamatsu
+=========
 
 .. automodule:: UUTrack.Model.Cameras.Hamamatsu
     :members:

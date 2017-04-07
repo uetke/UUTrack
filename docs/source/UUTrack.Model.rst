@@ -1,7 +1,7 @@
-.. _UUTrack.Model:
+.. _model:
 
-UUTrack.Model package
-=====================
+Model package
+=============
 
 Subpackages
 -----------

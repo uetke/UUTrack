@@ -1,5 +1,7 @@
-UUTrack.Model.Cameras.dummyCamera module
-========================================
+.. _dummyCamera:
+
+dummyCamera
+===========
 
 .. automodule:: UUTrack.Model.Cameras.dummyCamera
     :members:

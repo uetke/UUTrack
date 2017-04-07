@@ -1,4 +1,6 @@
-UUTrack.View package
+.. _view:
+
+View package
 ====================
 
 Subpackages

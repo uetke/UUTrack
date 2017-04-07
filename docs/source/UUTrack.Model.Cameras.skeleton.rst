@@ -1,7 +1,7 @@
 .. _skeleton:
 
-UUTrack.Model.Cameras.skeleton module
-=====================================
+Model.Cameras.skeleton
+======================
 
 .. automodule:: UUTrack.Model.Cameras._skeleton
     :members:
