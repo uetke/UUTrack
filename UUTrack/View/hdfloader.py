@@ -1,14 +1,26 @@
+"""
+    UUTrack.View.hdfloader
+    =========================
+    
+    Window for opening an hdf file generated with the UUtrack program and displaying the settings. 
+    It allows to browse through different data groups and visualize the settings before applying them to the main program.
+    
+    This Window can also run in standalone mode to review past settings without triggering the main GUI. 
+"""
+
 import h5py
-from PyQt4.QtGui import QMainWindow, QFileDialog, QListWidget, QLineEdit, QHBoxLayout, QWidget, QTextEdit, QVBoxLayout, \
+from PyQt4.QtGui import QMainWindow, QFileDialog, QListWidget, QHBoxLayout, QWidget, QTextEdit, QVBoxLayout, \
     QPushButton
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 
-# from pyqtgraph.Qt import QtGui
 from .Camera import resources
 
 
 class HDFLoader(QMainWindow):
+    """
+        Main window for displaying the metadata contents of the HDF5 files.
+    """
     def __init__(self):
         super(HDFLoader, self).__init__()
         self.setGeometry(40,40,600,600)
@@ -24,6 +36,10 @@ class HDFLoader(QMainWindow):
         self.setupMenubar()
 
     def setup_actions(self):
+        """ Sets up the actions for the menus in the program.
+        
+        :return: Null
+        """
         self.exitAction = QtGui.QAction(QtGui.QIcon(':Icons/power-icon.png'), '&Exit', self)
         self.exitAction.setShortcut('Ctrl+Q')
         self.exitAction.setStatusTip('Exit application')
@@ -51,6 +67,8 @@ class HDFLoader(QMainWindow):
         self.fileMenu.addAction(self.openAction)
 
     def open_file(self):
+        """Dialog for selecting whay file to open. 
+        """
         fname = QFileDialog.getOpenFileName(self, 'Open file',
                                             '/home/aquiles', "HDF Files (*.hdf *.hdf5)")
         self.widget.add_items(fname)
@@ -89,6 +107,8 @@ class HDFWidget(QWidget):
         self.connect(self.button,QtCore.SIGNAL("clicked()"),self.apply_settings)
 
     def item_clicked(self, item):
+        """Action triggered when an item is clicked. The content of the metadata is retrieved from its index and not from the file itself, avoiding clashes with the main program. """
+
         i = self.list.currentRow()
         self.settings = self.all_settings[i]
         self.textBox.clear()
@@ -98,6 +118,12 @@ class HDFWidget(QWidget):
         #     self.textBox.append(t)
 
     def add_items(self, name):
+        """ Adds the group items to the display.
+        The file is closed after extracting the metadata, to avoid conflicts with the main program. 
+        
+        :param name: Name of the HDF file to be opened.
+        :return: Null 
+        """
         f = h5py.File(name, 'r')
         self.settings = None
         self.all_settings = []
@@ -109,6 +135,8 @@ class HDFWidget(QWidget):
         f.close()
 
     def apply_settings(self):
+        """ Triggered when the apply button is pressed. The settings are broadcasted as coming from the parent. 
+        """
         if self.settings is not None:
             self.parent.emit(QtCore.SIGNAL('settings'), self.settings)
 
