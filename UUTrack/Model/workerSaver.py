@@ -46,7 +46,7 @@ def workerSaver(fileData, meta, q):
     allocate = 50 # Number of frames to allocate along the z-axis.
     keep_saving = True  # Flag that will stop the worker function if running in a separate thread.
                         # Has to be submitted via the queue a string 'exit'
-    g.create_dataset('metadata',data=meta)
+    g.create_dataset('metadata', data=meta.encode("ascii","ignore"))
     i = 0
     j = 0
     first = True
