@@ -21,3 +21,4 @@ Subpackages
     :maxdepth: 1
 
     UUTrack.View.Camera
+    UUTrack.View.hdfloader
