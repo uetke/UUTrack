@@ -17,7 +17,7 @@ class HDFLoader(QMainWindow):
         self.list.addItem('Test')
         self.list.addItem('Test')
         self.list.addItem('Test')
-        
+
 
         self.setup_actions()
         self.setupToolbar()
