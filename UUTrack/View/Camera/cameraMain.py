@@ -19,6 +19,8 @@ from pyqtgraph import ProgressDialog
 from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.dockarea import *
 
+from UUTrack.Model._session import _session
+from UUTrack.View.hdfloader import HDFLoader
 from .cameraMainWidget import cameraMainWidget
 from .cameraViewer import cameraViewer
 from .clearQueueThread import clearQueueThread
@@ -74,6 +76,8 @@ class cameraMain(QtGui.QMainWindow):
         self.config = configWidget(self._session)
         # Line cut widget
         self.crossCut = crossCutWindow(parent=self)
+        # Select settings Window
+        self.selectSettings = HDFLoader()
 
         self.refreshTimer = QtCore.QTimer()
         self.connect(self.refreshTimer, QtCore.SIGNAL('timeout()'), self.updateGUI)
@@ -411,6 +415,9 @@ class cameraMain(QtGui.QMainWindow):
         self.crossCutAction = QtGui.QAction(QtGui.QIcon(':Icons/Ruler-icon.png'),'Show cross cut', self)
         self.crossCutAction.triggered.connect(self.crossCut.show)
 
+        self.settingsAction = QtGui.QAction('Load config', self)
+        self.settingsAction.triggered.connect(self.selectSettings.show)
+
     def setupToolbar(self):
         """Setups the toolbar with the desired icons. It's placed into a function
         to make it easier to reuse in other windows.
@@ -435,6 +442,7 @@ class cameraMain(QtGui.QMainWindow):
         """
         menubar = self.menuBar()
         self.fileMenu = menubar.addMenu('&File')
+        self.fileMenu.addAction(self.settingsAction)
         self.fileMenu.addAction(self.saveAction)
         self.fileMenu.addAction(self.exitAction)
         self.snapMenu = menubar.addMenu('&Snap')
@@ -501,6 +509,7 @@ class cameraMain(QtGui.QMainWindow):
         self.connect(self.camViewer, QtCore.SIGNAL('Stop_MainAcquisition'), self.stopMovie)
         self.connect(self, QtCore.SIGNAL('stopChildMovie'), self.camViewer.stopCamera)
         self.connect(self, QtCore.SIGNAL('CloseAll'), self.camViewer.closeViewer)
+        self.connect(self.selectSettings, QtCore.SIGNAL("settings"), self.update_settings)
 
     def bufferStatus(self):
         """Starts or stops the buffer accumulation.
@@ -583,6 +592,11 @@ class cameraMain(QtGui.QMainWindow):
         self.messageWidget.updateMessage(msg)
         self.messageWidget.updateLog(self.logMessage)
         self.logMessage = []
+
+    def update_settings(self, settings):
+        new_session = _session(settings)
+        self.updateSession(new_session)
+        self.config.populateTree(self._session)
 
     def updateSession(self, session):
         """Updates the session variables passed by the config window.
