@@ -2,7 +2,7 @@
     UUTrack.View.Camera.crossCut.py
     ===================================
     Window that displays a 1D plot of a cross cut on the main window.
-    
+
     .. sectionauthor:: Aquiles Carattino <aquiles@aquicarattino.com>
 """
 
@@ -36,9 +36,10 @@ class crossCutWindow(QtGui.QMainWindow):
             if len(self.parent.tempImage) > 0:
                 #self.cc.plot(self.parent.tempImage[:, 50])
                 s = self.parent.camWidget.crossCut.value()
-                d = np.ascontiguousarray(self.parent.tempImage[:, s])
-                self.p.setData(d)
-                self.text.setText(str(np.std(d)/np.mean(d)))
+                if s<np.shape(self.parent.tempImage)[1]:
+                    d = np.ascontiguousarray(self.parent.tempImage[:, s])
+                    self.p.setData(d)
+                    self.text.setText(str(np.std(d)/np.mean(d)))
 
 
 if __name__ == '__main__':

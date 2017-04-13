@@ -1,9 +1,9 @@
 """
     UUTrack.View.Camera.workerThread
     ================================
-    
+
     Thread that acquires continuously data until a variable is changed. This enables to acquire at any frame rate without freezing the GUI or overloading it with data being acquired too fast.
-    
+
 """
 
 from pyqtgraph.Qt import QtCore
@@ -33,6 +33,7 @@ class workThread(QtCore.QThread):
                 self.camera.triggerCamera() # Triggers the camera only once
                 first = False
             img = self.camera.readCamera()
+            
             self.emit( QtCore.SIGNAL('Image'), img, self.origin)
         self.camera.stopAcq()
         return

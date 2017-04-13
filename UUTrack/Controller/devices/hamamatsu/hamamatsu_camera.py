@@ -3,24 +3,23 @@
     UUTrack.Controller.devices.hamamatsu.hamamatsu_camera.py
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     File taken from `ZhuangLab <https://github.com/ZhuangLab/storm-control>`_
-    
+
     A ctypes based interface to Hamamatsu cameras.
     (tested on a sCMOS Flash 4.0).
-    
+
     The documentation is a little confusing to me on this subject..
     I used c_int32 when this is explicitly specified, otherwise I use c_int.
-    
+
     .. todo:: I'm using the "old" functions because these are documented. Switch to the "new" functions at some point.
-    
+
     .. todo:: How to stream 2048 x 2048 at max frame rate to the flash disk? The Hamamatsu software can do this.
-    
+
     .. sectionauthor:: Hazen Babcock 10/13
-    
+
 """
 
 import ctypes
 import ctypes.util
-
 import numpy
 
 # Hamamatsu constants.
@@ -103,15 +102,14 @@ class DCAMException(Exception):
 
 
 # dcam = ctypes.windll.dcamapi
-# 
+#
 # temp = ctypes.c_int32(0)
-# if (self.dcam.dcam_init(None, ctypes.byref(temp), None) != DCAMERR_NOERROR):
+# if (dcam.dcam_init(None, ctypes.byref(temp), None) != DCAMERR_NOERROR):
 #     raise DCAMException("DCAM initialization failed.")
 # n_cameras = temp.value
 
 class HCamData():
     """Hamamatsu camera data object.
-
     Initially I tried to use create_string_buffer() to allocate storage for the
     data from the camera but this turned out to be too slow. The software
     kept falling behind the camera and create_string_buffer() seemed to be the
@@ -158,14 +156,12 @@ class HCamData():
 
 
 class HamamatsuCamera():
-    """
-    Basic camera interface class.
-    This version uses the Hamamatsu library to allocate camera buffers.
-    Storage for the data from the camera is allocated dynamically and
-    copied out of the camera buffers.
-    """
     CAPTUREMODE_SNAP = 0
     CAPTUREMODE_SEQUENCE = 1
+    """Basic camera interface class.
+    This version uses the Hamamatsu library to allocate camera buffers.
+    Storage for the data from the camera is allocated dynamically and
+    copied out of the camera buffers."""
 
     def __init__(self, camera_id):
         """Open the connection to the camera specified by camera_id.
@@ -173,6 +169,7 @@ class HamamatsuCamera():
 
         self.buffer_index = 0
         self.camera_id = camera_id
+        self.dcam = ctypes.windll.dcamapi
 
         self.debug = False
         self.frame_bytes = 0
@@ -183,7 +180,25 @@ class HamamatsuCamera():
         self.max_backlog = 0
         self.number_image_buffers = 0
 
+        # Open the camera.
         self.camera_handle = ctypes.c_void_p(0)
+        self.temp = ctypes.c_int32(0)
+        if (self.dcam.dcam_init(None, ctypes.byref(self.temp), None) != DCAMERR_NOERROR):
+            raise DCAMException("DCAM initialization failed.")
+        self.n_cameras = self.temp.value
+
+        self.checkStatus(self.dcam.dcam_open(ctypes.byref(self.camera_handle),
+                                        ctypes.c_int32(self.camera_id),
+                                        None),
+                         "dcam_open")
+        self.camera_model = self.getModelInfo(camera_id)
+        # Get camera properties.
+        self.properties = self.getCameraProperties()
+
+        # Get camera max width, height.
+        self.max_width = self.getPropertyValue("image_width")[0]
+        self.max_height = self.getPropertyValue("image_height")[0]
+        self.setmode(self.CAPTUREMODE_SEQUENCE) # By default is a sequence
 
     def settrigger(self,mode):
         TRIGMODE = ctypes.c_int32(mode)
@@ -211,31 +226,11 @@ class HamamatsuCamera():
         return DCAM_TRIGGERMODE.value
 
     def initCamera(self):
-        """Initialization.
-        In this function the DCAM-API is called.
-        :return: 
-        """
+        #
+        # Initialization
+        #
+        #self.dcam = ctypes.windll.dcamapi
 
-        self.dcam = ctypes.windll.dcamapi
-        self.temp = ctypes.c_int32(0)
-        if (self.dcam.dcam_init(None, ctypes.byref(self.temp), None) != DCAMERR_NOERROR):
-            raise DCAMException("DCAM initialization failed.")
-        self.n_cameras = self.temp.value
-        self.camera_model = self.getModelInfo(self.camera_id)
-
-        # Get camera properties.
-        self.properties = self.getCameraProperties()
-
-        # Get camera max width, height.
-        self.max_width = self.getPropertyValue("image_width")[0]
-        self.max_height = self.getPropertyValue("image_height")[0]
-        self.setmode(self.CAPTUREMODE_SEQUENCE) # By default is a sequence
-
-        # Open the camera.
-        self.checkStatus(self.dcam.dcam_open(ctypes.byref(self.camera_handle),
-                                        ctypes.c_int32(self.camera_id),
-                                        None),
-                         "dcam_open")
 
         self.captureSetup()
 
@@ -264,9 +259,7 @@ class HamamatsuCamera():
     def checkStatus(self, fn_return, fn_name= "unknown"):
         """Check return value of the dcam function call.
         Throw an error if not as expected?
-        
-        :return: The return value of the function.
-        """
+        @return The return value of the function."""
 
         #if (fn_return != DCAMERR_NOERROR) and (fn_return != DCAMERR_ERROR):
         #    raise DCAMException("dcam error: " + fn_name + " returned " + str(fn_return))
@@ -283,9 +276,7 @@ class HamamatsuCamera():
     def getCameraProperties(self):
         """Return the ids & names of all the properties that the camera supports. This
         is used at initialization to populate the self.properties attribute.
-        
-        :return: A python dictionary of camera properties.
-        """
+        @return A python dictionary of camera properties."""
 
         c_buf_len = 64
         c_buf = ctypes.create_string_buffer(c_buf_len)
@@ -332,14 +323,12 @@ class HamamatsuCamera():
         """Triggers the camera when in software mode."""
         self.checkStatus(self.dcam.dcam_firetrigger(self.camera_handle),"dcam_firetrigger")
         print('TRIG')
-        
+
     def getFrames(self):
-        """
-        Gets all of the available frames. This will block waiting for new frames even if there new frames available 
-        when it is called.
-        
-        :return: [frames, [frame x size, frame y size]].
-        """
+        """Gets all of the available frames.
+        This will block waiting for new frames even if
+        there new frames available when it is called.
+        @return [frames, [frame x size, frame y size]]."""
 
         frames = []
         for n in self.newFrames():
@@ -370,10 +359,8 @@ class HamamatsuCamera():
 
     def getModelInfo(self, camera_id):
         """Returns the model of the camera
-        
-        :param int camera_id: The camera id number.
-        :return: A string containing the camera name.
-        """
+        @param camera_id The (integer) camera id number.
+        @return A string containing the camera name."""
 
         c_buf_len = 20
         c_buf = ctypes.create_string_buffer(c_buf_len)
@@ -387,20 +374,15 @@ class HamamatsuCamera():
     def getProperties(self):
         """Return the list of camera properties. This is the one to call if you
         want to know the camera properties.
-        
-        :return: A dictionary of camera properties.
-        """
+        @return A dictionary of camera properties."""
 
         return self.properties
 
     def getPropertyAttribute(self, property_name):
         """Return the attribute structure of a particular property.
-        
-        :param property_name: The name of the property to get the attributes of.
-        :return: A DCAM_PARAM_PROPERTYATTR object.
-        
-        .. todo:: FIXME (OPTIMIZATION): Keep track of known attributes?
-        """
+        FIXME (OPTIMIZATION): Keep track of known attributes?
+        @param property_name The name of the property to get the attributes of.
+        @return A DCAM_PARAM_PROPERTYATTR object."""
 
         p_attr = DCAM_PARAM_PROPERTYATTR()
         p_attr.cbSize = ctypes.sizeof(p_attr)
@@ -416,10 +398,8 @@ class HamamatsuCamera():
 
     def getPropertyText(self, property_name):
         """Return the text options of a property (if any).
-        
-        :param property_name: The name of the property to get the text values of.
-        :return: A dictionary of text properties (which may be empty).
-        """
+        @param property_name The name of the property to get the text values of.
+        @return A dictionary of text properties (which may be empty)."""
 
         prop_attr = self.getPropertyAttribute(property_name)
         if not (prop_attr.attribute & DCAMPROP_ATTR_HASVALUETEXT):
@@ -462,10 +442,8 @@ class HamamatsuCamera():
 
     def getPropertyRange(self, property_name):
         """Return the range for an attribute.
-        
-        :param property_name: The name of the property (as a string).
-        :return: [minimum value, maximum value].
-        """
+        @param property_name The name of the property (as a string).
+        @return [minimum value, maximum value]."""
 
         prop_attr = self.getPropertyAttribute(property_name)
         temp = prop_attr.attribute & DCAMPROP_TYPE_MASK
@@ -476,9 +454,7 @@ class HamamatsuCamera():
 
     def getPropertyRW(self, property_name):
         """Return if a property is readable / writeable.
-        
-        :return: [True/False (readable), True/False (writeable)].
-        """
+        @return [True/False (readable), True/False (writeable)]."""
 
         prop_attr = self.getPropertyAttribute(property_name)
         rw = []
@@ -499,10 +475,8 @@ class HamamatsuCamera():
 
     def getPropertyValue(self, property_name):
         """Return the current setting of a particular property.
-        
-        :param property_name: The name of the property.
-        :return: [the property value, the property type].
-        """
+        @param property_name The name of the property.
+        @return [the property value, the property type]."""
 
         # Check if the property exists.
         if not (property_name in self.properties):
@@ -539,9 +513,8 @@ class HamamatsuCamera():
 
     def isCameraProperty(self, property_name):
         """Check if a property name is supported by the camera.
-        
-        :param property_name: The name of the property.
-        :return: True/False if property_name is a supported camera property.
+        @param property_name The name of the property.
+        return True/False if property_name is a supported camera property.
         """
 
         if (property_name in self.properties):
@@ -553,8 +526,7 @@ class HamamatsuCamera():
     def newFrames(self):
         """Return a list of the ids of all the new frames since the last check.
         This will block waiting for at least one new frame.
-        
-        :return: [id of the first frame, .. , id of the last frame]
+        @return [id of the first frame, .. , id of the last frame]
         """
 
         # Wait for a new frame.
@@ -604,9 +576,8 @@ class HamamatsuCamera():
 
     def setPropertyValue(self, property_name, property_value):
         """Set the value of a property.
-        
-        :param property_name: The name of the property.
-        :param property_value: The value to set the property to.
+        @param property_name The name of the property.
+        @param property_value The value to set the property to.
         """
 
         # Check if the property exists.
@@ -692,21 +663,21 @@ class HamamatsuCamera():
 
 
 class HamamatsuCameraMR(HamamatsuCamera):
-    """ Memory recycling camera class.
-
-    This version allocates "user memory" for the Hamamatsu camera buffers. This memory is also the location of the 
-    storage for the np_array element of a HCamData() class. The memory is allocated once at the beginning, 
-    then recycled. This means that there is a lot less memory allocation & shuffling compared to the basic class, 
-    which performs one allocation and (I believe) two copies for each frame that is acquired.
-
-    .. warning:: There is the potential here for chaos. Since the memory is now shared there is the possibility that 
-        downstream code will try and access the same bit of memory at the same time as the camera and this could end 
-        badly.
-
-    .. todo:: Use lockbits (and unlockbits) to avoid memory clashes? This would probably also involve some kind of 
-        reference counting scheme.
-    
-    """
+    """# Memory recycling camera class.
+    This version allocates "user memory" for the Hamamatsu camera
+    buffers. This memory is also the location of the storage for
+    the np_array element of a HCamData() class. The memory is
+    allocated once at the beginning, then recycled. This means
+    that there is a lot less memory allocation & shuffling compared
+    to the basic class, which performs one allocation and (I believe)
+    two copies for each frame that is acquired.
+    WARNING: There is the potential here for chaos. Since the memory
+      is now shared there is the possibility that downstream code
+      will try and access the same bit of memory at the same time
+      as the camera and this could end badly.
+    FIXME: Use lockbits (and unlockbits) to avoid memory clashes?
+      This would probably also involve some kind of reference counting
+      scheme."""
 
     def __init__(self, camera_id):
         """@param camera_id The id of the camera."""
@@ -720,13 +691,12 @@ class HamamatsuCameraMR(HamamatsuCamera):
         self.setPropertyValue("output_trigger_kind[0]", 2)
 
     def getFrames(self):
-        """
-        Gets all of the available frames. This will block waiting for new frames even if there are new frames 
-        
-        :return: [frames, [frame x size, frame y size]]
-
-        .. todo:: It does not always seem to block? The length of frames available when it is called can be zero.  
-            Are frames getting dropped? Some sort of race condition?
+        """Gets all of the available frames.
+        This will block waiting for new frames even if there new frames
+        available when it is called.
+        FIXME: It does not always seem to block? The length of frames can
+               be zero. Are frames getting dropped? Some sort of race condition?
+        return [frames, [frame x size, frame y size]]
         """
 
         frames = []
@@ -737,7 +707,6 @@ class HamamatsuCameraMR(HamamatsuCamera):
 
     def startAcquisition(self):
         """Allocate as many frames as will fit in 2GB of memory and start data acquisition."""
-
         self.captureSetup()
 
         # Allocate new image buffers if necessary.
@@ -763,13 +732,13 @@ class HamamatsuCameraMR(HamamatsuCamera):
         # We need to attach & release for each acquisition otherwise
         # we'll get an error if we try to change the ROI in any way
         # between acquisitions.
-        self.checkStatus(self.dcam.dcam_attachbuffer(self.camera_handle,
+        self.checkStatus(dcam.dcam_attachbuffer(self.camera_handle,
                                                 self.hcam_ptr,
                                                 ctypes.sizeof(self.hcam_ptr)),
                          "dcam_attachbuffer")
 
         # Start acquisition.
-        self.checkStatus(self.dcam.dcam_capture(self.camera_handle),
+        self.checkStatus(dcam.dcam_capture(self.camera_handle),
                          "dcam_capture")
 
 
@@ -778,12 +747,12 @@ class HamamatsuCameraMR(HamamatsuCamera):
         """Stops the acquisition and releases the memory associated with the frames."""
 
         # Stop acquisition.
-        self.checkStatus(self.dcam.dcam_idle(self.camera_handle),
+        self.checkStatus(dcam.dcam_idle(self.camera_handle),
                          "dcam_idle")
 
         # Release image buffers.
         if (self.hcam_ptr):
-            self.checkStatus(self.dcam.dcam_releasebuffer(self.camera_handle),
+            self.checkStatus(dcam.dcam_releasebuffer(self.camera_handle),
                              "dcam_releasebuffer")
 
         print("max camera backlog was: %s"%self.max_backlog)
@@ -795,11 +764,6 @@ class HamamatsuCameraMR(HamamatsuCamera):
 #
 if __name__ == "__main__":
     print('MAIN')
-    dcam = ctypes.windll.dcamapi
-    temp = ctypes.c_int32(0)
-    if (dcam.dcam_init(None, ctypes.byref(temp), None) != DCAMERR_NOERROR):
-        raise DCAMException("DCAM initialization failed.")
-    n_cameras = temp.value
 
     print ("found: %s cameras"%n_cameras)
     if (n_cameras > 0):

@@ -3,9 +3,9 @@
     ===================================
     Simple widget for storing the parameters of the :mod:`UUTrack.Model._session`. It creates and populates tree thanks to the :meth:`UUTrack.Model._session._session.getParams`.
     The widget has two buttons, one that updates the session by emitting a `signal` to the main thread and another the repopulates the tree whith the available parameters.
-    
+
     .. todo:: Remove the printing to screen of the parameters once the debugging is done.
-    
+
     .. sectionauthor:: Aquiles Carattino <aquiles@aquicarattino.com>
 """
 
@@ -41,14 +41,15 @@ class configWidget(QtGui.QWidget):
             to_update = param.name().replace(' ','_')
             path = self.p.childPath(param)[0]
             self._session_new.params[path][to_update] = data
-            print(self._session_new.params['Camera']['roi_x1'])
-            print(self._session_new.params['Camera']['roi_x2'])
-            print(self._session_new.params['Camera']['roi_y1'])
-            print(self._session_new.params['Camera']['roi_y2'])
-            print(self._session.params['Camera']['roi_x1'])
-            print(self._session.params['Camera']['roi_x2'])
-            print(self._session.params['Camera']['roi_y1'])
-            print(self._session.params['Camera']['roi_y2'])
+            if self._session.Debug['to_screen']:
+                print(self._session_new.params['Camera']['roi_x1'])
+                print(self._session_new.params['Camera']['roi_x2'])
+                print(self._session_new.params['Camera']['roi_y1'])
+                print(self._session_new.params['Camera']['roi_y2'])
+                print(self._session.params['Camera']['roi_x1'])
+                print(self._session.params['Camera']['roi_x2'])
+                print(self._session.params['Camera']['roi_y1'])
+                print(self._session.params['Camera']['roi_y2'])
 
     def updateSession(self):
         """ Updates the session and sends a signal"""

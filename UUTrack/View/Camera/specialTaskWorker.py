@@ -1,10 +1,10 @@
 """
     UUTrack.View.Camera.specialTaskWorker.py
     ========================================
-    Similar to the :ref:`UUTrack.View.Camera.workerThread`, the special task worker is designed for running in a separate thread a task other than just acquiring from the camera. 
-    For example, ona can use this to activate some feedback loop. 
+    Similar to the :ref:`UUTrack.View.Camera.workerThread`, the special task worker is designed for running in a separate thread a task other than just acquiring from the camera.
+    For example, ona can use this to activate some feedback loop.
     In order to see this in action, check :meth:`startSpecialTask <UUTrack.View.Camera.cameraMain.cameraMain.startSpecialTask>`
-    
+
     .. todo:: Make something out of this class more than just extracting the centroid.
 """
 
@@ -39,12 +39,17 @@ class specialTaskWorker(QtCore.QThread):
                 first = False
             img = self.camera.readCamera()
             if isinstance(img, list):
-                img = img[-1]
-
-            X = center_of_mass(img/np.max(np.max(img)))
+                X = np.zeros((2,len(img)))
+                n=0
+                for i in img:
+                    X[:,n] = center_of_mass(i/np.max(np.max(i)))
+                    n+=1
+            else:
+                X = np.array(center_of_mass(img/np.max(np.max(img))))
             # print(X)
             # print('Special task running... Coordinate X: %sCoordinate Y: %s'%(X[0], X[1]))
             self.emit(QtCore.SIGNAL('Image'), img, 'SpecialTask')
-            self.emit(QtCore.SIGNAL('Coordinates'), X[0], X[1])
+            self.emit(QtCore.SIGNAL('Coordinates'), X)
+        self.camera.stopAcq()
         print('Special task finished')
         return

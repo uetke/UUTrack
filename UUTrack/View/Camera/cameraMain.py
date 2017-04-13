@@ -30,17 +30,17 @@ from .messageWidget import messageWidget
 from .specialTaskWorker import specialTaskWorker
 from .workerThread import workThread
 from .trajectoryWidget import trajectoryWidget
-from ...Model.workerSaver import workerSaver
+from ...Model.workerSaver import workerSaver, clearQueue
 from . import resources
 
 class cameraMain(QtGui.QMainWindow):
-    """   
-    Displays the camera   
+    """
+    Displays the camera
     """
     def __init__(self, session, cam):
         """
         Inits the camera window
-        
+
         :param: session: session
         :param: cam: camera
         """
@@ -85,8 +85,7 @@ class cameraMain(QtGui.QMainWindow):
 
         self.refreshTimer.start(self._session.GUI['refresh_time'])
 
-        # Worker thread for clearing the queue.
-        self.clearWorker = clearQueueThread(self.q)
+
 
         self.acquiring = False
         self.logMessage = []
@@ -94,6 +93,9 @@ class cameraMain(QtGui.QMainWindow):
         ''' Initialize the camera and the camera related things '''
         self.maxSizex = self.camera.GetCCDWidth()
         self.maxSizey = self.camera.GetCCDHeight()
+        self.current_width = self.maxSizex
+        self.current_height = self.maxSizey
+
         if self._session.Camera['roi_x1'] == 0:
             self._session.Camera = {'roi_x1': 1}
         if self._session.Camera['roi_x2'] == 0 or self._session.Camera['roi_x2'] > self.maxSizex:
@@ -115,9 +117,12 @@ class cameraMain(QtGui.QMainWindow):
         self.bufferTimes = []
         self.refreshTimes = []
         self.totalFrames = 0
-        self.centroidX = []
-        self.centroidY = []
+        self.droppedFrames = 0
+        self.buffer_memory = 0
+        self.centroidX = np.array([])
+        self.centroidY = np.array([])
         self.watData = []
+        self.watIndex = 0 # Waterfall index
         self.corner_roi = [] # Real coordinates of the coorner of the ROI region. (Min_x and Min_y).
 
         self.docks = []
@@ -144,6 +149,7 @@ class cameraMain(QtGui.QMainWindow):
         self.fileName = self._session.Saving['filename_photo']
         self.movieName = self._session.Saving['filename_video']
         ###
+        self.messageWidget.appendLog('i', 'Program started by %s' % self._session.User['name'])
 
     def snap(self):
         """Function for acquiring a single frame from the camera. It is triggered by the user.
@@ -159,14 +165,14 @@ class cameraMain(QtGui.QMainWindow):
                 You should stop the free run acquisition and then snap a photo.""")
             msgBox.setStandardButtons(QtGui.QMessageBox.Ok)
             retval = msgBox.exec_()
-            self.logMessage.append('<b>Error: </b>Tried to snap while in free run')
+            self.messageWidget.appendLog('e', 'Tried to snap while in free run')
         else:
             self.workerThread = workThread(self._session, self.camera)
             self.connect(self.workerThread,QtCore.SIGNAL('Image'),self.getData)
             self.workerThread.origin = 'snap'
             self.workerThread.start()
             self.acquiring = True
-            self.logMessage.append('<i>Info: </i>Snapped photo')
+            self.messageWidget.appendLog('i', 'Snapped photo')
 
     def saveImage(self):
         """Saves the image that is being displayed to the user.
@@ -186,20 +192,25 @@ class cameraMain(QtGui.QMainWindow):
             meta = g.create_dataset('metadata',data=self._session.serialize())
             f.flush()
             f.close()
-            self.logMessage.append('<i>Info: </i>Saved photo')
+            self.messageWidget.appendLog('i', 'Saved photo')
 
     def startMovie(self):
-        if self.acquiring:
-            self.stopMovie()
+        if self._session.Debug['to_screen']:
+            print('Start Movie')
+        if self.specialTaskRunning:
+            self.messageWidget.appendLog('w', 'Special task is running')
         else:
-            self.emit(QtCore.SIGNAL('stopChildMovie'))
-            self.logMessage.append('<b>Info: </b>Started free run movie')
-            # Worker thread to acquire images. Specially useful for long exposure time images
-            self.workerThread = workThread(self._session,self.camera)
-            self.connect(self.workerThread, QtCore.SIGNAL('Image'), self.getData)
-            self.connect(self.workerThread, QtCore.SIGNAL("finished()"), self.done)
-            self.workerThread.start()
-            self.acquiring = True
+            if self.acquiring:
+                self.stopMovie()
+            else:
+                self.emit(QtCore.SIGNAL('stopChildMovie'))
+                self.messageWidget.appendLog('i', 'Started free run movie')
+                # Worker thread to acquire images. Specially useful for long exposure time images
+                self.workerThread = workThread(self._session,self.camera)
+                self.connect(self.workerThread, QtCore.SIGNAL('Image'), self.getData)
+                self.connect(self.workerThread, QtCore.SIGNAL("finished()"), self.done)
+                self.workerThread.start()
+                self.acquiring = True
 
     def stopMovie(self):
         if self.acquiring:
@@ -208,7 +219,9 @@ class cameraMain(QtGui.QMainWindow):
                 pass
             self.acquiring = False
             self.camera.stopAcq()
-            self.logMessage.append('<b>Info: </b>Stopped free run movie')
+            self.messageWidget.appendLog('i', 'Stopped free run movie')
+            if self.continuousSaving:
+                self.movieSaveStop()
 
     def movieData(self):
         """Function just to trigger and read the camera in the separate thread.
@@ -221,6 +234,11 @@ class cameraMain(QtGui.QMainWindow):
         if not self.continuousSaving:
             # Child process to save the data. It runs continuously until and exit flag
             # is passed through the Queue. (self.q.put('exit'))
+            self.accumulateBuffer = True
+            if len(self.tempImage) > 1:
+                im_size = self.tempImage.nbytes
+                max_element = int(self._session.Saving['max_memory']/im_size)
+                #self.q = Queue(0)
             fn = self._session.Saving['filename_video']
             filename = '%s.hdf5' % (fn)
             fileDir = self._session.Saving['directory']
@@ -231,22 +249,25 @@ class cameraMain(QtGui.QMainWindow):
             self.p = Process(target=workerSaver, args=(to_save, metaData, self.q,))  #
             self.p.start()
             self.continuousSaving = True
-            self.logMessage.append('<b>Info:</b> Started the Continuous savings')
+            self.messageWidget.appendLog('i', 'Started the Continuous savings')
         else:
-            self.logMessage.append('<b>WARNING</b>: Continuous savings already triggered')
+            self.messageWidget.appendLog('w', 'Continuous savings already triggered')
 
     def movieSaveStop(self):
         """Stops the saving to disk. It will however flush the queue.
         """
         if self.continuousSaving:
             self.q.put('Stop')
+            self.accumulateBuffer = False
             #self.p.join()
-            self.logMessage.append('<b>Info:</b> Stopped the Continuous savings')
+            self.messageWidget.appendLog('i', 'Stopped the Continuous savings')
             self.continuousSaving = False
 
     def emptyQueue(self):
         """Clears the queue.
         """
+        # Worker thread for clearing the queue.
+        self.clearWorker = Process(target = clearQueue, args = (self.q,))
         self.clearWorker.start()
 
     def startWaterfall(self):
@@ -259,10 +280,10 @@ class cameraMain(QtGui.QMainWindow):
             self.area.addDock(self.dwaterfall, 'bottom', self.dmainImage)
             self.dwaterfall.addWidget(self.watWidget)
             self.showWaterfall = True
-            Sx,Sy = self.camera.getSize()
+            Sx, Sy = self.camera.getSize()
             self.watData = np.zeros((self._session.GUI['length_waterfall'],Sx))
             self.watWidget.img.setImage(np.transpose(self.watData))
-            self.logMessage.append('<b>Info:</b> Waterfall opened')
+            self.messageWidget.appendLog('i', 'Waterfall opened')
         else:
             self.closeWaterfall()
 
@@ -279,40 +300,51 @@ class cameraMain(QtGui.QMainWindow):
             self.dwaterfall.close()
             self.showWaterfall = False
             del self.watData
-            self.logMessage.append('<b>Info:</b> Waterfall closed')
+            self.messageWidget.appendLog('i', 'Waterfall closed')
 
     def setROI(self, X, Y):
         """
         Gets the ROI from the lines on the image. It also updates the GUI to accommodate the changes.
-        :param X: 
-        :param Y: 
-        :return: 
+        :param X:
+        :param Y:
+        :return:
         """
         if not self.acquiring:
             self.corner_roi[0] = X[0]
             self.corner_roi[1] = Y[0]
-            print('Corner: %s, %s' % (self.corner_roi[0],self.corner_roi[1]))
+            if self._session.Debug['to_screen']:
+                print('Corner: %s, %s' % (self.corner_roi[0],self.corner_roi[1]))
             self._session.Camera = {'roi_x1': int(X[0])}
             self._session.Camera = {'roi_x2': int(X[1])}
             self._session.Camera = {'roi_y1': int(Y[0])}
             self._session.Camera = {'roi_y2': int(Y[1])}
+            self.messageWidget.appendLog('i', 'Updated roi_x1: %s' % int(X[0]))
+            self.messageWidget.appendLog('i', 'Updated roi_x2: %s' % int(X[1]))
+            self.messageWidget.appendLog('i', 'Updated roi_y1: %s' % int(Y[0]))
+            self.messageWidget.appendLog('i', 'Updated roi_y2: %s' % int(Y[1]))
 
             Nx, Ny = self.camera.setROI(X, Y)
+            Sx, Sy = self.camera.getSize()
+            self.current_width = Sx
+            self.current_height = Sy
+
             self.tempImage = np.zeros((Nx, Ny))
             self.camWidget.hline1.setValue(1)
             self.camWidget.hline2.setValue(Ny)
             self.camWidget.vline1.setValue(1)
             self.camWidget.vline2.setValue(Nx)
-            self.centroidX = []
-            self.centroidY = []
+            self.centroidX = np.array([])
+            self.centroidY = np.array([])
             self.trajectories = []
             self.camWidget.img2.clear()
             if self.showWaterfall:
-                self.watData = np.zeros((self._session.lengthWaterfall, Nx))
+                self.watData = np.zeros((self._session.GUI['length_waterfall'],self.current_width))
+                self.watWidget.img.setImage(np.transpose(self.watData))
+
             self.config.populateTree(self._session)
-            self.logMessage.append('<i>Info: </i>Updated the ROI')
+            self.messageWidget.appendLog('i', 'Updated the ROI')
         else:
-            self.logMessage.append('<b>Error: <b>Cannot change ROI while acquiring.')
+            self.messageWidget.appendLog('e', 'Cannot change ROI while acquiring.')
 
     def getROI(self):
         """Gets the ROI coordinates from the GUI and updates the values."""
@@ -337,15 +369,13 @@ class cameraMain(QtGui.QMainWindow):
             self.camWidget.hline2.setValue(self.maxSizey)
             self.corner_roi = [1, 1]
             self.getROI()
-            if self.showWaterfall:
-                self.watData = np.zeros((self._session.GUI['length_waterfall'], self.maxSizex))
         else:
-            self.logMessage.append('<b>Error: <b> Cannot change ROI while acquiring.')
+            self.messageWidget.appendLog('e', 'Cannot change ROI while acquiring.')
 
     def setupActions(self):
         """Setups the actions that the program will have. It is placed into a function
         to make it easier to reuse in other windows.
-        
+
         :rtype: None
         """
         self.exitAction = QtGui.QAction(QtGui.QIcon(':Icons/power-icon.png'), '&Exit', self)
@@ -357,6 +387,16 @@ class cameraMain(QtGui.QMainWindow):
         self.saveAction.setShortcut('Ctrl+S')
         self.saveAction.setStatusTip('Save Image')
         self.saveAction.triggered.connect(self.saveImage)
+
+        self.saveWaterfallAction = QtGui.QAction("Save Waterfall", self)
+        self.saveWaterfallAction.setShortcut('Ctrl+Shift+W')
+        self.saveWaterfallAction.setStatusTip('Save waterfall data to new file')
+        self.saveWaterfallAction.triggered.connect(self.saveWaterfall)
+
+        self.saveTrajectoryAction = QtGui.QAction("Save Trajectory", self)
+        self.saveTrajectoryAction.setShortcut('Ctrl+Shift+T')
+        self.saveTrajectoryAction.setStatusTip('Save trajectory data to new file')
+        self.saveTrajectoryAction.triggered.connect(self.saveTrajectory)
 
         self.snapAction = QtGui.QAction(QtGui.QIcon(':Icons/snap.png'),'S&nap photo',self)
         self.snapAction.setShortcut(QtCore.Qt.Key_F5)
@@ -462,6 +502,10 @@ class cameraMain(QtGui.QMainWindow):
         self.configMenu.addAction(self.configAction)
         self.configMenu.addAction(self.dockAction)
 
+        self.saveMenu = menubar.addMenu('S&ave')
+        self.saveMenu.addAction(self.saveWaterfallAction)
+        self.saveMenu.addAction(self.saveTrajectoryAction)
+
     def setupDocks(self):
         """Setups the docks in order to recover the initial configuration if one gets closed."""
 
@@ -510,22 +554,24 @@ class cameraMain(QtGui.QMainWindow):
         self.connect(self, QtCore.SIGNAL('stopChildMovie'), self.camViewer.stopCamera)
         self.connect(self, QtCore.SIGNAL('CloseAll'), self.camViewer.closeViewer)
         self.connect(self.selectSettings, QtCore.SIGNAL("settings"), self.update_settings)
+        self.connect(self, QtCore.SIGNAL('CloseAll'), self.selectSettings.close)
 
     def bufferStatus(self):
         """Starts or stops the buffer accumulation.
         """
         if self.accumulateBuffer:
             self.accumulateBuffer = False
-            self.logMessage.append('<b>Info:</b> Stopped the buffer accumulation')
+            self.messageWidget.appendLog('i', 'Stopped the buffer accumulation')
         else:
             self.accumulateBuffer = True
-            self.logMessage.append('<b>Info:</b> Started the buffer accumulation')
+            self.messageWidget.appendLog('i', 'Stopped the buffer accumulation')
 
     def getData(self, data, origin):
         """Gets the data that is being gathered by the working thread.
-        
+
         .. _getData:
         """
+        s = 0
         if origin == 'snap': #Single snap.
             self.acquiring=False
             self.workerThread.origin = None
@@ -535,63 +581,134 @@ class cameraMain(QtGui.QMainWindow):
         if isinstance(data, list):
             for d in data:
                 if self.accumulateBuffer:
-                    try:
+                    s = float(self.q.qsize())*int(d.nbytes)/1024/1024
+                    if s<self._session.Saving['max_memory']:
                         self.q.put(d)
-                    except:
-                        print('Not enough memory!')
-            self.tempImage = data[-1]
-            self.totalFrames+=1
+                    else:
+                        self.droppedFrames+=1
+
+                if self.showWaterfall:
+                    if self.watIndex == self._session.GUI['length_waterfall']:
+                        if self._session.Saving['auto_save_waterfall']:
+                            self.saveWaterfall()
+
+                        self.watData = np.zeros((self._session.GUI['length_waterfall'],self.current_width))
+                        self.watIndex = 0
+
+                    wf = np.array([np.sum(d,1)])
+                    self.watData[self.watIndex,:] = wf
+                    self.watIndex +=1
+
+                self.totalFrames+=1
+            self.tempImage = d
         else:
             self.tempImage = data
             if self.accumulateBuffer:
-                try:
+                s = float(self.q.qsize())*int(d.nbytes)/1024/1024
+
+                if s<self._session.Saving['max_memory']:
                     self.q.put(data)
-                except:
-                    print('Not enough memory!')
+                else:
+                    self.droppedFrames+=1
 
             if self.showWaterfall:
-                d = np.array([np.sum(data,1)])
-                self.watData = np.concatenate((d,self.watData),axis=0)
+                if self.watIndex == self._session.GUI['length_waterfall']:
+                    if self._session.Saving['auto_save_waterfall']:
+                        self.saveWaterfall()
+
+                    self.watData = np.zeros((self._session.GUI['length_waterfall'],self.current_width))
+                    self.watIndex = 0
+
+                wf = np.array([np.sum(d,1)])
+                self.watData[self.watIndex,:] = wf
+                self.watIndex +=1
 
             self.totalFrames += 1
+
         new_time = time.time()
         self.bufferTime = new_time - self.lastBuffer
         self.lastBuffer = new_time
+        self.buffer_memory = s
+        if self._session.Debug['queue_memory']:
+            print('Queue Memory: %3.2f MB' % self.buffer_memory)
 
-    def getCoordinates(self, X, Y):
+    def getCoordinates(self, X):
         """Gets the coordinates emitted by the special task worker and stores them in an array"""
-        self.centroidX.append(int(X))
-        self.centroidY.append(int(Y))
-        self.trajectories[int(X), int(Y),1] = 50000
+        self.centroidX = np.append(self.centroidX,X[0,:])
+        self.centroidY = np.append(self.centroidY,X[1,:])
+        self.trajectories[int(X[0,0]), int(X[1,0]),1] = 50000
 
     def updateGUI(self):
         """Updates the image displayed to the user.
         """
         if len(self.tempImage) >= 1:
             self.camWidget.img.setImage(self.tempImage, autoLevels=False, autoRange=False, autoHistogramRange=False)
+            self.buffer_memory = float(self.q.qsize())*int(self.tempImage.nbytes)/1024/1024
 
         if len(self.centroidX) >= 1:
             self.camWidget.img2.setImage(self.trajectories)
+            # self.trajectoryWidget.plot.clear()
             self.trajectoryWidget.plot.setData(self.centroidX,self.centroidY)
 
         if self.showWaterfall:
             self.watData  = self.watData[:self._session.GUI['length_waterfall'],:]
-            self.watWidget.img.setImage(np.flipud(np.transpose(self.watData[::-1,:])))
+            self.watWidget.img.setImage(np.transpose(self.watData))
 
 
         new_time = time.time()
         self.fps = new_time-self.lastRefresh
         self.lastRefresh = new_time
-        self.messageWidget.updateMemory(self.q.qsize()/200*100) #TODO: Make it depend on the real size of the Queue
+
+        self.messageWidget.updateMemory(self.buffer_memory/self._session.Saving['max_memory']*100)
         self.messageWidget.updateProcessor(psutil.cpu_percent())
 
         msg = '''<b>Buffer time:</b> %0.2f ms <br />
-        #     <b>Refresh time:</b> %0.2f ms <br />
-        #     <b>Acquired Frames</b> %i <br />
-        #     <b>Frames in buffer</b> %i'''%(self.bufferTime*1000,self.fps*1000,self.totalFrames,self.q.qsize())
+             <b>Refresh time:</b> %0.2f ms <br />
+             <b>Acquired Frames</b> %i <br />
+             <b>Dropped Frames</b> %i <br />
+             <b>Frames in buffer</b> %i'''%(self.bufferTime*1000,self.fps*1000,self.totalFrames,self.droppedFrames,self.q.qsize())
         self.messageWidget.updateMessage(msg)
-        self.messageWidget.updateLog(self.logMessage)
+        #self.messageWidget.updateLog(self.logMessage)
         self.logMessage = []
+
+    def saveWaterfall(self):
+        """Saves the waterfall data, if any.
+        """
+        if len(self.watData) > 1:
+            fn = self._session.Saving['filename_waterfall']
+            filename = '%s.hdf5' % (fn)
+            fileDir = self._session.Saving['directory']
+            if not os.path.exists(fileDir):
+                os.makedirs(fileDir)
+
+            f = h5py.File(os.path.join(fileDir,filename), "a")
+            now = str(datetime.now())
+            g = f.create_group(now)
+            dset = g.create_dataset('waterfall', data=self.watData)
+            meta = g.create_dataset('metadata', data=self._session.serialize().encode("ascii","ignore"))
+            f.flush()
+            f.close()
+            self.messageWidget.appendLog('i','Saved Waterfall')
+
+    def saveTrajectory(self):
+        """Saves the trajectory data, if any.
+        """
+        if len(self.centroidX) > 1:
+            fn = self._session.Saving['filename_trajectory']
+            filename = '%s.hdf5' % (fn)
+            fileDir = self._session.Saving['directory']
+            if not os.path.exists(fileDir):
+                os.makedirs(fileDir)
+
+            f = h5py.File(os.path.join(fileDir,filename), "a")
+            now = str(datetime.now())
+            g = f.create_group(now)
+            dset = g.create_dataset('trajectory', data=[self.centroidX, self.centroidY])
+            meta = g.create_dataset('metadata',data=self._session.serialize().encode("ascii","ignore"))
+            f.flush()
+            f.close()
+            self.messageWidget.appendLog('i', 'Saved Trajectory')
+
 
     def update_settings(self, settings):
         new_session = _session(settings)
@@ -612,13 +729,19 @@ class cameraMain(QtGui.QMainWindow):
                 update_cam = True
                 if k in ['roi_x1', 'roi_x2', 'roi_y1', 'roi_y2']:
                     update_roi = True
-                    print('UUPdate ROI')
+                    if self._session.Debug['to_screen']:
+                        print('Update ROI')
                 elif k == 'exposure_time':
                     update_exposure = True
                 elif k in ['binning_x', 'binning_y']:
                     update_binning = True
 
-        self.logMessage.append('<b>Info:</b> Updated the parameters')
+        if session.GUI['length_waterfall'] != self._session.GUI['length_waterfall']:
+            if self.showWaterfall:
+                self.closeWaterfall()
+                self.restart_waterfall = True
+
+        self.messageWidget.appendLog('i', 'Updated the parameters')
         self._session = session.copy()
 
         if update_cam:
@@ -631,32 +754,39 @@ class cameraMain(QtGui.QMainWindow):
                 self.setROI(X, Y)
 
             if update_exposure:
-                self.camera.setExposure(session.Camera['exposure_time'])
+                new_exp = self.camera.setExposure(session.Camera['exposure_time'])
+                self._session.Camera = {'exposure_time': new_exp}
+                self.messageWidget.appendLog('i', 'Updated exposure: %s' % new_exp)
+                if self._session.Debug['to_screen']:
+                    print("New Exposure: %s" % new_exp)
+                    print(self._session)
 
             if update_binning:
                 self.camera.setBinning(session.Camera['binning_x'],session.Camera['binning_y'])
 
-            if self.acquiring:
-                self.startMovie()
-
         self.refreshTimer.stop()
         self.refreshTimer.start(session.GUI['refresh_time'])
+
 
     def startSpecialTask(self):
         """Starts a special task. This is triggered by the user with a special combination of actions, for example clicking
         with the mouse on a plot, draggin a crosshair, etc."""
         if not self.specialTaskRunning:
+            if self.acquiring:
+                self.stopMovie()
+                self.acquiring = False
+
             X = self.camWidget.crosshair[0].getPos()
             Y = self.camWidget.crosshair[1].getPos()
-            self.centroidX = []
-            self.centroidY = []
+            self.centroidX = np.array([])
+            self.centroidY = np.array([])
             self.trajectories = np.zeros((self.tempImage.shape[0],self.tempImage.shape[1],3))
             self.specialTaskWorker = specialTaskWorker(self._session,self.camera,X,Y)
             self.connect(self.specialTaskWorker,QtCore.SIGNAL('Image'),self.getData)
             self.connect(self.specialTaskWorker,QtCore.SIGNAL('Coordinates'),self.getCoordinates)
             self.specialTaskWorker.start()
             self.specialTaskRunning = True
-            self.logMessage.append('<b>Info: </b>Started special task')
+            self.messageWidget.appendLog('i', 'Started special task')
         else:
             print('special task already running')
 
@@ -665,8 +795,7 @@ class cameraMain(QtGui.QMainWindow):
         if self.specialTaskRunning:
             self.specialTaskWorker.keep_running = False
             self.specialTaskRunning = False
-            self.camera.stopAcq()
-            self.logMessage.append('<b>Info: </b>Stopped special task')
+            self.messageWidget.appendLog('i', 'Stopped special task')
 
     def done(self):
         #self.saveRunning = False
@@ -679,10 +808,13 @@ class cameraMain(QtGui.QMainWindow):
     def closeEvent(self,evnt):
         """Triggered at closing. Checks that the save is complete and closes the dataFile
         """
+        self.messageWidget.appendLog('i', 'Closing the program')
         if self.acquiring:
             self.stopMovie()
         if self.specialTaskRunning:
             self.stopSpecialTask()
+            while self.specialTaskWorker.isRunning():
+                pass
         self.emit(QtCore.SIGNAL('CloseAll'))
         self.camera.stopCamera()
         self.movieSaveStop()
@@ -697,8 +829,28 @@ class cameraMain(QtGui.QMainWindow):
             self.p.join()
         except AttributeError:
             pass
-        self.emptyQueue()
-        self.close()
+        if self.q.qsize() > 0:
+            self.messageWidget.appendLog('i', 'The queue was not empty')
+            print('Freeing up memory...')
+            self.emptyQueue()
+
+        # Save LOG.
+        fn = self._session.Saving['filename_log']
+        filename = '%s.log' % (fn)
+        fileDir = self._session.Saving['directory']
+        if not os.path.exists(fileDir):
+            os.makedirs(fileDir)
+
+        f = open(os.path.join(fileDir,filename), "a")
+        for line in self.messageWidget.logText:
+            f.write(line+'\n')
+        f.flush()
+        f.close()
+        print('Saved LOG')
+        super(cameraMain, self).closeEvent(evnt)
+
+
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

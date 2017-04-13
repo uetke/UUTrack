@@ -65,7 +65,7 @@ def start(configDir='',configFile=''):
         cam = camera(0)
     elif session.Camera['camera'] == 'PSI':
         from .Model.Cameras.PSI import camera
-        cam = camera('C:\\Users\\Experimentor\\Programs\\UUTrack\\Controller\\devices\\PhotonicScience')
+        cam = camera('UUTrack\\Controller\\devices\\PhotonicScience')
     else:
         raise Exception('That particular camera has not been implemented yet.\n Please check your config file')
 

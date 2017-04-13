@@ -8,9 +8,13 @@ User:
 
 Saving:
   auto_save: False
+  auto_save_waterfall: True
   directory: C:\Users\Aquiles\Data
   filename_video: Video # Can be the same filename for video and photo
   filename_photo: Snap
+  filename_waterfall: Waterfall
+  filename_trajectory: Trajectory
+  max_memory: 1000 # In megabytes
 
 GUI:
   length_waterfall: 100 # Total length of the Waterfall (lines)
@@ -32,3 +36,6 @@ Camera:
 Tracking: # Not yet implemented, will show up in the config window
   param_1: 0.
   param_2: 0
+
+Debug:
+  queue_memory: False

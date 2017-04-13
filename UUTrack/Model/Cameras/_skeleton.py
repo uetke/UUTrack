@@ -2,10 +2,10 @@
     UUTrack.Model.Cameras._skeleton.py
     ==================================
     Camera class with the skeleton functions. Important to keep track of the methods that are
-    exposed to the View. The class cameraBase should be subclassed when developing new Models. This ensures that all the methods are automatically inherited and there is no breaks downstream. 
-    
+    exposed to the View. The class cameraBase should be subclassed when developing new Models. This ensures that all the methods are automatically inherited and there is no breaks downstream.
+
     .. note:: **IMPORTANT** Whatever new function is implemented in a specific model, it should be first declared in the cameraBase class. In this way the other models will have access to the method and the program will keep running (perhaps with non intended behavior though).
-    
+
     .. sectionauthor:: Aquiles Carattino <aquiles@aquicarattino.com>
 """
 
@@ -17,6 +17,7 @@ class cameraBase():
         self.running = False
         self.maxWidth = 0
         self.maxHeight = 0
+        self.exposure = 0
 
     def initializeCamera(self):
         """
@@ -30,13 +31,13 @@ class cameraBase():
         """
         Triggers the camera.
         """
-        raise NotImplementedError
+        print("Not Implemented")
 
     def setAcquisitionMode(self, mode):
         """
         Set the readout mode of the camera: Single or continuous.
         :param int mode: One of self.MODE_CONTINUOUS, self.MODE_SINGLE_SHOT
-        :return: 
+        :return:
         """
         self.mode = mode
 
@@ -50,35 +51,37 @@ class cameraBase():
         """
         Checks if the acquisition in the camera is over.
         """
-        raise NotImplementedError
+        print("Not Implemented")
 
     def setExposure(self,exposure):
         """
         Sets the exposure of the camera.
         """
-        raise NotImplementedError
+        self.exposure = exposure
+        print("Not Implemented")
 
     def getExposure(self):
         """
         Gets the exposure time of the camera.
         """
-        raise NotImplementedError
-
+        print("Not Implemented")
+        return self.exposure
+        
     def readCamera(self):
         """
         Reads the camera
         """
-        raise NotImplementedError
+        print("Not Implemented")
 
     def setROI(self,X,Y):
         """ Sets up the ROI. Not all cameras are 0-indexed, so this is an important
         place to define the proper ROI.
-        
-        :param array X: array type with the coordinates for the ROI X[0], X[1] 
+
+        :param array X: array type with the coordinates for the ROI X[0], X[1]
         :param array Y: array type with the coordinates for the ROI Y[0], Y[1]
-        :return: 
+        :return:
         """
-        raise NotImplementedError
+        print("Not Implemented")
 
     def clearROI(self):
         """
@@ -89,45 +92,45 @@ class cameraBase():
     def getSize(self):
         """Returns the size in pixels of the image being acquired. This is useful for checking the ROI settings.
         """
-        raise NotImplementedError
+        print("Not Implemented")
 
     def getSerialNumber(self):
         """Returns the serial number of the camera.
         """
-        raise NotImplementedError
+        print("Not Implemented")
 
     def GetCCDWidth(self):
         """
         Returns the CCD width in pixels
         """
-        raise NotImplementedError
+        print("Not Implemented")
 
     def GetCCDHeight(self):
         """
         Returns: the CCD height in pixels
         """
-        raise NotImplementedError
+        print("Not Implemented")
 
     def stopAcq(self):
         """Stops the acquisition without closing the connection to the camera."""
-        raise NotImplementedError
+        print("Not Implemented")
 
     def setBinning(self,xbin,ybin):
         """
         Sets the binning of the camera if supported. Has to check if binning in X/Y can be different or not, etc.
-        
-        :param xbin: 
-        :param ybin: 
-        :return: 
+
+        :param xbin:
+        :param ybin:
+        :return:
         """
-        raise NotImplementedError
+        print("Not Implemented")
 
     def stopCamera(self):
         """Stops the acquisition and closes the connection with the camera.
         """
         try:
             #Closing the camera
-            raise NotImplementedError
+            print("Not Implemented")
         except:
             #Camera failed to close
-            raise NotImplementedError
+            print("Not Implemented")

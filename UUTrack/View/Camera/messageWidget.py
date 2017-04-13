@@ -1,22 +1,23 @@
-""" 
+"""
     UUTrack.View.Camera.messageWidget.py
     ====================================
     Simple widget that holds an HTML box to display messages to the user. Example of usage would be,
-        
+
         >>> messageWidget.updateProcessor(psutil.cpu_percent())
         >>> msg = []
         >>> msg.append('<b>Error</b>: This is an error message.')
         >>> msg.append('<i>Info</i>: This is a test message.')
         >>> messageWidget.updateMessage(msg)
-        
-    The main objective of this widget is to confirm to the user that something was triggered and to have a permanent way of seeing it. 
-    
+
+    The main objective of this widget is to confirm to the user that something was triggered and to have a permanent way of seeing it.
+
     .. todo:: This widget capabilities could be combined with some logging capabilities.
-    
+
     .. todo:: Change colors for error, info and debug messages.
-    
+
     .. sectionauthor:: Aquiles Carattino <aquiles@aquicarattino.com>
 """
+from datetime import datetime
 from pyqtgraph.Qt import QtGui
 
 class messageWidget(QtGui.QWidget):
@@ -24,6 +25,9 @@ class messageWidget(QtGui.QWidget):
     messageTitle = "Status"
     logTitle = "Log"
     logMaxLength = 20 # maximum length of the log to be displayed to the user.
+    categories = {'i': 'Info',
+                'e': 'Error',
+                'w': 'Warning'}
 
     def __init__(self,parent=None):
         QtGui.QWidget.__init__(self, parent)
@@ -103,7 +107,7 @@ class messageWidget(QtGui.QWidget):
 
     def updateMessage(self,msg):
         """Updates the message displayed to the user.
-        
+
         :param msg: string or array, in which case every item will be displayed in a new line.
         :type msg: string or array.
         """
@@ -121,9 +125,32 @@ class messageWidget(QtGui.QWidget):
         self.log.setHtml('<h1>%s</h1>' % self.logTitle)
         self.logText = []
 
+    def appendLog(self, cat, msg):
+        """ Appends to the log the desired message.
+
+        :param cat: Category of the message (i,w.e)
+        :param msg: Message to display
+        """
+        c = self.categories[cat]
+        t = datetime.now().strftime("%H:%M:%S")
+        self.logText.append('%s  %s:  %s' % (t, c, msg))
+
+        if len(self.logText)>self.logMaxLength:
+            until = self.logMaxLength
+        else:
+            until = len(self.logText)
+
+        message = ''
+        mm = self.logText[-until:]
+        for m in mm[::-1]:
+            message += "<br />%s"%m
+        self.log.setHtml(message)
+
+
+
     def updateLog(self,msg):
         """Updates the log displayed to the user by prepending the desired message to the available messages.
-        
+
         :param msg: every item will be displayed in a new line
         :type msg: string or array."""
         message = '<h1>%s</h1>'%self.logTitle
@@ -147,7 +174,7 @@ class messageWidget(QtGui.QWidget):
     def updateMemory(self,percentage):
         """
         Updates the progress bar that displays how much memory is available to the user.
-        
+
         :param percentage: Percentage of memory used.
         """
         if percentage > 75:

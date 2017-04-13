@@ -8,12 +8,17 @@ User:
 
 Saving:
   auto_save: False
+  auto_save_waterfall: True
   directory: C:\data\nanoCET
   filename_video: Video # Can be the same filename for video and photo
   filename_photo: Snap
+  filename_waterfall: Waterfall
+  filename_trajectory: Trajectory
+  filename_log: Log
+  max_memory: 800 # In megabytes
 
 GUI:
-  length_waterfall: 100 # Total length of the Waterfall (lines)
+  length_waterfall: 20 # Total length of the Waterfall (lines)
   refresh_time: 100 # Refresh rate of the GUI (in ms)
 
 Camera:
@@ -32,3 +37,7 @@ Camera:
 Tracking: # Not yet implemented, will show up in the config window
   param_1: 0.
   param_2: 0
+
+Debug:
+  queue_memory: False
+  to_screen: True
