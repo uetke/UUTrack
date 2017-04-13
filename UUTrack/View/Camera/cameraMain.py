@@ -26,7 +26,6 @@ from .configWidget import configWidget
 from .crossCut import crossCutWindow
 from .messageWidget import messageWidget
 from .specialTaskWorker import specialTaskWorker
-from .waterfallWidget import waterfallWidget
 from .workerThread import workThread
 from .trajectoryWidget import trajectoryWidget
 from ...Model.workerSaver import workerSaver
@@ -59,7 +58,12 @@ class cameraMain(QtGui.QMainWindow):
         self.area.setMouseTracking(True)
 
         # Main widget
-        self.camWidget = cameraMainWidget([self.camera.maxWidth, self.camera.maxHeight])
+        self.camWidget = cameraMainWidget()
+        self.camWidget.setup_cross_cut(self.camera.maxHeight)
+        self.camWidget.setup_cross_hair([self.camera.maxWidth, self.camera.maxHeight])
+        self.camWidget.setup_roi_lines([self.camera.maxWidth, self.camera.maxHeight])
+        self.camWidget.setup_overlay()
+        self.camWidget.setup_mouse_tracking()
         # Widget for displaying information to the user
         self.messageWidget = messageWidget()
         # Small window to display the results of the special task
@@ -112,6 +116,8 @@ class cameraMain(QtGui.QMainWindow):
         self.watData = []
         self.corner_roi = [] # Real coordinates of the coorner of the ROI region. (Min_x and Min_y).
 
+        self.docks = []
+
         self.corner_roi.append(self._session.Camera['roi_x1'])
         self.corner_roi.append(self._session.Camera['roi_y1'])
 
@@ -121,6 +127,7 @@ class cameraMain(QtGui.QMainWindow):
         self.saveRunning = False
         self.accumulateBuffer = False
         self.specialTaskRunning = False
+        self.dock_state = None
 
         self.setupActions()
         self.setupToolbar()
@@ -244,7 +251,7 @@ class cameraMain(QtGui.QMainWindow):
         TODO: Fast waterfall should have separate window, since the acquisition of the full CCD will be stopped.
         """
         if not self.showWaterfall:
-            self.watWidget = waterfallWidget()
+            self.watWidget = cameraMainWidget()
             self.area.addDock(self.dwaterfall, 'bottom', self.dmainImage)
             self.dwaterfall.addWidget(self.watWidget)
             self.showWaterfall = True
@@ -265,6 +272,7 @@ class cameraMain(QtGui.QMainWindow):
         """
         if self.showWaterfall:
             self.watWidget.close()
+            self.dwaterfall.close()
             self.showWaterfall = False
             del self.watData
             self.logMessage.append('<b>Info:</b> Waterfall closed')
@@ -448,24 +456,41 @@ class cameraMain(QtGui.QMainWindow):
 
     def setupDocks(self):
         """Setups the docks in order to recover the initial configuration if one gets closed."""
-        self.dparams = Dock("Parameters", size=(100, 3))
-        self.dmainImage = Dock("Main Image", size=(500, 500))
 
+        for d in self.docks:
+            try:
+                d.close()
+            except:
+                pass
+
+        self.docks = []
+
+        self.dmainImage = Dock("Main Image", size=(500, 250))
+        self.dwaterfall = Dock("Waterfall", size=(500, 125))
+
+        self.dparams = Dock("Parameters", size=(100, 3))
         self.dtraj = Dock("Trajectory", size=(200, 2))
         self.dmessage = Dock("Messages", size=(200, 2))
         # self.dstatus = Dock("Status", size=(100, 3))
-        self.dwaterfall = Dock("Waterfall", size=(250, 250))
 
-        self.area.addDock(self.dparams)
         self.area.addDock(self.dmainImage, 'right')
-        self.area.addDock(self.dtraj, 'right')
-        self.area.addDock(self.dmessage, 'bottom', self.dtraj)
+        self.area.addDock(self.dtraj, 'bottom')
+        self.area.addDock(self.dmessage, 'right', self.dtraj)
+        self.area.addDock(self.dparams, 'left', self.dtraj)
+
+        self.docks.append(self.dmainImage)
+        self.docks.append(self.dtraj)
+        self.docks.append(self.dmessage)
+        self.docks.append(self.dparams)
+        self.docks.append(self.dwaterfall)
         # self.area.addDock(self.dstatus, 'bottom', self.dparams)
 
         self.dmainImage.addWidget(self.camWidget)
         self.dmessage.addWidget(self.messageWidget)
         self.dparams.addWidget(self.config)
         self.dtraj.addWidget(self.trajectoryWidget)
+
+        self.dock_state = self.area.saveState()
 
     def setupSignals(self):
         """Setups all the signals that are going to be handled during the excution of the program."""

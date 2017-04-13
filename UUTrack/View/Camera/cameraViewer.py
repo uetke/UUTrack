@@ -16,7 +16,7 @@ from pyqtgraph import GraphicsLayoutWidget
 from pyqtgraph.Qt import QtGui, QtCore
 
 from .workerThread import workThread
-
+from .cameraMainWidget import cameraMainWidget
 
 class cameraViewer(QtGui.QMainWindow):
     """Main window for the viewer.
@@ -93,7 +93,7 @@ class cameraViewer(QtGui.QMainWindow):
 class viewerWidget(QtGui.QWidget):
     """Widget for holding the GUI elements of the viewer.
     """
-    def __init__(self,parent=None):
+    def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
 
         self.layout = QtGui.QVBoxLayout(self)
