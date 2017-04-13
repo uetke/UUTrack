@@ -27,8 +27,26 @@ This will install the package inside of your virtual environment and will genera
 A smarter way to install the code is to fork it to your own user and the run the previous command from there. This allows you to easily update and track changes without sending pull requests, etc.
 
 ## Running the program ##
-Once you have installed
+Once you have installed the package, you can run the following commands to bring up the GUI:
 
+```python
+   from UUTrack import startCamera
+
+   ConfigDir = 'Path/to/config'
+   ConfigFile = 'config.yml'
+   startCamera.start(ConfigDir, ConfigFile)
+```
+
+## Building the documentation
+The documentation of the program can be build locally and is available at http://uutrack.readthedocs.io. 
+
+To build the documentation locally, you need to have sphinx installed. Go to the folder docs and run the following command:
+
+```python
+    sphinx-build -b html source/ build/
+```
+
+This will build all the documentation from the source folder into the build folder. Remember that for it to work, the program needs to import every module, therefore you can't build the documentation if you don't have the dependencies in order.
 
 ## Software for monitoring a CCD. ##
 The program follows the Model-View-Controller design structure. This allows a rapid exchange of different parts of the code.

@@ -1,5 +1,10 @@
-from UUTrack import startCamera
+"""
+    Starting point for running the program.
+"""
 
-ConfigDir = 'Config'
-ConfigFile = 'Camera_defaults_example.yml'
-startCamera.start(ConfigDir, ConfigFile)
+from UUTrack.startCamera import start
+
+confDir = 'Config'
+confFile = 'Camera_defaults_example.yml'
+
+start(confDir,confFile)

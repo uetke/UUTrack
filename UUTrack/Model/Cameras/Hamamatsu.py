@@ -21,6 +21,7 @@
 """
 import numpy as np
 
+from UUTrack.Controller.devices.hamamatsu.hamamatsu_camera import HamamatsuCamera
 from ._skeleton import cameraBase
 
 
@@ -36,8 +37,8 @@ class camera(cameraBase):
         self.mode = self.MODE_SINGLE_SHOT
 
     def initializeCamera(self):
-        """
-        Initializes the camera.
+        """ Initializes the camera.
+        
         :return: 
         """
 

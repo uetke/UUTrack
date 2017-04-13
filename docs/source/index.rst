@@ -29,6 +29,10 @@ Note that the splitting between the config directory and the config file is done
 
 It is important to have a Config file ready for the program to run properly. You can check the example :ref:`config`
 
+.. figure:: _static/screenshot.png
+   :scale: 50 %
+   :alt: screenshot
+
 Changing the code
 -----------------
 The program is open source and therefore you can modify all what you want. You have to remember that the code was written with a specific experiment in mind and therefore it may not fulfill or the requirements of more advanced imaging software.
