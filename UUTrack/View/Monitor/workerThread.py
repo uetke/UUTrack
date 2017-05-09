@@ -22,7 +22,7 @@ class workThread(QtCore.QThread):
         self.wait()
 
     def run(self):
-        """ Triggers the Camera to acquire a new Image.
+        """ Triggers the Monitor to acquire a new Image.
         """
         first = True
         while self.keep_acquiring:

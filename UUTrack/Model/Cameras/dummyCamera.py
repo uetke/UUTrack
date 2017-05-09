@@ -143,5 +143,5 @@ class camera(cameraBase):
             #Closing the camera
             return True
         except:
-            #Camera failed to close
+            #Monitor failed to close
             return False

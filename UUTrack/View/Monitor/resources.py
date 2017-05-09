@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    UUTrack.View.Camera.resources.py
+    UUTrack.View.Monitor.resources.py
     ===================================
     Resource object code
 

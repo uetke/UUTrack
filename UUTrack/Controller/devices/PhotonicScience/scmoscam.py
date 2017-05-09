@@ -32,7 +32,7 @@ NUMPY_MODES = {"L":numpy.uint8, "I;16":numpy.uint16}
 class GEVSCMOS:
     def __init__(self, cwd_path, name):
         self.cwd_path = cwd_path #working directory
-        self.name = name #Camera name = folder where DLL and settings are stored
+        self.name = name #Monitor name = folder where DLL and settings are stored
         self.setup_file = "%s\\%s\\PSL_camera_files\\ps_setup.dat"%(cwd_path,name)
         self.dll_name = self.GetDLL()
         self.dll = None
@@ -40,7 +40,7 @@ class GEVSCMOS:
         self.ResetOptions()
 
     def __str__(self):
-        msg = "Camera setting located in %s"%(self.setup_file)
+        msg = "Monitor setting located in %s"%(self.setup_file)
         return msg
 
     def GetDLL(self):

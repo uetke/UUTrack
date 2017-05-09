@@ -26,7 +26,7 @@ GUI:
   length_waterfall: 100 # Total length of the Waterfall (lines)
   refresh_time: 100 # Refresh rate of the GUI (in ms)
 
-Camera:
+Monitor:
   camera: dummyCamera # the camera to use
   model: dummy
   exposure_time: 35 # Initial exposure time (in ms)

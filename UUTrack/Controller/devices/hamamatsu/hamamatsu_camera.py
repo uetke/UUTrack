@@ -95,7 +95,7 @@ def convertPropertyName(p_name):
     return c
 
 class DCAMException(Exception):
-    """Camera exceptions."""
+    """Monitor exceptions."""
     def __init__(self, message):
         Exception.__init__(self, message)
 

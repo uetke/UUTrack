@@ -16,7 +16,7 @@ from pyqtgraph import GraphicsLayoutWidget
 from pyqtgraph.Qt import QtGui, QtCore
 
 from .workerThread import workThread
-from .cameraMainWidget import cameraMainWidget
+from .monitorMainWidget import monitorMainWidget
 
 class cameraViewer(QtGui.QMainWindow):
     """Main window for the viewer.
@@ -27,7 +27,7 @@ class cameraViewer(QtGui.QMainWindow):
         self._session = session
         self.camera = camera
         self.parent = parent
-        self.setWindowTitle('Camera Viewer')
+        self.setWindowTitle('On-Demand Camera Terminal')
         self.viewerWidget = viewerWidget()
         self.setCentralWidget(self.viewerWidget)
 

@@ -132,5 +132,5 @@ class cameraBase():
             #Closing the camera
             print("Not Implemented")
         except:
-            #Camera failed to close
+            #Monitor failed to close
             print("Not Implemented")

@@ -42,14 +42,14 @@ class configWidget(QtGui.QWidget):
             path = self.p.childPath(param)[0]
             self._session_new.params[path][to_update] = data
             if self._session.Debug['to_screen']:
-                print(self._session_new.params['Camera']['roi_x1'])
-                print(self._session_new.params['Camera']['roi_x2'])
-                print(self._session_new.params['Camera']['roi_y1'])
-                print(self._session_new.params['Camera']['roi_y2'])
-                print(self._session.params['Camera']['roi_x1'])
-                print(self._session.params['Camera']['roi_x2'])
-                print(self._session.params['Camera']['roi_y1'])
-                print(self._session.params['Camera']['roi_y2'])
+                print(self._session_new.params['Monitor']['roi_x1'])
+                print(self._session_new.params['Monitor']['roi_x2'])
+                print(self._session_new.params['Monitor']['roi_y1'])
+                print(self._session_new.params['Monitor']['roi_y2'])
+                print(self._session.params['Monitor']['roi_x1'])
+                print(self._session.params['Monitor']['roi_x2'])
+                print(self._session.params['Monitor']['roi_y1'])
+                print(self._session.params['Monitor']['roi_y2'])
 
     def updateSession(self):
         """ Updates the session and sends a signal"""

@@ -1,5 +1,5 @@
 """
-    UUTrack.View.Camera.cameraMain.py
+    UUTrack.View.Monitor.monitorMain.py
     ========================================
 
     .. sectionauthor:: Aquiles Carattino <aquiles@aquicarattino.com>
@@ -21,7 +21,7 @@ from pyqtgraph.dockarea import *
 
 from UUTrack.Model._session import _session
 from UUTrack.View.hdfloader import HDFLoader
-from .cameraMainWidget import cameraMainWidget
+from .monitorMainWidget import monitorMainWidget
 from .cameraViewer import cameraViewer
 from .clearQueueThread import clearQueueThread
 from .configWidget import configWidget
@@ -33,9 +33,9 @@ from .trajectoryWidget import trajectoryWidget
 from ...Model.workerSaver import workerSaver, clearQueue
 from . import resources
 
-class cameraMain(QtGui.QMainWindow):
+class monitorMain(QtGui.QMainWindow):
     """
-    Displays the camera
+    Main control window for showing the live captured images and initiating special tasks
     """
     def __init__(self, session, cam):
         """
@@ -44,8 +44,8 @@ class cameraMain(QtGui.QMainWindow):
         :param: session: session
         :param: cam: camera
         """
-        super(cameraMain,self).__init__()
-        self.setWindowTitle('nano-EPics Flow Setup Monitor')
+        super(monitorMain,self).__init__()
+        self.setWindowTitle('nano-EPics Flow Setup Monitoring (UUTrack)')
         self.setMouseTracking(True)
         self._session = session
 
@@ -60,7 +60,7 @@ class cameraMain(QtGui.QMainWindow):
         self.area.setMouseTracking(True)
 
         # Main widget
-        self.camWidget = cameraMainWidget()
+        self.camWidget = monitorMainWidget()
         self.camWidget.setup_cross_cut(self.camera.maxHeight)
         self.camWidget.setup_cross_hair([self.camera.maxWidth, self.camera.maxHeight])
         self.camWidget.setup_roi_lines([self.camera.maxWidth, self.camera.maxHeight])
@@ -276,7 +276,7 @@ class cameraMain(QtGui.QMainWindow):
         TODO: Fast waterfall should have separate window, since the acquisition of the full CCD will be stopped.
         """
         if not self.showWaterfall:
-            self.watWidget = cameraMainWidget()
+            self.watWidget = monitorMainWidget()
             self.area.addDock(self.dwaterfall, 'bottom', self.dmainImage)
             self.dwaterfall.addWidget(self.watWidget)
             self.showWaterfall = True
@@ -847,13 +847,13 @@ class cameraMain(QtGui.QMainWindow):
         f.flush()
         f.close()
         print('Saved LOG')
-        super(cameraMain, self).closeEvent(evnt)
+        super(monitorMain, self).closeEvent(evnt)
 
 
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    cam = cameraMain()
+    cam = monitorMain()
     cam.show()
     sys.exit(app.exec_())
