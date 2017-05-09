@@ -836,7 +836,8 @@ class monitorMain(QtGui.QMainWindow):
 
         # Save LOG.
         fn = self._session.Saving['filename_log']
-        filename = '%s.log' % (fn)
+        timestamp = datetime.now().strftime('%H%M%S')
+        filename = '%s%s.log' % (fn, timestamp)
         fileDir = self._session.Saving['directory']
         if not os.path.exists(fileDir):
             os.makedirs(fileDir)
