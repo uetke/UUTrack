@@ -45,7 +45,7 @@ class cameraMain(QtGui.QMainWindow):
         :param: cam: camera
         """
         super(cameraMain,self).__init__()
-        self.setWindowTitle('Camera Monitor')
+        self.setWindowTitle('nano-EPics Flow Setup Monitor')
         self.setMouseTracking(True)
         self._session = session
 
