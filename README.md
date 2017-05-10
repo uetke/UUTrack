@@ -65,34 +65,6 @@ UUTrap: Main folder. Important executables should be placed here.
 
 ![Alt text](docs/resources/screenshot.png?raw=true "Optional Title")
 
-### General Functionalities to achieve ###
+### Workplan and Issue tracker ###
 
-* preparation
-
-	1. [x] live video for alignment and exposure settings
-	2. [x] selection of ROI
-	3. [x] adjustment of mean/range min/max for grayscale viewer
-	4. [ ] selecting background correction option
-
-* tracking
-
-	1. [x] waterfall update
-	2. [ ] event counter (?)
-	3. [ ] timer (?)
-	4. [x] selecting particle of interest with cursor
-	5. [x] recording track
-	6. [ ] saving track (preferably on the screen) with flexible extra parameters (x,y,z,size,angle,intensity, etc vs time)
-	7. [x] live update of the track on screen 
-	8. [ ] adjusting tracking parameters
-	9. [ ] calculating track properties such as D or other computation
-
-* electrophoresis
-
-	1. [x] setting up function generator
-	2. [x] programming waveforms such as ramps, etc
-	3. [ ] generating specific waveform based on tracking coordinates for feedback control
-
-* review
-
-	1. [ ]  possibility of reviewing a track on a separate screen
-
+check WORKPLAN file (please link here)

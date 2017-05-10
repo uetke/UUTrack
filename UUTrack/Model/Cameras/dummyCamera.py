@@ -91,7 +91,7 @@ class camera(cameraBase):
         """
         self.xsize = abs(X[1]-X[0])
         self.ysize = abs(Y[1]-Y[0])
-
+        self.sb.resizeView((self.xsize, self.ysize))
         return self.getSize()
 
     def getSize(self):

@@ -9,7 +9,7 @@ User:
 Saving:
   auto_save: False
   auto_save_waterfall: True
-  directory: C:\tmp\data\UUTrack
+  directory: C:\\tmp\\data\\UUTrack
   filename_video: Video # Can be the same filename for video and photo
   filename_photo: Snap
   filename_waterfall: Waterfall
@@ -18,7 +18,8 @@ Saving:
   max_memory: 800 # In megabytes
 
 GUI:
-  length_waterfall: 20 # Total length of the Waterfall (lines)
+  length_waterfall: 100 # # Number of Waterfall lines collected before saving and refreshing
+  vbin_waterfall: 20 # Number of pixels summed up at the vertical center of the captured frame for waterfall
   refresh_time: 100 # Refresh rate of the GUI (in ms)
 
 Camera:
@@ -33,10 +34,14 @@ Camera:
   roi_y2: 0
   background: '' # Full path to background file, or empty for none.
   background_method: [Method1, Method2]
+  future_background_method: [Method1, Method2]
 
-Tracking: # Not yet implemented, will show up in the config window
-  param_1: 0.
-  param_2: 0
+Tracking: # implementation in progress, expect errors
+  particle_size: 5 # expected particle size (FWHM) in pixels, set to zero for automatic estimation
+  step_size: 1 # expected particle jump between frames for adjusting the search area
+  future_view_track: [X-I, X-Y] # choosing the desired track to view x-intensity, or x-y coordinates
+  future_localization_method: [CenMass, Fit] # chosen localization method
+  future_snr: 0 # expected signal to noise ratio, set to zero for automatic estimation
 
 Debug:
   queue_memory: False

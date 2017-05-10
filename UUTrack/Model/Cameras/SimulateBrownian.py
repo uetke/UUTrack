@@ -35,11 +35,11 @@ class SimBrownian:
         self.loca = self.nextRandomStep()
         return self.loca
 
-    def resizeView(self):
-        """SimulateBrownian.resizeView adjusts the coordinates of the moving particles such that they
+    def resizeView(self, size):
+        """SimulateBrownian.resizeView() adjusts the coordinates of the moving particles such that they
         fit into the desired framesize of the simulated dummycamera"""
-        print("to be implemented!")
-
+        self.xsize, self.ysize = size
+        self.loca = self.initLocations()
         return()
 
     def nextRandomStep(self):
@@ -53,7 +53,7 @@ class SimBrownian:
 
         self.loca[:,0:2] = locations
 
-        return(self.loca)
+        return self.loca
 
     def genImage(self):
         """

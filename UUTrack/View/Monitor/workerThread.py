@@ -23,6 +23,8 @@ class workThread(QtCore.QThread):
 
     def run(self):
         """ Triggers the Monitor to acquire a new Image.
+        the QThread defined .start() method is a special method that sets up the thread and
+        calls our implementation of the run() method.
         """
         first = True
         while self.keep_acquiring:
@@ -34,6 +36,6 @@ class workThread(QtCore.QThread):
                 first = False
             img = self.camera.readCamera()
             
-            self.emit( QtCore.SIGNAL('Image'), img, self.origin)
+            self.emit(QtCore.SIGNAL('Image'), img, self.origin)
         self.camera.stopAcq()
         return

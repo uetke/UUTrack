@@ -39,7 +39,10 @@ class crossCutWindow(QtGui.QMainWindow):
                 if s<np.shape(self.parent.tempImage)[1]:
                     d = np.ascontiguousarray(self.parent.tempImage[:, s])
                     self.p.setData(d)
-                    self.text.setText(str(np.std(d)/np.mean(d)))
+                    if np.mean(d) > 0:
+                        self.text.setText(str(np.std(d)/np.mean(d)))
+                    else:
+                        self.text.setText("Blank image")
 
 
 if __name__ == '__main__':

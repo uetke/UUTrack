@@ -22,10 +22,12 @@ from pyqtgraph.dockarea import *
 from UUTrack.Model._session import _session
 from UUTrack.View.hdfloader import HDFLoader
 from .monitorMainWidget import monitorMainWidget
+from .waterfallWidget import waterfallWidget
 from .cameraViewer import cameraViewer
 from .clearQueueThread import clearQueueThread
 from .configWidget import configWidget
 from .crossCut import crossCutWindow
+from .popOut import popOutWindow
 from .messageWidget import messageWidget
 from .specialTaskWorker import specialTaskWorker
 from .workerThread import workThread
@@ -56,7 +58,7 @@ class monitorMain(QtGui.QMainWindow):
 
         self.area = DockArea()
         self.setCentralWidget(self.area)
-        self.resize(800, 800)
+        self.resize(1064, 840)
         self.area.setMouseTracking(True)
 
         # Main widget
@@ -76,6 +78,8 @@ class monitorMain(QtGui.QMainWindow):
         self.config = configWidget(self._session)
         # Line cut widget
         self.crossCut = crossCutWindow(parent=self)
+        # Example message window, shows the cheatsheet
+        self.popOut = popOutWindow(parent=self)
         # Select settings Window
         self.selectSettings = HDFLoader()
 
@@ -112,6 +116,7 @@ class monitorMain(QtGui.QMainWindow):
         # Program variables
         self.tempImage = []
         self.trajectories = []
+        self.trackinfo = np.array([]) # real particle trajectory filled by "LocateParticle" analysis
         self.fps = 0
         self.bufferTime = 0
         self.bufferTimes = []
@@ -119,14 +124,14 @@ class monitorMain(QtGui.QMainWindow):
         self.totalFrames = 0
         self.droppedFrames = 0
         self.buffer_memory = 0
+        #!!! delete next two when the correct tracking algorithm is implemented!!!
         self.centroidX = np.array([])
         self.centroidY = np.array([])
+
         self.watData = []
         self.watIndex = 0 # Waterfall index
-        self.corner_roi = [] # Real coordinates of the coorner of the ROI region. (Min_x and Min_y).
-
+        self.corner_roi = [] # Real coordinates of the corner of the ROI region. (Min_x and Min_y).
         self.docks = []
-
         self.corner_roi.append(self._session.Camera['roi_x1'])
         self.corner_roi.append(self._session.Camera['roi_y1'])
 
@@ -208,7 +213,7 @@ class monitorMain(QtGui.QMainWindow):
                 # Worker thread to acquire images. Specially useful for long exposure time images
                 self.workerThread = workThread(self._session,self.camera)
                 self.connect(self.workerThread, QtCore.SIGNAL('Image'), self.getData)
-                self.connect(self.workerThread, QtCore.SIGNAL("finished()"), self.done)
+                self.connect(self.workerThread, QtCore.SIGNAL('finished()'), self.done)
                 self.workerThread.start()
                 self.acquiring = True
 
@@ -276,13 +281,13 @@ class monitorMain(QtGui.QMainWindow):
         TODO: Fast waterfall should have separate window, since the acquisition of the full CCD will be stopped.
         """
         if not self.showWaterfall:
-            self.watWidget = monitorMainWidget()
+            self.watWidget = waterfallWidget() # !!! why not using waterfallWidget?
             self.area.addDock(self.dwaterfall, 'bottom', self.dmainImage)
             self.dwaterfall.addWidget(self.watWidget)
             self.showWaterfall = True
             Sx, Sy = self.camera.getSize()
             self.watData = np.zeros((self._session.GUI['length_waterfall'],Sx))
-            self.watWidget.img.setImage(np.transpose(self.watData))
+            self.watWidget.img.setImage(np.transpose(self.watData), autoLevels=False, autoRange=False, autoHistogramRange=False)
             self.messageWidget.appendLog('i', 'Waterfall opened')
         else:
             self.closeWaterfall()
@@ -458,6 +463,9 @@ class monitorMain(QtGui.QMainWindow):
         self.settingsAction = QtGui.QAction('Load config', self)
         self.settingsAction.triggered.connect(self.selectSettings.show)
 
+        self.showCheatsheetAction = QtGui.QAction('Cheat Sheet', self)
+        self.showCheatsheetAction.triggered.connect(self.popOut.showText("cheatsheet"))
+
     def setupToolbar(self):
         """Setups the toolbar with the desired icons. It's placed into a function
         to make it easier to reuse in other windows.
@@ -501,10 +509,11 @@ class monitorMain(QtGui.QMainWindow):
         self.configMenu.addAction(self.viewerAction)
         self.configMenu.addAction(self.configAction)
         self.configMenu.addAction(self.dockAction)
-
         self.saveMenu = menubar.addMenu('S&ave')
         self.saveMenu.addAction(self.saveWaterfallAction)
         self.saveMenu.addAction(self.saveTrajectoryAction)
+        self.saveMenu = menubar.addMenu('&Help')
+        self.saveMenu.addAction(self.showCheatsheetAction)
 
     def setupDocks(self):
         """Setups the docks in order to recover the initial configuration if one gets closed."""
@@ -519,7 +528,6 @@ class monitorMain(QtGui.QMainWindow):
 
         self.dmainImage = Dock("Main Image", size=(500, 250))
         self.dwaterfall = Dock("Waterfall", size=(500, 125))
-
         self.dparams = Dock("Parameters", size=(100, 3))
         self.dtraj = Dock("Trajectory", size=(200, 2))
         self.dmessage = Dock("Messages", size=(200, 2))
@@ -570,9 +578,13 @@ class monitorMain(QtGui.QMainWindow):
         """Gets the data that is being gathered by the working thread.
 
         .. _getData:
+        .. data: single image or a list of images (saved in buffer)
+        .. origin: indicates which command has trigerred execution of this method (e.g. 'snap' of 'movie')
+        both input variables are handed it through QThread signal that is "emit"ted
+        !!!how the list of images is handled is a bit unclear, needs clarification
         """
         s = 0
-        if origin == 'snap': #Single snap.
+        if origin == 'snap': # Single snap.
             self.acquiring=False
             self.workerThread.origin = None
             self.workerThread.keep_acquiring = False  # This already happens in the worker thread itself.
@@ -595,16 +607,19 @@ class monitorMain(QtGui.QMainWindow):
                         self.watData = np.zeros((self._session.GUI['length_waterfall'],self.current_width))
                         self.watIndex = 0
 
-                    wf = np.array([np.sum(d,1)])
-                    self.watData[self.watIndex,:] = wf
-                    self.watIndex +=1
+                    centerline = np.int(self.current_height / 2)
+                    vbinhalf = np.int(self._session.GUI['vbin_waterfall'])
+                    if vbinhalf >= self.current_height / 2 - 1:
+                        wf = np.array([np.sum(data, 1)])
+                    else:
+                        wf = np.array([np.sum(data[:, centerline - vbinhalf:centerline + vbinhalf], 1)])
 
                 self.totalFrames+=1
             self.tempImage = d
         else:
             self.tempImage = data
             if self.accumulateBuffer:
-                s = float(self.q.qsize())*int(d.nbytes)/1024/1024
+                s = float(self.q.qsize())*int(data.nbytes)/1024/1024
 
                 if s<self._session.Saving['max_memory']:
                     self.q.put(data)
@@ -613,13 +628,18 @@ class monitorMain(QtGui.QMainWindow):
 
             if self.showWaterfall:
                 if self.watIndex == self._session.GUI['length_waterfall']:
+                    # checks if the buffer variable for waterfall image is full, saves it if requested, and sets it to zero.
                     if self._session.Saving['auto_save_waterfall']:
                         self.saveWaterfall()
 
                     self.watData = np.zeros((self._session.GUI['length_waterfall'],self.current_width))
                     self.watIndex = 0
-
-                wf = np.array([np.sum(d,1)])
+                centerline = np.int(self.current_height/2)
+                vbinhalf = np.int(self._session.GUI['vbin_waterfall'])
+                if vbinhalf >= self.current_height/2-1:
+                    wf = np.array([np.sum(data,1)])
+                else:
+                    wf = np.array([np.sum(data[:,centerline-vbinhalf:centerline+vbinhalf], 1)])
                 self.watData[self.watIndex,:] = wf
                 self.watIndex +=1
 
@@ -633,7 +653,8 @@ class monitorMain(QtGui.QMainWindow):
             print('Queue Memory: %3.2f MB' % self.buffer_memory)
 
     def getCoordinates(self, X):
-        """Gets the coordinates emitted by the special task worker and stores them in an array"""
+        """Gets the coordinates emitted by the specialTaskWorker and stores them in an array
+        the format of the emitted """
         self.centroidX = np.append(self.centroidX,X[0,:])
         self.centroidY = np.append(self.centroidY,X[1,:])
         self.trajectories[int(X[0,0]), int(X[1,0]),1] = 50000
@@ -644,15 +665,15 @@ class monitorMain(QtGui.QMainWindow):
         if len(self.tempImage) >= 1:
             self.camWidget.img.setImage(self.tempImage, autoLevels=False, autoRange=False, autoHistogramRange=False)
             self.buffer_memory = float(self.q.qsize())*int(self.tempImage.nbytes)/1024/1024
-
+        # For plotting the detected track on top of the camera viewport, mainly useful for 2D tracking
         if len(self.centroidX) >= 1:
-            self.camWidget.img2.setImage(self.trajectories)
+            self.camWidget.img2.setImage(self.trajectories) #plotting the particle past trajectory on top of the camera frames
             # self.trajectoryWidget.plot.clear()
-            self.trajectoryWidget.plot.setData(self.centroidX,self.centroidY)
+            self.trajectoryWidget.plot.setData(self.centroidX,self.centroidY) #updating the plotted trajectory in the tracking viewport
 
         if self.showWaterfall:
             self.watData  = self.watData[:self._session.GUI['length_waterfall'],:]
-            self.watWidget.img.setImage(np.transpose(self.watData))
+            self.watWidget.img.setImage(np.transpose(self.watData), autoLevels=False, autoRange=False, autoHistogramRange=False)
 
 
         new_time = time.time()
@@ -778,12 +799,13 @@ class monitorMain(QtGui.QMainWindow):
 
             X = self.camWidget.crosshair[0].getPos()
             Y = self.camWidget.crosshair[1].getPos()
-            self.centroidX = np.array([])
-            self.centroidY = np.array([])
+            #self.centroidX = np.array([])
+            #self.centroidY = np.array([])
+            self.trackinfo = np.array([])
             self.trajectories = np.zeros((self.tempImage.shape[0],self.tempImage.shape[1],3))
             self.specialTaskWorker = specialTaskWorker(self._session,self.camera,X,Y)
             self.connect(self.specialTaskWorker,QtCore.SIGNAL('Image'),self.getData)
-            self.connect(self.specialTaskWorker,QtCore.SIGNAL('Coordinates'),self.getCoordinates)
+            self.connect(self.specialTaskWorker,QtCore.SIGNAL('Coordinates'),self.getParticleLocation)
             self.specialTaskWorker.start()
             self.specialTaskRunning = True
             self.messageWidget.appendLog('i', 'Started special task')
