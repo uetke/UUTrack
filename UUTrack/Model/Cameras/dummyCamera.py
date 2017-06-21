@@ -17,10 +17,10 @@ class camera(cameraBase):
     def __init__(self,camera):
         self.camera = camera
         self.running = False
-        self.xsize = 512
-        self.ysize = 512
-        self.maxX = 512
-        self.maxY = 512
+        self.xsize = 600
+        self.ysize = 250
+        self.maxX = 600
+        self.maxY = 250
         self.exposure = 0
 
     def initializeCamera(self):

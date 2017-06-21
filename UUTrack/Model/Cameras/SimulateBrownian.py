@@ -14,15 +14,15 @@ class SimBrownian:
     :param loca: N x d array of coordinates for N particles in d dimensions, dimension can be intensity or point spread width
     :return: generated an image with specified noise and particles displaced accordingly
     """
-    def __init__(self, size = [200, 200]):
+    def __init__(self, size = [500, 100]):
         # camera and monitor parameters
         self.xsize, self.ysize = size
         # simulation parameters
-        self.difcon = 10 # Desired diffusion constant in pixel squared per second
-        self.numpar = 5 # Desired number of diffusing particles
-        self.signal = 20 # brightness for each particle
+        self.difcon = 2 # Desired diffusion constant in pixel squared per second
+        self.numpar = 4 # Desired number of diffusing particles
+        self.signal = 30 # brightness for each particle
         self.noise = 10 # background noise
-        self.psize = 10 # half-spread of each particle in the image, currently must be integer
+        self.psize = 8 # half-spread of each particle in the image, currently must be integer
         self.initLocations()
 
     def initLocations(self):
@@ -64,7 +64,7 @@ class SimBrownian:
         normpar = np.zeros((2*psize, 2*psize))
         for x in range(psize):
             for y in range (psize):
-                r = 2*(x**2+2*y**2)/psize**2
+                r = 2*(x**2+6*y**2)/psize**2
                 normpar[psize-x, psize-y] = normpar[psize-x, psize+y] = normpar[psize+x, psize-y] = normpar[psize+x, psize+y] = np.exp(-r)
         for n in range(0, self.numpar):
             x = np.int(self.loca[n,0])

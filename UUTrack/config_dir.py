@@ -17,7 +17,8 @@ User:
   name: ghost
 
 Saving:
-  auto_save: False
+  autosave_raw_images: False
+  autosave_trajectory: True
   directory: C:\\tmp\\Data\\openCET
   filename_video: Video # Can be the same filename for video and photo
   filename_photo: Snap
@@ -47,6 +48,7 @@ Camera:
 Tracking: # implementation in progress, expect errors
   particle_size: 5 # expected particle size (FWHM) in pixels
   step_size: 1 # expected particle jump between frames for adjusting the search area
+  noise_level: 100 # dark counts plus noise level, all values below will be set to zero for tracking an object
   future_view_track: [X-I, X-Y] # the desired type of track to view: x-intensity, or x-y coordinates
   future_localization_method: [CenMass, Fit] # localization method
   future_snr: 0 # expected signal to noise ratio, set to zero for automatic estimation

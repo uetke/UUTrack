@@ -17,5 +17,5 @@ class popOutWindow(QtGui.QMainWindow):
     def __init__(self, parent=None):
         super(popOutWindow, self).__init__(parent=parent)
 
-    def showtext(self, text="cheatsheet"):
+    def showText(self, text="cheatsheet"):
         pass

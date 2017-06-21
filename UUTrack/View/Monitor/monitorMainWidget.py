@@ -1,7 +1,8 @@
 import pyqtgraph as pg
-
+import numpy as np
 from pyqtgraph import GraphicsLayoutWidget
 from pyqtgraph.Qt import QtGui, QtCore
+
 
 
 class monitorMainWidget(QtGui.QWidget):
@@ -21,9 +22,7 @@ class monitorMainWidget(QtGui.QWidget):
         self.view.menu.addAction(self.autoScale)
 
         self.img = pg.ImageItem()
-
         self.view.addItem(self.img)
-
         self.imv = pg.ImageView(view=self.view, imageItem=self.img)
 
         # Add everything to the widget
@@ -34,9 +33,10 @@ class monitorMainWidget(QtGui.QWidget):
         self.showCrossCut = False
 
     def setup_overlay(self):
+        # useful if one want to plot the recovered trajectory in the camera viewport
         self.img2 = pg.ImageItem() # To overlay another image if needed.
-        self.img2.setOpacity(0.5)
-        self.img2.setZValue(10)
+        self.img2.setOpacity(0.4)
+        self.img2.setZValue(1000)
         self.view.addItem(self.img2)
 
     def setup_cross_hair(self, max_size):
@@ -44,8 +44,8 @@ class monitorMainWidget(QtGui.QWidget):
         self.crosshair = []
         self.crosshair.append(pg.InfiniteLine(angle=0, movable=False, pen={'color': 124, 'width': 4}))
         self.crosshair.append(pg.InfiniteLine(angle=90, movable=False, pen={'color': 124, 'width': 4}))
-        self.crosshair[0].setBounds((1, max_size[0] - 1))
-        self.crosshair[1].setBounds((1, max_size[1] - 1))
+        self.crosshair[0].setBounds((1, max_size[1] - 1))
+        self.crosshair[1].setBounds((1, max_size[0] - 1))
 
     def setup_cross_cut(self, max_size):
         """Set ups the horizontal line for the cross cut."""
@@ -95,7 +95,7 @@ class monitorMainWidget(QtGui.QWidget):
                     self.view.removeItem(self.crossCut)
                     self.showCrossCut = False
         elif modifiers == QtCore.Qt.ControlModifier:
-            if key.key() == 67:
+            if key.key() == 67: # For letter C of 'Clear
                 self.emit(QtCore.SIGNAL('specialTask'))
             if key.key() == 86: # For letter V
                 self.emit(QtCore.SIGNAL('stopSpecialTask'))
@@ -121,6 +121,20 @@ class monitorMainWidget(QtGui.QWidget):
         h, y = self.img.getHistogram()
         self.imv.setLevels(min(h),max(h))
         # self.img.HistogramLUTItem.setLevels(min(h),max(h))
+
+    def drawTargetPointer(self, image, location):
+        """gets an image and draws a square around the target location"""
+        w = 5
+        x0 = np.int(location[0])
+        y0 = np.int(location[1])
+        newimage = image/2
+        for x in range(w):
+            newimage[x0 + x, y0 - w + x, 1] = 3000
+            newimage[x0 - x, y0 - w + x, 2] = 6000
+            newimage[x0 + x, y0 + w - x, 2] = 6000
+            newimage[x0 - x, y0 + w - x, 1] = 3000
+
+        return newimage
 
     # def updateImage(self,img):
     #     """Updates the image being displayed.
