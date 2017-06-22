@@ -1,0 +1,42 @@
+
+* preparation
+
+	1. [x] live video for alignment and exposure settings
+	2. [x] selection of ROI
+	3. [x] adjustment of mean/range min/max for grayscale viewer
+	4. [ ] selecting background correction option
+	5. [x] synthesizing Brownian particles for testing functions
+	6. [x] Add help menu with especially a cheatsheet for shortcuts
+
+* tracking
+
+	1. [x] waterfall update
+	2. [ ] event counter (?)
+	3. [ ] timer to show experiment progress
+	4. [x] selecting particle of interest with cursor
+	5. [x] recording a single particle track
+	6. [ ] saving track (preferably on the screen) with flexible extra parameters (size,x,y,stdx,stdy, etc vs time)
+	7. [x] live update of the track on screen
+	8. [x] adjusting tracking parameters
+	9. [ ] calculating track properties such as D or other live computations
+	10.[ ] recording multiple tracks simultaneously
+
+
+* electrokinetic actuation
+
+	1. [x] setting up function generator
+	2. [x] programming waveforms such as ramps, etc
+	3. [ ] generating specific waveform based on tracking coordinates for feedback control
+
+* review
+
+	1. [ ]  possibility of reviewing a track on a separate screen
+
+
+* Bugs and Errors
+    1. the waterfall window does not keep the grayscale adjustments after refreshing the GUI, and jumps back to the auto-contrast mode! (Issue resolved but adjusting the GUI refresh options for waterfall image update, Sanli, 10/5/17)
+
+* Requested features and Recommendations
+    1. [ ] make a special text pop-up method for viewing longer text such as for help
+
+

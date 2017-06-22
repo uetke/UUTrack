@@ -62,8 +62,8 @@ class specialTaskTracking(QtCore.QThread):
                     tracktag = self.locator.Locate(img)
             # print(X)
             # print('Special task running... Coordinate X: %sCoordinate Y: %s'%(X[0], X[1]))
-            self.emit(QtCore.SIGNAL('Image'), img, 'SpecialTaskTracking')
-            self.emit(QtCore.SIGNAL('Coordinates'), tracktag)
+            self.emit(QtCore.SIGNAL('image'), img, 'SpecialTaskTracking')
+            self.emit(QtCore.SIGNAL('coordinates'), tracktag)
         self.camera.stopAcq()
         print('Live tracking stopped! Set particle size to %s \n' %(self.psize))
         return
