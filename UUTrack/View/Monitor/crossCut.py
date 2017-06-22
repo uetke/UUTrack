@@ -33,11 +33,11 @@ class crossCutWindow(QtGui.QMainWindow):
         """ Updates the 1-D plot. It is called externally from the main window.
         """
         if self.parent != None:
-            if len(self.parent.tempImage) > 0:
-                #self.cc.plot(self.parent.tempImage[:, 50])
+            if len(self.parent.tempimage) > 0:
+                #self.cc.plot(self.parent.tempimage[:, 50])
                 s = self.parent.camWidget.crossCut.value()
-                if s<np.shape(self.parent.tempImage)[1]:
-                    d = np.ascontiguousarray(self.parent.tempImage[:, s])
+                if s<np.shape(self.parent.tempimage)[1]:
+                    d = np.ascontiguousarray(self.parent.tempimage[:, s])
                     self.p.setData(d)
                     if np.mean(d) > 0:
                         self.text.setText(str(np.std(d)/np.mean(d)))

@@ -199,7 +199,7 @@ class monitorMain(QtGui.QMainWindow):
         self.saveAction.setStatusTip('Save Image')
         self.saveAction.triggered.connect(self.saveImage)
 
-        self.showHelpAction = QtGui.QAction(QtGui.QIcon(':Icons/info.png'),'Show cheatsheet',self)
+        self.showHelpAction = QtGui.QAction(QtGui.QIcon(':Icons/info-icon.png'),'Show cheatsheet',self)
         self.showHelpAction.setShortcut(QtCore.Qt.Key_F1)
         self.showHelpAction.setStatusTip('Show Cheatsheet')
         self.showHelpAction.triggered.connect(self.showHelp)
@@ -242,7 +242,7 @@ class monitorMain(QtGui.QMainWindow):
         self.toggleBGAction = QtGui.QAction(QtGui.QIcon(':Icons/noBg.png'), 'Toggle B&G-reduction', self)
         self.toggleBGAction.setShortcut('Ctrl+G')
         self.toggleBGAction.setStatusTip('Toggle Background Reduction')
-        self.toggleBGAction.triggered.connect(self.toggleBGRe)
+        self.toggleBGAction.triggered.connect(self.toggleBGReduction)
 
         self.setROIAction = QtGui.QAction(QtGui.QIcon(':Icons/Zoom-In-icon.png'),'Set &ROI',self)
         self.setROIAction.setShortcut('Ctrl+T')
@@ -402,11 +402,25 @@ class monitorMain(QtGui.QMainWindow):
             self.messageWidget.appendLog('e', 'Tried to snap while in free run')
         else:
             self.workerThread = workThread(self._session, self.camera)
-            self.connect(self.workerThread,QtCore.SIGNAL('Image'),self.getData)
+            self.connect(self.workerThread,QtCore.SIGNAL('image'),self.getData)
             self.workerThread.origin = 'snap'
             self.workerThread.start()
             self.acquiring = True
             self.messageWidget.appendLog('i', 'Snapped photo')
+
+    def toggleBGReduction(self):
+        """Toggles between background cancellation modes. Takes a background snap if necessary
+        """
+
+        if self.subtract_background:
+            self.subtract_background = False
+            self.messageWidget.appendLog('i', 'Background reduction deactivated')
+        else:
+            self.subtract_background = True
+            if len(self.tempimage)==0:
+                self.snap()
+            self.bgimage = self.tempimage.astype(float)
+            self.messageWidget.appendLog('i', 'Background reduction active')
 
     def saveImage(self):
         """Saves the image that is being displayed to the user.
@@ -441,7 +455,7 @@ class monitorMain(QtGui.QMainWindow):
                 self.messageWidget.appendLog('i', 'Continuous run started')
                 # Worker thread to acquire images. Specially useful for long exposure time images
                 self.workerThread = workThread(self._session,self.camera)
-                self.connect(self.workerThread, QtCore.SIGNAL('Image'), self.getData)
+                self.connect(self.workerThread, QtCore.SIGNAL('image'), self.getData)
                 self.connect(self.workerThread, QtCore.SIGNAL('finished()'), self.done)
                 self.workerThread.start()
                 self.acquiring = True
@@ -510,7 +524,7 @@ class monitorMain(QtGui.QMainWindow):
         TODO: Fast waterfall should have separate window, since the acquisition of the full CCD will be stopped.
         """
         if not self.show_waterfall:
-            self.watWidget = waterfallWidget() # !!! why not using waterfallWidget?
+            self.watWidget = waterfallWidget()
             self.area.addDock(self.dwaterfall, 'bottom', self.dmainImage)
             self.dwaterfall.addWidget(self.watWidget)
             self.show_waterfall = True
@@ -622,7 +636,6 @@ class monitorMain(QtGui.QMainWindow):
         .. data: single image or a list of images (saved in buffer)
         .. origin: indicates which command has trigerred execution of this method (e.g. 'snap' of 'movie')
         both input variables are handed it through QThread signal that is "emit"ted
-        !!!how the list of images is handled is a bit unclear, needs clarification
         """
         s = 0
         if origin == 'snap': # Single snap.
@@ -675,8 +688,10 @@ class monitorMain(QtGui.QMainWindow):
 
                     self.waterfall_data = np.zeros((self._session.GUI['length_waterfall'], self.current_width))
                     self.watindex = 0
+
                 centerline = np.int(self.current_height/2)
                 vbinhalf = np.int(self._session.GUI['vbin_waterfall'])
+
                 if vbinhalf >= self.current_height/2-1:
                     wf = np.array([np.sum(data,1)])
                 else:
@@ -708,10 +723,14 @@ class monitorMain(QtGui.QMainWindow):
     def updateGUI(self):
         """Updates the image displayed to the user.
         """
-        if len(self.tempimage) >= 1:
-            self.camWidget.img.setImage(self.tempimage, autoLevels=False, autoRange=False, autoHistogramRange=False)
+        if len(self.tempimage)>=1:
+            if (self.subtract_background and len(self.bgimage)>=1):
+                img = self.tempimage - self.bgimage
+                img[img<1] = 1
+                self.camWidget.img.setImage(img.astype(int), autoLevels=False, autoRange=False, autoHistogramRange=False)
+            else:
+                self.camWidget.img.setImage(self.tempimage, autoLevels=False, autoRange=False, autoHistogramRange=False)
             self.buffer_memory = float(self.q.qsize())*int(self.tempimage.nbytes) / 1024 / 1024
-        # For plotting the detected track on top of the camera viewport, mainly useful for 2D tracking
         if self.trackinfo.shape[0] > 1:
             #self.camWidget.img2.setImage(self.overlayImage) #plotting the particle past trajectory on top of the camera frames
             self.trajectoryWidget.plot.setData(self.trackinfo[1:,1],self.trackinfo[1:,2]) #updating the plotted trajectory in the tracking viewport
@@ -807,7 +826,8 @@ class monitorMain(QtGui.QMainWindow):
                 self.closeWaterfall()
                 self.restart_waterfall = True
 
-        self.messageWidget.appendLog('i', 'Updated the parameters')
+        self.messageWidget.appendLog('i', 'Parameters updated')
+        self.messageWidget.appendLog('i', 'Measurement: %s' % session.User['measurement'])
         self._session = session.copy()
 
         if update_cam:
@@ -849,8 +869,8 @@ class monitorMain(QtGui.QMainWindow):
             imgsize = self.tempimage.shape
             iniloc = [locx, locy]
             self.specialTaskWorker = specialTaskTracking(self._session, self.camera, self.noiselvl, imgsize, iniloc)
-            self.connect(self.specialTaskWorker,QtCore.SIGNAL('Image'),self.getData)
-            self.connect(self.specialTaskWorker,QtCore.SIGNAL('Coordinates'),self.getParticleLocation)
+            self.connect(self.specialTaskWorker,QtCore.SIGNAL('image'),self.getData)
+            self.connect(self.specialTaskWorker,QtCore.SIGNAL('coordinates'),self.getParticleLocation)
             self.specialTaskWorker.start()
             self.specialtask_running = True
             self.messageWidget.appendLog('i', 'Live tracking started')
@@ -862,6 +882,8 @@ class monitorMain(QtGui.QMainWindow):
         if self.specialtask_running:
             self.specialTaskWorker.keep_running = False
             self.specialtask_running = False
+            if self._session.Saving['autosave_trajectory'] == True:
+                self.saveTrajectory()
             self.messageWidget.appendLog('i', 'Live tracking stopped')
 
     def done(self):

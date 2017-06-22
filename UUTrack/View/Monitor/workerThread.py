@@ -36,6 +36,6 @@ class workThread(QtCore.QThread):
                 first = False
             img = self.camera.readCamera()
             
-            self.emit(QtCore.SIGNAL('Image'), img, self.origin)
+            self.emit(QtCore.SIGNAL('image'), img, self.origin)
         self.camera.stopAcq()
         return

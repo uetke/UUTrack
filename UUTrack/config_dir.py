@@ -15,6 +15,7 @@ f = """
 # All parameters can be changed at runtime with the appropriate config window
 User:
   name: ghost
+  measurement: Sample
 
 Saving:
   autosave_raw_images: False
@@ -42,7 +43,6 @@ Camera:
   roi_x2: 0
   roi_y1: 0
   roi_y2: 0
-  background: '' # Full path to background file, or empty for none.
   future_background_method: [Method1, Method2]
 
 Tracking: # implementation in progress, expect errors
