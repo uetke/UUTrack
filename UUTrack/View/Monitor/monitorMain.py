@@ -189,17 +189,17 @@ class monitorMain(QtGui.QMainWindow):
 
         :rtype: None
         """
-        self.exitAction = QtGui.QAction(QtGui.QIcon(':Icons/power-icon.png'), '&Exit', self)
+        self.exitAction = QtGui.QAction(QtGui.QIcon('UUTrack/View/Monitor/Icons/power-icon.png'), '&Exit', self)
         self.exitAction.setShortcut('Ctrl+Q')
         self.exitAction.setStatusTip('Exit application')
         self.exitAction.triggered.connect(self.exitSafe)
 
-        self.saveAction = QtGui.QAction(QtGui.QIcon(':Icons/floppy-icon.png'),'&Save image',self)
+        self.saveAction = QtGui.QAction(QtGui.QIcon('UUTrack/View/Monitor/Icons/floppy-icon.png'),'&Save image',self)
         self.saveAction.setShortcut('Ctrl+S')
         self.saveAction.setStatusTip('Save Image')
         self.saveAction.triggered.connect(self.saveImage)
 
-        self.showHelpAction = QtGui.QAction(QtGui.QIcon(':Icons/info-icon.png'),'Show cheatsheet',self)
+        self.showHelpAction = QtGui.QAction(QtGui.QIcon('UUTrack/View/Monitor/Icons/info-icon.png'),'Show cheatsheet',self)
         self.showHelpAction.setShortcut(QtCore.Qt.Key_F1)
         self.showHelpAction.setStatusTip('Show Cheatsheet')
         self.showHelpAction.triggered.connect(self.showHelp)
@@ -214,47 +214,47 @@ class monitorMain(QtGui.QMainWindow):
         self.saveTrajectoryAction.setStatusTip('Save trajectory data to new file')
         self.saveTrajectoryAction.triggered.connect(self.saveTrajectory)
 
-        self.snapAction = QtGui.QAction(QtGui.QIcon(':Icons/snap.png'),'S&nap photo',self)
+        self.snapAction = QtGui.QAction(QtGui.QIcon('UUTrack/View/Monitor/Icons/snap.png'),'S&nap photo',self)
         self.snapAction.setShortcut(QtCore.Qt.Key_F5)
         self.snapAction.setStatusTip('Snap Image')
         self.snapAction.triggered.connect(self.snap)
 
-        self.movieAction = QtGui.QAction(QtGui.QIcon(':Icons/video-icon.png'),'Start &movie',self)
+        self.movieAction = QtGui.QAction(QtGui.QIcon('UUTrack/View/Monitor/Icons/video-icon.png'),'Start &movie',self)
         self.movieAction.setShortcut(QtCore.Qt.Key_F6)
         self.movieAction.setStatusTip('Start Movie')
         self.movieAction.triggered.connect(self.startMovie)
 
-        self.movieSaveStartAction = QtGui.QAction(QtGui.QIcon(':Icons/Download-Database-icon.png'),'Continuous saves',self)
+        self.movieSaveStartAction = QtGui.QAction(QtGui.QIcon('UUTrack/View/Monitor/Icons/Download-Database-icon.png'),'Continuous saves',self)
         self.movieSaveStartAction.setShortcut('Ctrl+M')
         self.movieSaveStartAction.setStatusTip('Continuous save to disk')
         self.movieSaveStartAction.triggered.connect(self.movieSave)
 
-        self.movieSaveStopAction = QtGui.QAction(QtGui.QIcon(':Icons/Delete-Database-icon.png'),'Stop continuous saves',self)
+        self.movieSaveStopAction = QtGui.QAction(QtGui.QIcon('UUTrack/View/Monitor/Icons/Delete-Database-icon.png'),'Stop continuous saves',self)
         self.movieSaveStopAction.setShortcut('Ctrl+N')
         self.movieSaveStopAction.setStatusTip('Stop continuous save to disk')
         self.movieSaveStopAction.triggered.connect(self.movieSaveStop)
 
-        self.startWaterfallAction = QtGui.QAction(QtGui.QIcon(':Icons/Blue-Waterfall-icon.png'),'Start &Waterfall',self)
+        self.startWaterfallAction = QtGui.QAction(QtGui.QIcon('UUTrack/View/Monitor/Icons/Blue-Waterfall-icon.png'),'Start &Waterfall',self)
         self.startWaterfallAction.setShortcut('Ctrl+W')
         self.startWaterfallAction.setStatusTip('Start Waterfall')
         self.startWaterfallAction.triggered.connect(self.startWaterfall)
 
-        self.toggleBGAction = QtGui.QAction(QtGui.QIcon(':Icons/noBg.png'), 'Toggle B&G-reduction', self)
+        self.toggleBGAction = QtGui.QAction(QtGui.QIcon('UUTrack/View/Monitor/Icons/noBg.png'), 'Toggle B&G-reduction', self)
         self.toggleBGAction.setShortcut('Ctrl+G')
         self.toggleBGAction.setStatusTip('Toggle Background Reduction')
         self.toggleBGAction.triggered.connect(self.toggleBGReduction)
 
-        self.setROIAction = QtGui.QAction(QtGui.QIcon(':Icons/Zoom-In-icon.png'),'Set &ROI',self)
+        self.setROIAction = QtGui.QAction(QtGui.QIcon('UUTrack/View/Monitor/Icons/Zoom-In-icon.png'),'Set &ROI',self)
         self.setROIAction.setShortcut('Ctrl+T')
         self.setROIAction.setStatusTip('Set ROI')
         self.setROIAction.triggered.connect(self.getROI)
 
-        self.clearROIAction = QtGui.QAction(QtGui.QIcon(':Icons/Zoom-Out-icon.png'),'Set R&OI',self)
+        self.clearROIAction = QtGui.QAction(QtGui.QIcon('UUTrack/View/Monitor/Icons/Zoom-Out-icon.png'),'Set R&OI',self)
         self.clearROIAction.setShortcut('Ctrl+T')
         self.clearROIAction.setStatusTip('Clear ROI')
         self.clearROIAction.triggered.connect(self.clearROI)
 
-        self.accumulateBufferAction = QtGui.QAction(QtGui.QIcon(':Icons/disk-save.png'),'Accumulate buffer',self)
+        self.accumulateBufferAction = QtGui.QAction(QtGui.QIcon('UUTrack/View/Monitor/Icons/disk-save.png'),'Accumulate buffer',self)
         self.accumulateBufferAction.setShortcut('Ctrl+B')
         self.accumulateBufferAction.setStatusTip('Start or stop buffer accumulation')
         self.accumulateBufferAction.triggered.connect(self.bufferStatus)
@@ -273,7 +273,7 @@ class monitorMain(QtGui.QMainWindow):
         self.dockAction = QtGui.QAction('Restore Docks', self)
         self.dockAction.triggered.connect(self.setupDocks)
 
-        self.crossCutAction = QtGui.QAction(QtGui.QIcon(':Icons/Ruler-icon.png'),'Show cross cut', self)
+        self.crossCutAction = QtGui.QAction(QtGui.QIcon('UUTrack/View/Monitor/Icons/Ruler-icon.png'),'Show cross cut', self)
         self.crossCutAction.triggered.connect(self.crossCut.show)
 
         self.settingsAction = QtGui.QAction('Load config', self)
@@ -416,11 +416,13 @@ class monitorMain(QtGui.QMainWindow):
             self.subtract_background = False
             self.messageWidget.appendLog('i', 'Background reduction deactivated')
         else:
-            self.subtract_background = True
             if len(self.tempimage)==0:
                 self.snap()
-            self.bgimage = self.tempimage.astype(float)
-            self.messageWidget.appendLog('i', 'Background reduction active')
+                self.messageWidget.appendLog('i', 'Snapped an image as background')
+            else:
+                self.subtract_background = True
+                self.bgimage = self.tempimage.astype(float)
+                self.messageWidget.appendLog('i', 'Background reduction active')
 
     def saveImage(self):
         """Saves the image that is being displayed to the user.
@@ -715,8 +717,14 @@ class monitorMain(QtGui.QMainWindow):
             self.stopSpecialTask()
         else:
             self.trackinfo = np.append(self.trackinfo, tracktag, axis=0)
+            # next line checks particle location along fiber axis and call for proper control feedback
+            w = self.tempimage.shape[0]
+            if tracktag[0,1]<50:
+                self.messageWidget.appendLog('w', 'Particle approaching left limit')
+            elif tracktag[0,1]>w-50:
+                self.messageWidget.appendLog('w', 'Particle approaching right limit')
+            #print(tracktag.astype(int)) #for debugging: prints particle mass and coordinates
             #self.overlayImage = self.camWidget.drawTargetPointer(self.overlayImage,tracktag[0][1:3]) #to overlay track and live image in viewport
-            #print(tracktag[0,:].astype(int)) #for debugging: prints particle mass and coordinates
             # future: in case of an image series one should plot all the trajectory instead of just one point
 
 

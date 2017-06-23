@@ -58,13 +58,13 @@ class LocatingParticle:
 
     def pointspread(self, data, cx, cy):
         h, w = np.shape(data)
-        x = np.arange(0, w) - cx
-        y = np.arange(0, h) - cy
+        x = np.arange(w) - cy
+        y = np.arange(h) - cx
 
         X, Y = np.meshgrid(x, y)
-
-        sy = np.sqrt(np.sum(np.square(X * data)) / np.square(np.sum(data)))
-        sx = np.sqrt(np.sum(np.square(Y * data)) / np.square(np.sum(data)))
+        mass = np.sum(data)
+        sy = np.sqrt(np.sum(np.square(X) * data) / mass)
+        sx = np.sqrt(np.sum(np.square(Y) * data) / mass)
 
         return [sx, sy]
 

@@ -7,6 +7,8 @@ One should first decide on how often the required feature is used and how comput
 -- Create button/keyboard-shortcut in setupToolbars() and setupMenubar()
 -- Create the necessary actions and signals in setupActions() and setupSignals()
 -- Create/initialize necessary program variables in the init() moddule: e.g. self.bgimage
+-- Code the new method that performs the action and connect it to the proper signal in setupActions()
+-- Use proper reference to the message log for providing indication of running procedures
 
 
 For computation-intensive routines such a high-speed saving, tracking, or feedback, one should use a specialTaskWorker which runs at a high speed in a separate thread not to freeze the GUI.
