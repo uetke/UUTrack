@@ -71,6 +71,7 @@ class monitorMain(QtGui.QMainWindow):
         self.camWidget.setup_mouse_tracking()
         # Widget for displaying information to the user
         self.messageWidget = messageWidget()
+        self.messageWidget2 = messageWidget()
         # Small window to display the results of the special task
         self.trajectoryWidget = trajectoryWidget()
         # Window for the camera viewer
@@ -202,8 +203,9 @@ class monitorMain(QtGui.QMainWindow):
         self.showHelpAction = QtGui.QAction(QtGui.QIcon('UUTrack/View/Monitor/Icons/info-icon.png'),'Show cheatsheet',self)
         self.showHelpAction.setShortcut(QtCore.Qt.Key_F1)
         self.showHelpAction.setStatusTip('Show Cheatsheet')
-        self.showHelpAction.triggered.connect(self.showHelp)
-
+        #self.showHelpAction.triggered.connect(self.showHelp)
+        self.showHelpAction.triggered.connect(self.messageWidget2.show)
+           
         self.saveWaterfallAction = QtGui.QAction("Save Waterfall", self)
         self.saveWaterfallAction.setShortcut('Ctrl+Shift+W')
         self.saveWaterfallAction.setStatusTip('Save waterfall data to new file')

@@ -20,6 +20,7 @@
 	8. [x] adjusting tracking parameters
 	9. [ ] calculating track properties such as D or other live computations
 	10.[ ] recording multiple tracks simultaneously
+    11.[ ] follow two line cuts at the same time
 
 
 * electrokinetic actuation
@@ -37,6 +38,7 @@
     1. the waterfall window does not keep the grayscale adjustments after refreshing the GUI, and jumps back to the auto-contrast mode! (Issue resolved but adjusting the GUI refresh options for waterfall image update, Sanli, 10/5/17)
 
 * Requested features and Recommendations
-    1. [ ] make a special text pop-up method for viewing longer text such as for help
+    1. [ ] make a special text pop-up method for viewing longer text such as for help, use example of messagewidget
+    2. [ ] read out actual frame rate from the hamamatsu
 
 

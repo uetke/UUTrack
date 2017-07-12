@@ -8,7 +8,7 @@ from multiprocessing import Process
 if __name__ == '__main__':
 
     confDir = 'Config'
-    confFile = 'Config_simulate.yml'
+    confFile = 'Config_Sanli.yml'
 
     p = Process(target = start, args=(confDir,confFile))
     p.start()

@@ -8,6 +8,7 @@
     .. sectionauthor:: Sanli Faez <s.faez@uu.nl>
 """
 import numpy as np
+import copy
 #from scipy.ndimage.measurements import center_of_mass as cenmass
 
 class LocatingParticle:
@@ -68,8 +69,9 @@ class LocatingParticle:
 
         return [sx, sy]
 
-    def Locate(self, data):
+    def Locate(self, data_o):
         """extracts the particle localization information close the lastly known location (self.loc) and updates it"""
+        data = copy.copy(data_o)
         x, y = [int(self.locx), int(self.locy)]
         w = np.int((self.psize + self.step)*2)
         if (x in np.arange(self.imgwidth-2*w-1)+w) and (y in np.arange(self.imgheight-2*w-1)+w):
