@@ -36,9 +36,10 @@
 
 * Bugs and Errors
     1. the waterfall window does not keep the grayscale adjustments after refreshing the GUI, and jumps back to the auto-contrast mode! (Issue resolved but adjusting the GUI refresh options for waterfall image update, Sanli, 10/5/17)
+    2. crossCut.py, the data that is passed gets longer, blank image does not show up, when closing the window, the cross-cut still is updated
 
 * Requested features and Recommendations
-    1. [ ] make a special text pop-up method for viewing longer text such as for help, use example of messagewidget
-    2. [ ] read out actual frame rate from the hamamatsu
+    1. [*] make a special text pop-up method for viewing longer text such as for help, use example of messagewidget
+    2. [ ] read out actual frame rate from the Hamamatsu camera
 
 

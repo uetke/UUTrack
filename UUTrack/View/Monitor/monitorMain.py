@@ -71,7 +71,7 @@ class monitorMain(QtGui.QMainWindow):
         self.camWidget.setup_mouse_tracking()
         # Widget for displaying information to the user
         self.messageWidget = messageWidget()
-        self.messageWidget2 = messageWidget()
+        self.cheatSheet = popOutWindow()
         # Small window to display the results of the special task
         self.trajectoryWidget = trajectoryWidget()
         # Window for the camera viewer
@@ -156,6 +156,7 @@ class monitorMain(QtGui.QMainWindow):
 
     def showHelp(self):
         """To show the cheatsheet for shortcuts in a pop-up meassage box
+        OBSOLETE, will be deleted after transferring info into a better message viewer!
         """
         msgBox = QtGui.QMessageBox()
         msgBox.setIcon(QtGui.QMessageBox.Information)
@@ -203,8 +204,7 @@ class monitorMain(QtGui.QMainWindow):
         self.showHelpAction = QtGui.QAction(QtGui.QIcon('UUTrack/View/Monitor/Icons/info-icon.png'),'Show cheatsheet',self)
         self.showHelpAction.setShortcut(QtCore.Qt.Key_F1)
         self.showHelpAction.setStatusTip('Show Cheatsheet')
-        #self.showHelpAction.triggered.connect(self.showHelp)
-        self.showHelpAction.triggered.connect(self.messageWidget2.show)
+        self.showHelpAction.triggered.connect(self.cheatSheet.show)
            
         self.saveWaterfallAction = QtGui.QAction("Save Waterfall", self)
         self.saveWaterfallAction.setShortcut('Ctrl+Shift+W')
@@ -694,9 +694,9 @@ class monitorMain(QtGui.QMainWindow):
                     self.watindex = 0
 
                 centerline = np.int(self.current_height/2)
-                vbinhalf = np.int(self._session.GUI['vbin_waterfall'])
+                vbinhalf = np.int(self._session.GUI['vbin_waterfall']/2)
 
-                if vbinhalf >= self.current_height/2-1:
+                if vbinhalf >= self.current_height-1:
                     wf = np.array([np.sum(data,1)])
                 else:
                     wf = np.array([np.sum(data[:,centerline-vbinhalf:centerline+vbinhalf], 1)])
