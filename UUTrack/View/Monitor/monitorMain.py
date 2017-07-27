@@ -668,10 +668,11 @@ class monitorMain(QtGui.QMainWindow):
                     centerline = np.int(self.current_height / 2)
                     vbinhalf = np.int(self._session.GUI['vbin_waterfall'])
                     if vbinhalf >= self.current_height / 2 - 1:
-                        wf = np.array([np.sum(data, 1)])
+                        wf = np.array([np.sum(d, 1)])
                     else:
-                        wf = np.array([np.sum(data[:, centerline - vbinhalf:centerline + vbinhalf], 1)])
-
+                        wf = np.array([np.sum(d[:, centerline - vbinhalf:centerline + vbinhalf], 1)])
+                    self.waterfall_data[self.watindex, :] = wf
+                    self.watindex +=1
                 self.totalframes+=1
             self.tempimage = d
         else:

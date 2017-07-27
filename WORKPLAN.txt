@@ -35,7 +35,12 @@
 
 
 * Bugs and Errors
+    1. in the simulate mode, one should check if the particle size is smaller than the frame size (e.g. in height) and perform suitable adjustments.
+    2. after each resize, or maybe zoom out, the width of the image is reduced by 1 pixel. not clear why!
+
+* Resolved bugs
     1. the waterfall window does not keep the grayscale adjustments after refreshing the GUI, and jumps back to the auto-contrast mode! (Issue resolved but adjusting the GUI refresh options for waterfall image update, Sanli, 10/5/17)
+
 
 * Requested features and Recommendations
     1. [ ] make a special text pop-up method for viewing longer text such as for help, use example of messagewidget
