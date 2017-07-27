@@ -34,8 +34,8 @@ GUI:
   refresh_time: 100 # Refresh rate of the GUI (in ms)
 
 Camera:
-  camera: dummyCamera # the camera to use
-  model: none
+  camera: [dummyCamera, Hamamatsu, PSI] # the camera to use
+  model: [none, OrcaFlash4]
   exposure_time: 35 # Initial exposure time (in ms)
   binning_x: 1 # Binning
   binning_y: 1

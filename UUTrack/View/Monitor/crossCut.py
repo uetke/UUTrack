@@ -8,6 +8,7 @@
 
 import pyqtgraph as pg
 import numpy as np
+import copy
 from pyqtgraph.Qt import QtGui
 
 
@@ -24,25 +25,31 @@ class crossCutWindow(QtGui.QMainWindow):
         self.p = self.cc.plot()
         changingLabel = QtGui.QLabel()
         font = changingLabel.font()
-        font.setPointSize(24)
+        font.setPointSize(16)
         self.text =  pg.TextItem(text='', color=(200, 200, 200), border='w', fill=(0, 0, 255, 100))
         self.text.setFont(font)
         self.cc.addItem(self.text)
+        self.cc.setRange(xRange=(0,100), yRange=(-20,500))
 
     def update(self):
         """ Updates the 1-D plot. It is called externally from the main window.
         """
         if self.parent != None:
             if len(self.parent.tempimage) > 0:
-                #self.cc.plot(self.parent.tempimage[:, 50])
                 s = self.parent.camWidget.crossCut.value()
-                if s<np.shape(self.parent.tempimage)[1]:
-                    d = np.ascontiguousarray(self.parent.tempimage[:, s])
+                (w,h) = np.shape(self.parent.tempimage)
+                self.cc.setXRange(0,w)
+                if s<h:
+                    d = copy.copy(self.parent.tempimage[:, s])
+                    if (self.parent.subtract_background and len(self.parent.bgimage) >= 1):
+                        bg = self.parent.bgimage[:, s]
+                        d = d - bg
                     self.p.setData(d)
                     if np.mean(d) > 0:
-                        self.text.setText(str(np.std(d)/np.mean(d)))
-                    else:
-                        self.text.setText("Blank image")
+                        self.text.setText('Line %d\t Average: %d\t Max: %d\t' %(s, np.mean(d), np.max(d)))
+            else:
+                self.text.setText("Blank image")
+
 
 
 if __name__ == '__main__':
