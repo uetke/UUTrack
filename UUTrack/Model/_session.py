@@ -133,7 +133,7 @@ if __name__ == '__main__':
     s.Camera = {'new': 'New'}
     print('OLD')
     s.Camera = {'model': 'Old'}
-    #print(s.Camera)
+    #print(s.Monitor)
     # for k in s.params:
     #     print(k)
     #     for m in s.params[k]:

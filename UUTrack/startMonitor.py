@@ -4,10 +4,10 @@
     Main starting point of the program. It imports the base classes and defines the :meth:`~UUTrack.startCamera.start` function.
     To start the program you can run either from the command prompt or embedded into your own code.
     
-        >>> from UUTrack import startCamera
+        >>> from UUTrack import startMonitor
         >>> config_dir = 'Path/To/Config_Dir'
         >>> config_file = 'config.yml'
-        >>> startCamera.start(config_dir,config_file)
+        >>> startMonitor.start(config_dir,config_file)
     
     The config file is passed to a :class:`~UUTrack.Model._session` variable. That will be shared with the rest of the program. The session variable idea comes from programming websites, but is useful in other kind of programs as well.
         
@@ -22,7 +22,7 @@ from datetime import datetime
 from PyQt4.Qt import QApplication
 
 from .Model._session import _session
-from .View.Camera.cameraMain import cameraMain
+from .View.Monitor.monitorMain import monitorMain
 
 
 def start(configDir='',configFile=''):
@@ -72,7 +72,7 @@ def start(configDir='',configFile=''):
     cam.initializeCamera()
     cam.setExposure(session.Camera['exposure_time'])
     app = QApplication(sys.argv)
-    win = cameraMain(session,cam)
+    win = monitorMain(session,cam)
     win.show()
     sys.exit(app.exec_())
 

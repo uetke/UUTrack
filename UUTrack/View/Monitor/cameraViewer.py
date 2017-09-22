@@ -16,7 +16,7 @@ from pyqtgraph import GraphicsLayoutWidget
 from pyqtgraph.Qt import QtGui, QtCore
 
 from .workerThread import workThread
-from .cameraMainWidget import cameraMainWidget
+from .monitorMainWidget import monitorMainWidget
 
 class cameraViewer(QtGui.QMainWindow):
     """Main window for the viewer.
@@ -27,7 +27,7 @@ class cameraViewer(QtGui.QMainWindow):
         self._session = session
         self.camera = camera
         self.parent = parent
-        self.setWindowTitle('Camera Viewer')
+        self.setWindowTitle('On-Demand Camera Terminal')
         self.viewerWidget = viewerWidget()
         self.setCentralWidget(self.viewerWidget)
 
@@ -46,13 +46,13 @@ class cameraViewer(QtGui.QMainWindow):
     def startCamera(self):
         """Starts a continuous acquisition of the camera.
         """
-        self.emit(QtCore.SIGNAL('Stop_MainAcquisition'))
+        self.emit(QtCore.SIGNAL('stopMainAcquisition'))
         if self.acquiring:
             self.stopCamera()
         else:
             self.acquiring = True
             self.workerThread = workThread(self._session,self.camera)
-            self.connect(self.workerThread,QtCore.SIGNAL('Image'),self.getData)
+            self.connect(self.workerThread,QtCore.SIGNAL('image'),self.getData)
             self.workerThread.start()
 
     def stopCamera(self):
@@ -83,7 +83,7 @@ class cameraViewer(QtGui.QMainWindow):
         """Triggered at closing. If it is running as main window or not.
         """
         if self.parent == None:
-            self.emit(QtCore.SIGNAL('CloseAll'))
+            self.emit(QtCore.SIGNAL('closeAll'))
             self.camera.stopCamera()
             self.workerThread.terminate()
             self.close()

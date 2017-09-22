@@ -14,7 +14,7 @@ from PyQt4.QtGui import QMainWindow, QFileDialog, QListWidget, QHBoxLayout, QWid
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 
-from .Camera import resources
+from .Monitor import resources
 
 
 class HDFLoader(QMainWindow):

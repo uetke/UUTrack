@@ -6,12 +6,10 @@
     .. sectionauthor: Aquiles Carattino <aquiles@aquicarattino.com>
 """
 import time
-
 import numpy as np
+from .SimulateBrownian import SimBrownian
 from lantz import Q_
-
 from ._skeleton import cameraBase
-
 
 class camera(cameraBase):
     MODE_CONTINUOUS = 1
@@ -19,10 +17,11 @@ class camera(cameraBase):
     def __init__(self,camera):
         self.camera = camera
         self.running = False
-        self.xsize = 2048
-        self.ysize = 2048
-        self.maxX = 2048
-        self.maxY = 2048
+        self.xsize = 600
+        self.ysize = 250
+        self.maxX = 600
+        self.maxY = 250
+        self.exposure = 0
 
     def initializeCamera(self):
         """Initializes the camera.
@@ -30,6 +29,7 @@ class camera(cameraBase):
         print('Initializing camera')
         self.maxWidth = self.GetCCDWidth()
         self.maxHeight = self.GetCCDHeight()
+        self.sb = SimBrownian([self.xsize, self.ysize])
         return True
 
     def triggerCamera(self):
@@ -69,13 +69,15 @@ class camera(cameraBase):
 
     def readCamera(self):
         X,Y = self.getSize()
+        moment = time.time()
+        self.sb.nextRandomStep() #creates a next random step according to parameters in SimulateBrownian.py
+        sample = self.sb.genImage()
+        sample = sample.astype('uint16')
+        elapsed = time.time()- moment
         try:
-            sample = np.random.normal(size=(X,Y))
-            sample = sample.astype('uint16')
+            time.sleep(self.exposure.magnitude/1000-elapsed) # to simulate exposure time corrected for data generation delay
         except:
-            sample = np.zeros((X,Y))
-        # img = np.reshape(sample,(X,Y))
-        time.sleep(self.exposure.magnitude/1000)
+            time.sleep(0)
         return sample
 
     def setROI(self,X,Y):
@@ -89,7 +91,7 @@ class camera(cameraBase):
         """
         self.xsize = abs(X[1]-X[0])
         self.ysize = abs(Y[1]-Y[0])
-
+        self.sb.resizeView((self.xsize, self.ysize))
         return self.getSize()
 
     def getSize(self):
@@ -141,5 +143,5 @@ class camera(cameraBase):
             #Closing the camera
             return True
         except:
-            #Camera failed to close
+            #Monitor failed to close
             return False

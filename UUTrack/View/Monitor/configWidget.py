@@ -1,5 +1,5 @@
 """
-    UUTrack.View.Camera.configWidget.py
+    UUTrack.View.Monitor.configWidget.py
     ===================================
     Simple widget for storing the parameters of the :mod:`UUTrack.Model._session`. It creates and populates tree thanks to the :meth:`UUTrack.Model._session._session.getParams`.
     The widget has two buttons, one that updates the session by emitting a `signal` to the main thread and another the repopulates the tree whith the available parameters.

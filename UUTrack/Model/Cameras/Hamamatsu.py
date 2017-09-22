@@ -31,7 +31,7 @@ class camera(cameraBase):
     MODE_EXTERNAL = 2
 
     def __init__(self,camera):
-        self.cam_id = camera # Camera ID
+        self.cam_id = camera # Monitor ID
         self.camera = HamamatsuCamera(camera)
         self.running = False
         self.mode = self.MODE_SINGLE_SHOT
@@ -186,5 +186,5 @@ class camera(cameraBase):
             self.camera.shutdown()
             return True
         except:
-            #Camera failed to close
+            #Monitor failed to close
             return False

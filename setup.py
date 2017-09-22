@@ -3,10 +3,10 @@ from setuptools import setup
 setup(
     name='UUTracking',
     version='0.1',
-    description='Camera framework',
+    description='Monitor framework',
     packages=['UUTrack',
               'UUTrack.View',
-              'UUTrack.View.Camera',
+              'UUTrack.View.Monitor',
               'UUTrack.Model',
               'UUTrack.Model.Cameras',
               'UUTrack.Controller',
@@ -23,7 +23,7 @@ setup(
         'Operating System :: Microsoft :: Windows',
         'Programming Language :: Python',
     ],
-    package_data={'UUTrack': ['View/Camera/Icons/*.*', 'View/Camera/Icons/*.*']},
+    package_data={'UUTrack': ['View/Monitor/Icons/*.*', 'View/Monitor/Icons/*.*']},
     include_package_data=True,
     install_requires=['lantz',]
 )
