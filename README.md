@@ -7,6 +7,12 @@ The program also allows to trigger special tasks in a separate thread. To activa
 
 To acquire a cross cut of the image and display the standard deviation to mean ratio, press the **Alt** key while moving the mouse over the image. This also works live.
 
+## Documentation ## 
+The documentation can be built in the `docs` folder by using sphinx. It can also be found at
+
+http://documents.uetke.com/UUTracking/
+http://uutrack.readthedocs.io/en/latest/
+
 ## Installation ##
 To install UUTrack it is important to be inside of a virtual environment. From the command line you can run 
 
