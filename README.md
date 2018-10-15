@@ -71,6 +71,6 @@ UUTrap: Main folder. Important executables should be placed here.
 
 ![Alt text](UUTrack/docs/resources/screenshot.png?raw=true "Optional Title")
 
-### Workplan and Issue tracker 
+### Issues with the program
 
-check WORKPLAN file (please link here)
+If you have any issues with this program, please refer to the issue tracker of Github. 
