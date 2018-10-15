@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
     UUTrack.startCamera
     ===================
@@ -11,7 +12,8 @@
     
     The config file is passed to a :class:`~UUTrack.Model._session` variable. That will be shared with the rest of the program. The session variable idea comes from programming websites, but is useful in other kind of programs as well.
         
-    :copyright: 2017
+    :copyright: 2018, see AUTHORS for more details
+    :license: GPLv3, see LICENSE for more details
     
     .. sectionauthor:: Aquiles Carattino <aquiles@aquicarattino.com>
 """

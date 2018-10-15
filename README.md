@@ -71,6 +71,9 @@ UUTrap: Main folder. Important executables should be placed here.
 
 ![Alt text](UUTrack/docs/resources/screenshot.png?raw=true "Optional Title")
 
-### Issues with the program
+## Issues with the program
 
 If you have any issues with this program, please refer to the issue tracker of Github. 
+
+## License
+Unless specified otherway, the current software is licensed under [GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html). Feel free to use and modify the current code provided that you license any future work under the same license. 
