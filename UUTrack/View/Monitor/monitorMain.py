@@ -22,7 +22,7 @@ from pyqtgraph.dockarea import *
 
 from UUTrack.Model._session import _session
 from UUTrack.View.hdfloader import HDFLoader
-from .monitorMainWidget import monitorMainWidget
+from .MonitorMainWidget import MonitorMainWidget
 from .waterfallWidget import waterfallWidget
 from .cameraViewer import cameraViewer
 from .clearQueueThread import clearQueueThread
@@ -35,6 +35,7 @@ from .workerThread import workThread
 from .trajectoryWidget import trajectoryWidget
 from ...Model.workerSaver import workerSaver, clearQueue
 from . import resources
+
 
 class monitorMain(QtGui.QMainWindow):
     """
@@ -63,7 +64,7 @@ class monitorMain(QtGui.QMainWindow):
         self.area.setMouseTracking(True)
 
         # Main widget
-        self.camWidget = monitorMainWidget()
+        self.camWidget = MonitorMainWidget()
         self.camWidget.setup_cross_cut(self.camera.maxHeight)
         self.camWidget.setup_cross_hair([self.camera.maxWidth, self.camera.maxHeight])
         self.camWidget.setup_roi_lines([self.camera.maxWidth, self.camera.maxHeight])

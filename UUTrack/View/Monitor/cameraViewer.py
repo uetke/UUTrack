@@ -16,7 +16,7 @@ from pyqtgraph import GraphicsLayoutWidget
 from pyqtgraph.Qt import QtGui, QtCore
 
 from .workerThread import workThread
-from .monitorMainWidget import monitorMainWidget
+from .monitorMainWidget import MonitorMainWidget
 
 class cameraViewer(QtGui.QMainWindow):
     """Main window for the viewer.

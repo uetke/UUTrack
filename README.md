@@ -69,7 +69,7 @@ UUTrap: Main folder. Important executables should be placed here.
 
 ## Screenshot
 
-![Alt text](UUTrack/docs/resources/screenshot.png?raw=true "Optional Title")
+![Alt text](docs/resources/screenshot.png?raw=true "Optional Title")
 
 ## Issues with the program
 
