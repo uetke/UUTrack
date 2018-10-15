@@ -7,13 +7,13 @@ The program also allows to trigger special tasks in a separate thread. To activa
 
 To acquire a cross cut of the image and display the standard deviation to mean ratio, press the **Alt** key while moving the mouse over the image. This also works live.
 
-## Documentation ## 
+## Documentation
 The documentation can be built in the `docs` folder by using sphinx. It can also be found at
 
 http://documents.uetke.com/UUTracking/
 http://uutrack.readthedocs.io/en/latest/
 
-## Installation ##
+## Installation
 To install UUTrack it is important to be inside of a virtual environment. From the command line you can run 
 
 ```
@@ -29,7 +29,7 @@ pip install -e git+git@github.com:aquilesC/UUTrack.git#egg=UUTrack
 
 This will install the package inside of your virtual environment and will generate a copy of the repository in virtualenv/src/UUTrack that you can edit and push to the repository of your choice. This is very handy when you want to test new features, etc.
 
-### Installing your own fork of the code ###
+### Installing your own fork of the code
 A smarter way to install the code is to fork it to your own user and the run the previous command from there. This allows you to easily update and track changes without sending pull requests, etc.
 
 ## Running the program ##
@@ -54,11 +54,11 @@ To build the documentation locally, you need to have sphinx installed. Go to the
 
 This will build all the documentation from the source folder into the build folder. Remember that for it to work, the program needs to import every module, therefore you can't build the documentation if you don't have the dependencies in order.
 
-## Software for monitoring a CCD. ##
+## Software for monitoring a CCD.
 The program follows the Model-View-Controller design structure. This allows a rapid exchange of different parts of the code.
 
 
-### Structure of the folders: ###
+### Structure of the folders: 
 UUTrap: Main folder. Important executables should be placed here.
 
 * _Controller_ : Houses the files related to periferals, such as python wrappers for cameras. They are organized inside of folders according to the brand. The idea is to copy/paste wrappers already available, without worrying for specific implementations.
@@ -67,10 +67,10 @@ UUTrap: Main folder. Important executables should be placed here.
 
 * _View_: Houses everything related to visualization of data. View should communicate only through models to devices and should get the input from the user. Acquisition tasks should be performed in a different thread, in order not to block the GUI. A timer updates the GUI at constant intervals, while the acquisition can happen at a different rate.
 
-## Screenshot ##
+## Screenshot
 
 ![Alt text](docs/resources/screenshot.png?raw=true "Optional Title")
 
-### Workplan and Issue tracker ###
+### Workplan and Issue tracker 
 
 check WORKPLAN file (please link here)
