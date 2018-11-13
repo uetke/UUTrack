@@ -10,21 +10,23 @@ To acquire a cross cut of the image and display the standard deviation to mean r
 ## Documentation ## 
 The documentation can be built in the `docs` folder by using sphinx. It can also be found at
 
-http://documents.uetke.com/UUTracking/
 http://uutrack.readthedocs.io/en/latest/
 
 ## Installation ##
-To install UUTrack it is important to be inside of a virtual environment. From the command line you can run 
+To install UUTrack it is important to be inside of a virtual environment. When chosing a virtual environment keep in mind that UUTrack uses python syntax exlusive to python 3.x and also uses QtPy 4.x. 
+While other environments might also work it is certain that when using anaconda on a windows computer a python 3.5 environment has worked. This might need one addition in the "startMonitor.py" file: add `os.environ["QT_API"] = "pyqt"` near the top.
+
+To get a UUTrack you can run the following from the command line:
 
 ```
-pip install -U https://github.com/aquilesC/UUTrack/archive/master.zip
+pip install -U https://github.com/uetke/UUTrack/archive/master.zip
 ```
 Remember that in this case master refers to the branch you are installing. In case you want to work with specific branches of the code, you should change it. 
 
 If you are planning to develop code (you need to change, correct a bug or whatever is present), you need to install the package in an editable way. Just run:
 
 ```
-pip install -e git+git@github.com:aquilesC/UUTrack.git#egg=UUTrack 
+pip install -e git+git@github.com:uetke/UUTrack.git#egg=UUTrack 
 ```
 
 This will install the package inside of your virtual environment and will generate a copy of the repository in virtualenv/src/UUTrack that you can edit and push to the repository of your choice. This is very handy when you want to test new features, etc.
@@ -33,7 +35,7 @@ This will install the package inside of your virtual environment and will genera
 A smarter way to install the code is to fork it to your own user and the run the previous command from there. This allows you to easily update and track changes without sending pull requests, etc.
 
 ## Running the program ##
-Once you have installed the package, you can run the following commands to bring up the GUI:
+Once you have installed the package and created a config file, you can run the following commands to bring up the GUI:
 
 ```python
    from UUTrack import startCamera
