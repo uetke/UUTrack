@@ -23,11 +23,13 @@
     .. sectionauthor:: Aquiles Carattino <aquiles@aquicarattino.com>
 """
 import yaml
-from PyQt4.QtCore import QObject, SIGNAL
+from PyQt5.QtCore import QObject, pyqtSignal
 
 class _session(QObject):
     """Stores variables and other classes that are common to several UI or instances of the code.
     """
+    session_signal = pyqtSignal(str)
+
     def __init__(self, file=None):
         """The class is prepared to load values from a Yaml file
 
@@ -62,10 +64,12 @@ class _session(QObject):
                 if k in self.params[key]:
                     val = value[k]
                     self.params[key][k] = value[k] # Update value
-                    self.emit(SIGNAL('Updated'))
+                    # self.emit(SIGNAL('Updated'))
+                    self.session_signal.emit('Updated')
                 else:
                     self.params[key][k] = value[k]
-                    self.emit(SIGNAL('New'))
+                    # self.emit(SIGNAL('New'))
+                    self.session_signal.emit('New')
 
             super(_session, self).__setattr__(k, value[k])
 

@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='UUTracking',
-    version='0.1',
+    version='0.1.1',
     description='Monitor framework',
     packages=['UUTrack',
               'UUTrack.View',
@@ -17,7 +17,7 @@ setup(
               'UUTrack.Controller.devices.hamamatsu',
               'UUTrack.Controller.devices.PhotonicScience'],
     url='https://github.com/aquilesC/UUTrack',
-    license='MIT',
+    license='GPLv3',
     author='Aquiles',
     author_email='aquiles@aquicarattino.com',
     classifiers=[
@@ -27,5 +27,15 @@ setup(
     ],
     package_data={'UUTrack': ['View/Monitor/Icons/*.*', 'View/Monitor/Icons/*.*']},
     include_package_data=True,
-    install_requires=['lantz',]
+    install_requires=[
+        'lantzdev[full]',
+        'h5py',
+        'numpy',
+        'Pint',
+        'pyqtgraph',
+        'PyVISA',
+        'PyYAML',
+        'scipy',
+        'psutil',
+    ]
 )

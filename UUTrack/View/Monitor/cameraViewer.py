@@ -21,6 +21,8 @@ from UUTrack.View.Monitor.MonitorMainWidget import MonitorMainWidget
 class cameraViewer(QtGui.QMainWindow):
     """Main window for the viewer.
     """
+    stopMainAcquisition = QtCore.pyqtSignal()
+    closeAll = QtCore.pyqtSignal()
     def __init__(self,session,camera,parent=None):
         super(cameraViewer,self).__init__()
 
@@ -31,8 +33,8 @@ class cameraViewer(QtGui.QMainWindow):
         self.viewerWidget = viewerWidget()
         self.setCentralWidget(self.viewerWidget)
 
-        QtCore.QObject.connect(self.viewerWidget.startButton,QtCore.SIGNAL('clicked()'),self.startCamera)
-        QtCore.QObject.connect(self.viewerWidget.stopButton,QtCore.SIGNAL('clicked()'),self.startCamera)
+        self.viewerWidget.startButton.clicked.connect(self.startCamera)
+        self.viewerWidget.stopButton.clicked.connect(self.startCamera)
         self.acquiring = False
 
         self.tempImage = []
@@ -40,19 +42,19 @@ class cameraViewer(QtGui.QMainWindow):
         self.refreshTimer = QtCore.QTimer()
         self.refreshTimer.start(self._session.GUI['refresh_time']) # In milliseconds
 
-        self.connect(self.refreshTimer,QtCore.SIGNAL("timeout()"),self.updateGUI)
+        self.refreshTimer.timeout.connect(self.updateGUI)
 
 
     def startCamera(self):
         """Starts a continuous acquisition of the camera.
         """
-        self.emit(QtCore.SIGNAL('stopMainAcquisition'))
+        self.stopMainAcquisition.emit()
         if self.acquiring:
             self.stopCamera()
         else:
             self.acquiring = True
             self.workerThread = workThread(self._session,self.camera)
-            self.connect(self.workerThread,QtCore.SIGNAL('image'),self.getData)
+            self.workerThread.imageconnect(self.getData)
             self.workerThread.start()
 
     def stopCamera(self):
@@ -83,7 +85,7 @@ class cameraViewer(QtGui.QMainWindow):
         """Triggered at closing. If it is running as main window or not.
         """
         if self.parent == None:
-            self.emit(QtCore.SIGNAL('closeAll'))
+            self.closeAll.emit()
             self.camera.stopCamera()
             self.workerThread.terminate()
             self.close()
@@ -94,7 +96,7 @@ class viewerWidget(QtGui.QWidget):
     """Widget for holding the GUI elements of the viewer.
     """
     def __init__(self, parent=None):
-        QtGui.QWidget.__init__(self, parent)
+        super(viewerWidget, self).__init__(parent)
 
         self.layout = QtGui.QVBoxLayout(self)
 

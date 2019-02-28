@@ -21,32 +21,35 @@ import os
 import sys
 from datetime import datetime
 
-from PyQt4.Qt import QApplication
+from PyQt5.QtWidgets import QApplication
 
 from UUTrack.Model._session import _session
 from UUTrack.View.Monitor.monitorMain import monitorMain
 
 
-def start(configDir='',configFile=''):
+def start(config_dir='',configFile=''):
     """
     Starts the main window of the program and loads the appropirate configuration file.
 
-    :param str configDir: Folder where the config file is stored
+    :param str config_dir: Folder where the config file is stored
     :param str configFile: Name of the config file
     :return: Window for the camera
     """
     global session
 
-    if configDir != '':
+    if config_dir != '':
         base_dir = os.getcwd()
     else:
-        base_dir = os.path.dirname(os.path.realpath(__file__))
+        base_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
     if configFile == '':
         from UUTrack import config_dir
+        configFile = 'camera_defaults.yml'
 
+    config_dir = os.path.join(base_dir, 'Config')
     print(base_dir)
-    camera_config = os.path.join(base_dir, configDir, configFile)
+    camera_config = os.path.join(base_dir, config_dir, configFile)
+    print(camera_config)
     session = _session(camera_config)
 
     if session.Saving['directory'] == '':
@@ -60,13 +63,13 @@ def start(configDir='',configFile=''):
     session.Saving = {'directory': savedir}
 
     if session.Camera['camera'] == 'dummyCamera':
-        from .Model.Cameras.dummyCamera import camera
+        from UUTrack.Model.Cameras.dummyCamera import camera
         cam = camera(0)
     elif session.Camera['camera'] == 'Hamamatsu':
-        from .Model.Cameras.Hamamatsu import camera
+        from UUTrack.Model.Cameras.Hamamatsu import camera
         cam = camera(0)
     elif session.Camera['camera'] == 'PSI':
-        from .Model.Cameras.PSI import camera
+        from UUTrack.Model.Cameras.PSI import camera
         cam = camera('UUTrack\\Controller\\devices\\PhotonicScience')
     else:
         raise Exception('That particular camera has not been implemented yet.\n Please check your config file')

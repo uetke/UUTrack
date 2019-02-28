@@ -86,8 +86,8 @@ class monitorMain(QtGui.QMainWindow):
         self.selectSettings = HDFLoader()
 
         self.refreshTimer = QtCore.QTimer()
-        self.connect(self.refreshTimer, QtCore.SIGNAL('timeout()'), self.updateGUI)
-        self.connect(self.refreshTimer, QtCore.SIGNAL('timeout()'), self.crossCut.update)
+        self.refreshTimer.timeout.connect(self.updateGUI)
+        self.refreshTimer.timeout.connect(self.crossCut.update)
 
         self.refreshTimer.start(self._session.GUI['refresh_time'])
 

@@ -28,7 +28,7 @@ pyqtgraph==0.10.0
 python-dateutil==2.6.0
 pytz==2016.10
 PyVISA==1.8
-PyYAML==3.12
+PyYAML==3.13
 requests==2.13.0
 scipy==0.18.1
 six==1.10.0
@@ -38,4 +38,4 @@ sphinx-autobuild==0.6.0
 sphinx-rtd-theme==0.2.4
 stringparser==0.4.1
 tornado==4.4.3
-watchdog==0.8.3
+#watchdog==0.8.3

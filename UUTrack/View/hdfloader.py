@@ -9,10 +9,9 @@
 """
 
 import h5py
-from PyQt4.QtGui import QMainWindow, QFileDialog, QListWidget, QHBoxLayout, QWidget, QTextEdit, QVBoxLayout, \
-    QPushButton
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QListWidget, QHBoxLayout, QWidget, QTextEdit, QVBoxLayout, QPushButton
+from pyqtgraph.Qt import QtGui
+from pyqtgraph.Qt import QtCore
 
 from .Monitor import resources
 
@@ -104,7 +103,7 @@ class HDFWidget(QWidget):
         self.settings = None
 
         self.list.itemClicked.connect(self.item_clicked)
-        self.connect(self.button,QtCore.SIGNAL("clicked()"),self.apply_settings)
+        self.button.clicked.connect(self.apply_settings)
 
     def item_clicked(self, item):
         """Action triggered when an item is clicked. The content of the metadata is retrieved from its index and not from the file itself, avoiding clashes with the main program. """
