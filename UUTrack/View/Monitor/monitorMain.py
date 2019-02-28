@@ -15,26 +15,27 @@ from multiprocessing import Process, Queue
 import h5py
 import numpy as np
 import psutil
-from PyQt4.Qt import QApplication
+from PyQt5.QtWidgets import QApplication
 from pyqtgraph import ProgressDialog
 from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.dockarea import *
 
 from UUTrack.Model._session import _session
 from UUTrack.View.hdfloader import HDFLoader
-from .monitorMainWidget import monitorMainWidget
-from .waterfallWidget import waterfallWidget
-from .cameraViewer import cameraViewer
-from .clearQueueThread import clearQueueThread
-from .configWidget import configWidget
-from .crossCut import crossCutWindow
-from .popOut import popOutWindow
-from .messageWidget import messageWidget
-from .specialTaskTrack import specialTaskTracking
-from .workerThread import workThread
-from .trajectoryWidget import trajectoryWidget
-from ...Model.workerSaver import workerSaver, clearQueue
+from UUTrack.View.Monitor.MonitorMainWidget import MonitorMainWidget
+from UUTrack.View.Monitor.waterfallWidget import waterfallWidget
+from UUTrack.View.Monitor.cameraViewer import cameraViewer
+# from .clearQueueThread import clearQueueThread
+from UUTrack.View.Monitor.configWidget import configWidget
+from UUTrack.View.Monitor.crossCut import crossCutWindow
+from UUTrack.View.Monitor.popOut import popOutWindow
+from UUTrack.View.Monitor.messageWidget import messageWidget
+from UUTrack.View.Monitor.specialTaskTrack import specialTaskTracking
+from UUTrack.View.Monitor.workerThread import workThread
+from UUTrack.View.Monitor.trajectoryWidget import trajectoryWidget
+from UUTrack.Model.workerSaver import workerSaver, clearQueue
 from . import resources
+
 
 class monitorMain(QtGui.QMainWindow):
     """
@@ -63,7 +64,7 @@ class monitorMain(QtGui.QMainWindow):
         self.area.setMouseTracking(True)
 
         # Main widget
-        self.camWidget = monitorMainWidget()
+        self.camWidget = MonitorMainWidget()
         self.camWidget.setup_cross_cut(self.camera.maxHeight)
         self.camWidget.setup_cross_hair([self.camera.maxWidth, self.camera.maxHeight])
         self.camWidget.setup_roi_lines([self.camera.maxWidth, self.camera.maxHeight])

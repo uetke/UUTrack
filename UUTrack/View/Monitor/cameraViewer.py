@@ -15,8 +15,8 @@ import pyqtgraph as pg
 from pyqtgraph import GraphicsLayoutWidget
 from pyqtgraph.Qt import QtGui, QtCore
 
-from .workerThread import workThread
-from .monitorMainWidget import monitorMainWidget
+from UUTrack.View.Monitor.workerThread import workThread
+from UUTrack.View.Monitor.MonitorMainWidget import MonitorMainWidget
 
 class cameraViewer(QtGui.QMainWindow):
     """Main window for the viewer.

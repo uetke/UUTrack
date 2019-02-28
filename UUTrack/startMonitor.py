@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
     UUTrack.startCamera
     ===================
@@ -11,7 +12,8 @@
     
     The config file is passed to a :class:`~UUTrack.Model._session` variable. That will be shared with the rest of the program. The session variable idea comes from programming websites, but is useful in other kind of programs as well.
         
-    :copyright: 2017
+    :copyright: 2018, see AUTHORS for more details
+    :license: GPLv3, see LICENSE for more details
     
     .. sectionauthor:: Aquiles Carattino <aquiles@aquicarattino.com>
 """
@@ -21,8 +23,8 @@ from datetime import datetime
 
 from PyQt4.Qt import QApplication
 
-from .Model._session import _session
-from .View.Monitor.monitorMain import monitorMain
+from UUTrack.Model._session import _session
+from UUTrack.View.Monitor.monitorMain import monitorMain
 
 
 def start(configDir='',configFile=''):
@@ -41,7 +43,7 @@ def start(configDir='',configFile=''):
         base_dir = os.path.dirname(os.path.realpath(__file__))
 
     if configFile == '':
-        from . import config_dir
+        from UUTrack import config_dir
 
     print(base_dir)
     camera_config = os.path.join(base_dir, configDir, configFile)
