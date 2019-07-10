@@ -22,6 +22,15 @@
 
     .. sectionauthor:: Aquiles Carattino <aquiles@aquicarattino.com>
 """
+#from __future__ import (absolute_import, division,
+#                        print_function, unicode_literals)
+from __future__ import (absolute_import, division,
+                        print_function)
+from builtins import (
+         bytes, int, list, object, range, str,
+         ascii, chr, hex, input, next, oct, open,
+         pow, round, super,
+         filter, map, zip)
 import yaml
 from PyQt4.QtCore import QObject, SIGNAL
 
@@ -47,7 +56,7 @@ class _session(QObject):
                     print('LOADED STRING')
             elif type(file) == type({}):
                 data = file
-
+            
             for d in data:
                 self.__setattr__(d, data[d])
 
@@ -110,8 +119,10 @@ class _session(QObject):
                     s = {'name': m.replace('_', ' '), 'type': type(self.params[k][m]).__name__,'values': self.params[k][m]}
                 elif type(self.params[k][m]).__name__ == 'NoneType':
                     s = {'name': m.replace('_', ' '), 'type': "str",'values': self.params[k][m]}
+                elif type(self.params[k][m]).__name__ == 'long':
+                    s = {'name': m.replace('_', ' '), 'type': "float",'values': self.params[k][m]}
                 else:
-                    s = {'name': m.replace('_', ' '), 'type': type(self.params[k][m]).__name__, 'value': self.params[k][m]}
+                    s = {'name': m.replace('_', ' '), 'type': type(self.params[k][m]).__name__, 'value': self.params[k][m], 'decimals': 6}
                 c.append(s)
 
             a = {'name': k.replace('_', ' '), 'type': 'group', 'children': c}

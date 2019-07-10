@@ -199,6 +199,9 @@ class HamamatsuCamera():
         self.max_width = self.getPropertyValue("image_width")[0]
         self.max_height = self.getPropertyValue("image_height")[0]
         self.setmode(self.CAPTUREMODE_SEQUENCE) # By default is a sequence
+        self.setPropertyValue("output_trigger_kind[0]", 3)
+        self.setPropertyValue("output_trigger_period[0]", 0.003)
+        self.setPropertyValue("output_trigger_source[0]", 2)
 
     def settrigger(self,mode):
         TRIGMODE = ctypes.c_int32(mode)
@@ -210,20 +213,6 @@ class HamamatsuCamera():
     def setmode(self, mode):
         """Sets the acquisition mode of the camera."""
         self.mode = mode
-
-    def settrigger(self,mode):
-        TRIGMODE = ctypes.c_int32(mode)
-        self.checkStatus(self.dcam.dcam_settriggermode(self.camera_handle,TRIGMODE),'settriggermode')
-        DCAM_TRIGGERMODE = ctypes.c_int32(0)
-        self.checkStatus(self.dcam.dcam_gettriggermode(self.camera_handle,ctypes.byref(DCAM_TRIGGERMODE)),'gettrigermode')
-        return DCAM_TRIGGERMODE.value
-
-    def settrigger(self,mode):
-        TRIGMODE = ctypes.c_int32(mode)
-        self.checkStatus(self.dcam.dcam_settriggermode(self.camera_handle,TRIGMODE),'settriggermode')
-        DCAM_TRIGGERMODE = ctypes.c_int32(0)
-        self.checkStatus(self.dcam.dcam_gettriggermode(self.camera_handle,ctypes.byref(DCAM_TRIGGERMODE)),'gettrigermode')
-        return DCAM_TRIGGERMODE.value
 
     def initCamera(self):
         #

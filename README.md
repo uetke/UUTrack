@@ -1,5 +1,7 @@
-# UUTtracking v0.2 #
-This program can be used for monitoring a CCD camera. The structure allows to perform high framerate acquisitions while displaying the images to the user at a configurable rate. Data can be accumulated in a queue for saving while acquiring or saving retroactively. 
+# UUTtracking for Potiodynamics Scattering Microscopy v0.2 #
+_A nanoLINX instrumentation project based on the Pynta module, previously UUTrack_
+
+This program can be used for monitoring a CCD camera. The structure allows to perform high framerate acquisitions while displaying the images to the user at a configurable rate. Data can be accumulated in a queue for saving while acquiring or saving retroactively.
 
 The GUI has the possibility to show a waterfall and change the ROI of the camera by dragging vertical and horizontal lines. 
 
@@ -8,45 +10,23 @@ The program also allows to trigger special tasks in a separate thread. To activa
 To acquire a cross cut of the image and display the standard deviation to mean ratio, press the **Alt** key while moving the mouse over the image. This also works live.
 
 ## Documentation ## 
-The documentation can be built in the `docs` folder by using sphinx. It can also be found at
+The documentation can be built in the `docs` folder by using sphinx. The documentation for the ori can also be found at
 
+http://documents.uetke.com/UUTracking/
 http://uutrack.readthedocs.io/en/latest/
 
 ## Installation ##
-To install UUTrack it is important to be inside of a virtual environment. When chosing a virtual environment keep in mind that UUTrack uses python syntax exlusive to python 3.x and also uses QtPy 4.x. 
-While other environments might also work it is certain that when using anaconda on a windows computer a python 3.5 environment has worked. This might need one addition in the "startMonitor.py" file: add `os.environ["QT_API"] = "pyqt"` near the top.
-
-To get a UUTrack you can run the following from the command line:
-
-```
-pip install -U https://github.com/uetke/UUTrack/archive/master.zip
-```
-Remember that in this case master refers to the branch you are installing. In case you want to work with specific branches of the code, you should change it. 
-
-If you are planning to develop code (you need to change, correct a bug or whatever is present), you need to install the package in an editable way. Just run:
-
-```
-pip install -e git+git@github.com:uetke/UUTrack.git#egg=UUTrack 
-```
-
-This will install the package inside of your virtual environment and will generate a copy of the repository in virtualenv/src/UUTrack that you can edit and push to the repository of your choice. This is very handy when you want to test new features, etc.
-
-### Installing your own fork of the code ###
-A smarter way to install the code is to fork it to your own user and the run the previous command from there. This allows you to easily update and track changes without sending pull requests, etc.
+To install UUTrack it is important to be inside of a virtual environment. To install the code clone it to your lab computer using your own user. This allows you to easily update and track changes. Always keep the tested version in the master branch to be sure that you can run the setup without difficulty.
 
 ## Running the program ##
-Once you have installed the package and created a config file, you can run the following commands to bring up the GUI:
+Once you have installed the package, enter the virtual environment and run the following commands to bring up the GUI:
 
 ```python
-   from UUTrack import startCamera
-
-   ConfigDir = 'Path/to/config'
-   ConfigFile = 'config.yml'
-   startCamera.start(ConfigDir, ConfigFile)
+ <virtualENV> Python startProgram.py
 ```
 
 ## Building the documentation
-The documentation of the program can be build locally and is available at http://uutrack.readthedocs.io. 
+The documentation of the program can be built locally and is available at http://uutrack.readthedocs.io.
 
 To build the documentation locally, you need to have sphinx installed. Go to the folder docs and run the following command:
 
@@ -71,8 +51,8 @@ UUTrap: Main folder. Important executables should be placed here.
 
 ## Screenshot ##
 
-![Alt text](docs/resources/screenshot.png?raw=true "Optional Title")
+- to be added
 
 ### Workplan and Issue tracker ###
 
-check WORKPLAN file (please link here)
+check [WORKPLAN](WORKPLAN.txt) file (please link here)

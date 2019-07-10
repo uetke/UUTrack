@@ -1,50 +1,75 @@
-
-* preparation
-
-	1. [x] live video for alignment and exposure settings
-	2. [x] selection of ROI
-	3. [x] adjustment of mean/range min/max for grayscale viewer
-	4. [ ] selecting background correction option
-	5. [x] synthesizing Brownian particles for testing functions
-	6. [x] Add help menu with especially a cheatsheet for shortcuts
-
-* tracking
-
-	1. [x] waterfall update
-	2. [ ] event counter (?)
-	3. [ ] timer to show experiment progress
-	4. [x] selecting particle of interest with cursor
-	5. [x] recording a single particle track
-	6. [ ] saving track (preferably on the screen) with flexible extra parameters (size,x,y,stdx,stdy, etc vs time)
-	7. [x] live update of the track on screen
-	8. [x] adjusting tracking parameters
-	9. [ ] calculating track properties such as D or other live computations
-	10.[ ] recording multiple tracks simultaneously
-    11.[ ] follow two line cuts at the same time
+This workplan is to develop and maintain this package for running the Potentiodynamic Scattering Microscopy (PDSM) setup.
+Check each item after testing it on the setup.
 
 
-* electrokinetic actuation
+# Currently open issues
 
-	1. [x] setting up function generator
-	2. [x] programming waveforms such as ramps, etc
-	3. [ ] generating specific waveform based on tracking coordinates for feedback control
+## Work in progress
+* [ ] Creating place holder for new actions, signals, functions, menus
+    * Choose parameters and method for background correction
+    * Start speckle contrast monitor for focusing
+        + added shortcut and action Ctrl+X: Show speckle contrast
+    * View speckle average, drift, and contrast during the experiment
+        + needs adding extra parameters to messageWidget.py
+    * Display intensity variation on a single spot (with proper sampling) vs time
+        + enough to adjust the routines in View.Monitor.specialTaskTrack and View.Monitor.trajectoryWidget
 
-* review
+* [ ] Executable code
+    * write down showSpeckleContrast method in monitorMain
+    * complete contrastViewer.py class based on crossCut.py
+    * adjust trajectoryWidget.py to show signal vs time
+    * adjust specialTaskTrack to extract the signal from images
 
-	1. [ ]  possibility of reviewing a track on a separate screen
+* [ ] Correcting bugs %% report urgent bugs in this list %%
+    *
+
+## To be tested
+* [ ] Does this package run on the setup computer?
+    * test all the buttons
+    * test all the shortcuts
+    * make a list of whatever does not work as expected or is simply uncomfortable
+        + adjust default settings of the GUI docks in monitorMain.setupDocks()
 
 
-* Bugs and Errors
-    1. in the simulate mode, one should check if the particle size is smaller than the frame size (e.g. in height) and perform suitable adjustments.
-    2. after each resize, or maybe zoom out, the width of the image is reduced by 1 pixel. not clear why!
+# Overview of major tasks for running the first complete experiment
 
-* Resolved bugs
-    1. the waterfall window does not keep the grayscale adjustments after refreshing the GUI, and jumps back to the auto-contrast mode! (Issue resolved but adjusting the GUI refresh options for waterfall image update, Sanli, 10/5/17)
-    2. crossCut.py, the data that is passed gets longer, blank image does not show up, when closing the window, the cross-cut still is updated
+## preparation based on existing code
+    0. [ ] test run with dummy camera
+    1. [ ] test run with Orca on the setup
+        a. [ ] selection of ROI
+        b. [ ] adjustment of mean/range min/max for grayscale viewer
+        c. [ ] selecting background correction option
+	3. [ ] Check the help menu with especially a cheatsheet for shortcuts
+
+## new functions for PDSM
+
+	1. [*] monitoring speckle variance and stability
+	2. [ ] monitoring the focus stability with QPD/digilent
+	3. [ ] setting up binning, averaging, and other image corrections
+	4. [ ] defining/applying data recording standard
+	5. [ ] selecting particle of interest with cursor
+	6. [ ] monitoring/recording a single particle contrast
+
+## electrochemical measurements (related to edaq instrument)
+
+	1. [ ] record the applied potential with digilent card, triggered by the camera
+
+## nice features
+
+	1. [ ] possibility of replaying a measurement on a separate screen
+    2. [ ] Display the reflected beam on the little dart camera (basler), use inspiration from cameraViewer.py
+
+## Old Bugs and Errors __[report new bugs directly on the repository using issues]__
+    1. after each resize, or maybe zoom out, the width of the image is reduced by 1 pixel. not clear why!
+        -> has to do something with the monitorMain.setROI() or monitorMainWidge.setup_roi_lines()
 
 
-* Requested features and Recommendations
+## Resolved bugs
+
+
+## Requested features and Recommendations
     1. [*] make a special text pop-up method for viewing longer text such as for help, use example of messagewidget
     2. [ ] read out actual frame rate from the Hamamatsu camera
+    2. [ ] add some synthetic data generation functions to the dummy camera for testing the package performance in speed and accuracy
 
 

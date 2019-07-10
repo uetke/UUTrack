@@ -35,16 +35,9 @@ class trajectoryWidget(pg.GraphicsView):
         self.yScale = pg.AxisItem(orientation='left', linkView=self.vb)
         self.l.addItem(self.yScale, 0, 0)
 
-        self.xScale.setLabel('X Axis', units='px')
-        self.yScale.setLabel('Y Axis', units='px')
-        #self.view = pg.GraphicsLayoutWidget()
-        #
-        # self.vb = pg.ViewBox()
-        # self.plot = pg.PlotItem()
-        # self.vb.addItem(self.plot)
-        # self.layout.addWidget(self.vb)
-        # self.setLayout(self.layout)
-
+        self.xScale.setLabel('Time', units='GUI frame')
+        self.yScale.setLabel('Intensity', units='count')
+        
 if __name__ == '__main__':
     from PyQt4.Qt import QApplication
     import sys

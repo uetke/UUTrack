@@ -1,10 +1,10 @@
 """
-    openCET.View.LocateParticle.py
+    UUTrack.View.LocateParticle.py
     ==================================
     The LocateParticle class contains necessary methods for localizing centroid of a particle and following its track.
     the idea is to make the output suitable for analysis with TrackPy of similar open-source tracking packages
 
-    .. lastedit:: 10/5/2017
+    .. lastedit:: 30/11/2018
     .. sectionauthor:: Sanli Faez <s.faez@uu.nl>
 """
 import numpy as np
