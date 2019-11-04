@@ -4,6 +4,10 @@
 
     .. sectionauthor:: Aquiles Carattino <aquiles@aquicarattino.com>
     .. sectionauthor:: Sanli Faez <s.faez@uu.nl>
+    .. sectionauthor:: Kevin Namink <k.w.namink@uu.nl>
+    
+    NOTES: -trajectoryWidget is used to plot the intensity of a clicked spot.
+    -clicked spot 
 """
 
 import os
@@ -25,15 +29,16 @@ from UUTrack.View.hdfloader import HDFLoader
 from .monitorMainWidget import monitorMainWidget
 from .waterfallWidget import waterfallWidget
 from .cameraViewer import cameraViewer
+from .contrastViewer import contrastWindow
 from .clearQueueThread import clearQueueThread
 from .configWidget import configWidget
 from .crossCut import crossCutWindow
+from .specleWidget import SpecleWindow
 from .popOut import popOutWindow
 from .messageWidget import messageWidget
-from .specialTaskTrack import specialTaskTracking
 from .workerThread import workThread
 from .trajectoryWidget import trajectoryWidget
-from ...Model.workerSaver import workerSaver, clearQueue
+from UUTrack.Model.workerSaver import workerSaver, clearQueue
 from . import resources
 
 class monitorMain(QtGui.QMainWindow):
@@ -42,13 +47,13 @@ class monitorMain(QtGui.QMainWindow):
     """
     def __init__(self, session, cam):
         """
-        Inits the camera window
+        Inits the camera window 
 
         :param: session: session
         :param: cam: camera
         """
-        super(monitorMain,self).__init__()
-        self.setWindowTitle('nano-EPics Flow-Setup Monitoring (UUTrack)')
+        super(monitorMain, self).__init__()
+        self.setWindowTitle('Camera GUI')
         self.setMouseTracking(True)
         self._session = session
 
@@ -62,12 +67,47 @@ class monitorMain(QtGui.QMainWindow):
         self.resize(1064, 840)
         self.area.setMouseTracking(True)
 
+        # Program variables
+        self.tempimage = []
+        self.overlayimage = []
+        self.bgimage = []
+        self.vararray = np.array([], dtype = np.float64)
+        self.vararray_length = 20
+        self.vararray_location = 0
+        self.trackinfo = np.zeros((1, 5))  # real particle trajectory filled by "LocateParticle" analysis
+        self.spot_intensity = np.zeros(100) 
+        self.spot_tracking = False
+        self.spot_coords = [0,0]
+        self.fps = 0
+        self.realfps = 0
+        self.buffertime = 0
+        self.buffertimes = []
+        self.refreshtimes = []
+        self.totalframes = 0
+        self.droppedframes = 0
+        self.buffer_memory = 0
+        self.waterfall_data = []
+        self.watindex = 0  # Waterfall index
+        self.corner_roi = []  # Real coordinates of the corner of the ROI region. (Min_x and Min_y).
+        self.docks = []
+        self.corner_roi.append(self._session.Camera['roi_x1'])
+        self.corner_roi.append(self._session.Camera['roi_y1'])
+
+        # Program status controllers
+        self.continuous_saving = False
+        self.show_waterfall = False
+        self.subtract_background = False
+        self.view_variance = False
+        self.save_running = False
+        self.accumulate_buffer = False
+        self.dock_state = None
+        
         # Main widget
         self.camWidget = monitorMainWidget()
         self.camWidget.setup_cross_cut(self.camera.maxHeight)
         self.camWidget.setup_cross_hair([self.camera.maxWidth, self.camera.maxHeight])
         self.camWidget.setup_roi_lines([self.camera.maxWidth, self.camera.maxHeight])
-        #self.camWidget.setup_overlay() #use when extra information should be viewed on the camera viewport
+        # self.camWidget.setup_overlay() #use when extra information should be viewed on the camera viewport
         self.camWidget.setup_mouse_tracking()
         # Widget for displaying information to the user
         self.messageWidget = messageWidget()
@@ -80,13 +120,19 @@ class monitorMain(QtGui.QMainWindow):
         self.config = configWidget(self._session)
         # Line cut widget
         self.crossCut = crossCutWindow(parent=self)
-        self.popOut = popOutWindow(parent=self) #_future: for making long message pop-ups
+        # Line cut widget
+        self.specleWidget = SpecleWindow(parent=self)
+        # Line cut widget
+        self.contrastViewer = contrastWindow(parent=self)
+        # _future: for making long message pop-ups
+        self.popOut = popOutWindow(parent=self)
         # Select settings Window
         self.selectSettings = HDFLoader()
-
+        
         self.refreshTimer = QtCore.QTimer()
         self.connect(self.refreshTimer, QtCore.SIGNAL('timeout()'), self.updateGUI)
         self.connect(self.refreshTimer, QtCore.SIGNAL('timeout()'), self.crossCut.update)
+        self.connect(self.refreshTimer, QtCore.SIGNAL('timeout()'), self.specleWidget.update)
 
         self.refreshTimer.start(self._session.GUI['refresh_time'])
 
@@ -112,34 +158,6 @@ class monitorMain(QtGui.QMainWindow):
         self.lastBuffer = time.time()
         self.lastRefresh = time.time()
 
-        # Program variables
-        self.tempimage = []
-        self.overlayimage = []
-        self.bgimage = []
-        self.trackinfo = np.zeros((1,5)) # real particle trajectory filled by "LocateParticle" analysis
-        self.noiselvl = self._session.Tracking['noise_level']
-        self.fps = 0
-        self.buffertime = 0
-        self.buffertimes = []
-        self.refreshtimes = []
-        self.totalframes = 0
-        self.droppedframes = 0
-        self.buffer_memory = 0
-        self.waterfall_data = []
-        self.watindex = 0 # Waterfall index
-        self.corner_roi = [] # Real coordinates of the corner of the ROI region. (Min_x and Min_y).
-        self.docks = []
-        self.corner_roi.append(self._session.Camera['roi_x1'])
-        self.corner_roi.append(self._session.Camera['roi_y1'])
-
-        # Program status controllers
-        self.continuous_saving = False
-        self.show_waterfall = False
-        self.subtract_background = False
-        self.save_running = False
-        self.accumulate_buffer = False
-        self.specialtask_running = False
-        self.dock_state = None
 
         self.setupActions()
         self.setupToolbar()
@@ -171,6 +189,7 @@ class monitorMain(QtGui.QMainWindow):
             Ctrl+mouse: Crosshair \n
             Ctrl+B: Toggle buffering\n
             Ctrl+G: Toggle background subtraction\n
+            Ctrl+H: Toggle variance view\n
             Ctrl+F: Empty buffer\n
             Ctrl+C: Start tracking\n
             Ctrl+V: Stop tracking\n
@@ -178,6 +197,7 @@ class monitorMain(QtGui.QMainWindow):
             Ctrl+N: Autosave off\n
             Ctrl+S: Save image\n
             Ctrl+W: Start waterfall\n
+            Ctrl+X: Show speckle contrast\n
             Ctrl+Q: Exit application\n
             Ctrl+Shift+W: Save waterfall data\n
             Ctrl+Shift+T: Save trajectory\n
@@ -241,10 +261,25 @@ class monitorMain(QtGui.QMainWindow):
         self.startWaterfallAction.setStatusTip('Start Waterfall')
         self.startWaterfallAction.triggered.connect(self.startWaterfall)
 
+        self.startContrastAction = QtGui.QAction(QtGui.QIcon('UUTrack/View/Monitor/Icons/Specl.png'),'Spec&kle Contrast',self)
+        self.startContrastAction.setShortcut('Ctrl+X')
+        self.startContrastAction.setStatusTip('Show Speckle Contrast')
+        self.startContrastAction.triggered.connect(self.specleWidget.show)
+
         self.toggleBGAction = QtGui.QAction(QtGui.QIcon('UUTrack/View/Monitor/Icons/noBg.png'), 'Toggle B&G-reduction', self)
         self.toggleBGAction.setShortcut('Ctrl+G')
         self.toggleBGAction.setStatusTip('Toggle Background Reduction')
         self.toggleBGAction.triggered.connect(self.toggleBGReduction)
+        
+        self.toggleBGModeAction = QtGui.QAction(QtGui.QIcon('UUTrack/View/Monitor/Icons/BGmode.png'), 'Toggle B&G-reduction mode', self)
+        self.toggleBGModeAction.setShortcut('Ctrl+G')
+        self.toggleBGModeAction.setStatusTip('Toggle Background Reduction Mode')
+        self.toggleBGModeAction.triggered.connect(self.toggleBGMode)
+
+        self.toggleVarViewAction = QtGui.QAction(QtGui.QIcon('UUTrack/View/Monitor/Icons/varV.png'), 'Toggle Variance View', self)
+        self.toggleVarViewAction.setShortcut('Ctrl+G')
+        self.toggleVarViewAction.setStatusTip('Toggle viewing variance')
+        self.toggleVarViewAction.triggered.connect(self.toggleVarView)
 
         self.setROIAction = QtGui.QAction(QtGui.QIcon('UUTrack/View/Monitor/Icons/Zoom-In-icon.png'),'Set &ROI',self)
         self.setROIAction.setShortcut('Ctrl+T')
@@ -297,10 +332,13 @@ class monitorMain(QtGui.QMainWindow):
         self.toolbar3.addAction(self.movieSaveStopAction)
         self.toolbar4 = self.addToolBar('Extra')
         self.toolbar4.addAction(self.startWaterfallAction)
+        self.toolbar4.addAction(self.startContrastAction)
         self.toolbar4.addAction(self.setROIAction)
         self.toolbar4.addAction(self.clearROIAction)
         self.toolbar4.addAction(self.clearROIAction)
         self.toolbar4.addAction(self.toggleBGAction)
+        self.toolbar4.addAction(self.toggleBGModeAction)
+        self.toolbar4.addAction(self.toggleVarViewAction)
         self.toolbar5 = self.addToolBar('Help')
         self.toolbar5.addAction(self.showHelpAction)
 
@@ -320,8 +358,11 @@ class monitorMain(QtGui.QMainWindow):
         self.movieMenu.addAction(self.movieSaveStartAction)
         self.movieMenu.addAction(self.movieSaveStopAction)
         self.movieMenu.addAction(self.startWaterfallAction)
+        self.movieMenu.addAction(self.startContrastAction)
         self.configMenu = menubar.addMenu('&Configure')
         self.configMenu.addAction(self.toggleBGAction)
+        self.configMenu.addAction(self.toggleBGModeAction)
+        self.configMenu.addAction(self.toggleVarViewAction)
         self.configMenu.addAction(self.setROIAction)
         self.configMenu.addAction(self.clearROIAction)
         self.configMenu.addAction(self.accumulateBufferAction)
@@ -404,21 +445,24 @@ class monitorMain(QtGui.QMainWindow):
             self.messageWidget.appendLog('e', 'Tried to snap while in free run')
         else:
             self.workerThread = workThread(self._session, self.camera)
-            self.connect(self.workerThread,QtCore.SIGNAL('image'),self.getData)
+            self.connect(self.workerThread, QtCore.SIGNAL('image'),self.getData)
             self.workerThread.origin = 'snap'
             self.workerThread.start()
             self.acquiring = True
             self.messageWidget.appendLog('i', 'Snapped photo')
 
     def toggleBGReduction(self):
-        """Toggles between background cancellation modes. Takes a background snap if necessary
+        """Toggles between background cancellation on and off. Takes a background snap if necessary
         """
 
         if self.subtract_background:
             self.subtract_background = False
             self.messageWidget.appendLog('i', 'Background reduction deactivated')
         else:
-            if len(self.tempimage)==0:
+            if self.view_variance:
+                self.messageWidget.appendLog('i', 'Cannot start BG-reduction while variance view is active')
+                return
+            if len(self.tempimage) == 0:
                 self.snap()
                 self.messageWidget.appendLog('i', 'Snapped an image as background')
             else:
@@ -426,6 +470,34 @@ class monitorMain(QtGui.QMainWindow):
                 self.bgimage = self.tempimage.astype(float)
                 self.messageWidget.appendLog('i', 'Background reduction active')
 
+    def toggleBGMode(self):
+        """Toggles between background cancellation modes.
+        """
+        print("Not implemented yet: toggleBGMode")
+
+
+    def toggleVarView(self):
+        """Toggles showing variance.
+        """
+
+        if self.view_variance:
+            self.view_variance = False
+            self.messageWidget.appendLog('i', 'Variance view deactivated')
+            self.vararray = np.array([])
+        else:
+            if self.subtract_background:
+                self.messageWidget.appendLog('i', 'Cannot start variance view while BG-reduction is active')
+                return
+            elif len(self.vararray) == 0:
+                x, y = self.tempimage.shape
+                for i in range(self.vararray_length):
+                    self.vararray = np.append(self.vararray, np.zeros((x,y)) )
+                self.vararray = np.reshape(self.vararray, (self.vararray_length, x, y))
+                self.messageWidget.appendLog('i', 'Initialized variance view array')
+            self.view_variance = True
+            self.messageWidget.appendLog('i', 'Variance view active')
+        
+        
     def saveImage(self):
         """Saves the image that is being displayed to the user.
         """
@@ -449,8 +521,6 @@ class monitorMain(QtGui.QMainWindow):
     def startMovie(self):
         if self._session.Debug['to_screen']:
             print('Start Movie')
-        if self.specialtask_running:
-            self.messageWidget.appendLog('w', 'Special task is running, press Ctrl+V to stop')
         else:
             if self.acquiring:
                 self.stopMovie()
@@ -521,6 +591,7 @@ class monitorMain(QtGui.QMainWindow):
         # Worker thread for clearing the queue.
         self.clearWorker = Process(target = clearQueue, args = (self.q,))
         self.clearWorker.start()
+
 
     def startWaterfall(self):
         """Starts the waterfall. The waterfall can be accelerated if camera supports hardware binning in the appropriate
@@ -662,7 +733,7 @@ class monitorMain(QtGui.QMainWindow):
                         if self._session.Saving['autosave_trajectory']:
                             self.saveWaterfall()
 
-                        self.waterfall_data = np.zeros((self._session.GUI['length_waterfall'], self.current_width))
+                        #self.waterfall_data = np.zeros((self._session.GUI['length_waterfall'], self.current_width))
                         self.watindex = 0
 
                     centerline = np.int(self.current_height / 2)
@@ -736,23 +807,39 @@ class monitorMain(QtGui.QMainWindow):
         """
         if len(self.tempimage)>=1:
             if (self.subtract_background and len(self.bgimage)>=1):
-                img = self.tempimage - self.bgimage
-                img[img<1] = 1
-                self.camWidget.img.setImage(img.astype(int), autoLevels=False, autoRange=False, autoHistogramRange=False)
+                bgcorrected = self.tempimage - self.bgimage + np.full_like(self.bgimage, self.bgimage.max())
+                self.camWidget.img.setImage(bgcorrected, autoLevels=False, autoRange=False, autoHistogramRange=False)
+            elif (self.view_variance):
+                self.vararray[self.vararray_location] = self.tempimage.astype(np.float64) - 96 # Substract 96 to counteract dark noise
+                self.vararray_location += 1
+                if self.vararray_location == self.vararray_length:
+                    self.vararray_location = 0
+                with np.errstate(divide='ignore'):
+                    varview = np.var(self.vararray, axis=0)/np.mean(self.vararray, axis=0)
+                self.camWidget.img.setImage(varview, autoLevels=False, autoRange=False, autoHistogramRange=False)
             else:
                 self.camWidget.img.setImage(self.tempimage, autoLevels=False, autoRange=False, autoHistogramRange=False)
+            if self.spot_tracking:
+                self.spot_intensity[0:-1] = self.spot_intensity[1:]
+                self.spot_coords = [self.camWidget.crosshair[0].getPos()[1], self.camWidget.crosshair[1].getPos()[0]]
+                self.spot_intensity[-1] = self.tempimage[self.spot_coords[0], self.spot_coords[1]]
+                self.trajectoryWidget.plot.setData(np.arange(-len(self.spot_intensity),0), self.spot_intensity)
             self.buffer_memory = float(self.q.qsize())*int(self.tempimage.nbytes) / 1024 / 1024
-        if self.trackinfo.shape[0] > 1:
+        #if self.trackinfo.shape[0] > 1:
             #self.camWidget.img2.setImage(self.overlayImage) #plotting the particle past trajectory on top of the camera frames
-            self.trajectoryWidget.plot.setData(self.trackinfo[1:,1],self.trackinfo[1:,2]) #updating the plotted trajectory in the tracking viewport
+            #self.trajectoryWidget.plot.setData(self.trackinfo[1:,1],self.trackinfo[1:,2]) #updating the plotted trajectory in the tracking viewport
+             
+            
+            
 
         if self.show_waterfall:
             self.waterfall_data  = self.waterfall_data[:self._session.GUI['length_waterfall'], :]
             self.watWidget.img.setImage(np.transpose(self.waterfall_data), autoLevels=False, autoRange=False, autoHistogramRange=False)
-
+            
 
         new_time = time.time()
         self.fps = new_time-self.lastRefresh
+        self.realfps = self.camera.camera.getPropertyValue("internal_frame_rate")[0]
         self.lastRefresh = new_time
 
         self.messageWidget.updateMemory(self.buffer_memory/self._session.Saving['max_memory']*100)
@@ -760,9 +847,10 @@ class monitorMain(QtGui.QMainWindow):
 
         msg = '''<b>Buffer time:</b> %0.2f ms <br />
              <b>Refresh time:</b> %0.2f ms <br />
+             <b>FPS from camera:</b> %0.2f <br />
              <b>Acquired Frames</b> %i <br />
              <b>Dropped Frames</b> %i <br />
-             <b>Frames in buffer</b> %i'''%(self.buffertime * 1000, self.fps * 1000, self.totalframes, self.droppedframes, self.q.qsize())
+             <b>Frames in buffer</b> %i'''%(self.buffertime * 1000, self.fps * 1000, self.realfps, self.totalframes, self.droppedframes, self.q.qsize())
         self.messageWidget.updateMessage(msg)
         #self.messageWidget.updateLog(self.logMessage)
         self.logmessage = []
@@ -868,33 +956,20 @@ class monitorMain(QtGui.QMainWindow):
     def startSpecialTask(self):
         """Starts a special task. This is triggered by the user with a special combination of actions, for example clicking
         with the mouse on a plot, draggin a crosshair, etc."""
-        if not self.specialtask_running:
-            if self.acquiring:
-                self.stopMovie()
-                self.acquiring = False
-
+        if not self.spot_tracking:
             locy = self.camWidget.crosshair[0].getPos()[1]
             locx = self.camWidget.crosshair[1].getPos()[0]
-            self.trackinfo = np.zeros((1,5))
             self.trajectoryWidget.plot.clear()
-            imgsize = self.tempimage.shape
-            iniloc = [locx, locy]
-            self.specialTaskWorker = specialTaskTracking(self._session, self.camera, self.noiselvl, imgsize, iniloc)
-            self.connect(self.specialTaskWorker,QtCore.SIGNAL('image'),self.getData)
-            self.connect(self.specialTaskWorker,QtCore.SIGNAL('coordinates'),self.getParticleLocation)
-            self.specialTaskWorker.start()
-            self.specialtask_running = True
-            self.messageWidget.appendLog('i', 'Live tracking started')
+            self.spot_tracking = True
+            self.spot_coords = [locx, locy]
+            self.messageWidget.appendLog('i', 'Live tracking of intensity started')
         else:
             print('Special task already running')
 
     def stopSpecialTask(self):
         """Stops the special task"""
-        if self.specialtask_running:
-            self.specialTaskWorker.keep_running = False
-            self.specialtask_running = False
-            if self._session.Saving['autosave_trajectory'] == True:
-                self.saveTrajectory()
+        if self.spot_tracking:
+            self.spot_tracking = False
             self.messageWidget.appendLog('i', 'Live tracking stopped')
 
     def done(self):
@@ -911,10 +986,8 @@ class monitorMain(QtGui.QMainWindow):
         self.messageWidget.appendLog('i', 'Closing the program')
         if self.acquiring:
             self.stopMovie()
-        if self.specialtask_running:
+        if self.spot_tracking:
             self.stopSpecialTask()
-            while self.specialTaskWorker.isRunning():
-                pass
         self.emit(QtCore.SIGNAL('closeAll'))
         self.camera.stopCamera()
         self.movieSaveStop()

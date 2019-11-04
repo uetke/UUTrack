@@ -8,7 +8,7 @@
 import time
 import numpy as np
 from .SimulateBrownian import SimBrownian
-from lantz import Q_
+#from lantz import Q_
 from ._skeleton import cameraBase
 
 class camera(cameraBase):
@@ -59,7 +59,7 @@ class camera(cameraBase):
     def setExposure(self, exposure):
         """Sets the exposure of the camera.
         """
-        self.exposure = exposure*Q_('s')
+        self.exposure = exposure
         return exposure
 
     def getExposure(self):

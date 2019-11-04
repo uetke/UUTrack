@@ -2,15 +2,14 @@ Purpose:
 here are a few tips on the procedure to follow for adding new features using an example.
 
 * preparation
-One should first decide on how often the required feature is used and how computation intensitve is it. For interactive features that are called occasionally through the GUI (example: turn on/off background correction), one can follow the following procedure
-- Create an Action: 
--- Create button/keyboard-shortcut in setupToolbars() and setupMenubar()
--- Create the necessary actions and signals in setupActions() and setupSignals()
--- Create/initialize necessary program variables in the init() moddule: e.g. self.bgimage
--- Code the new method that performs the action and connect it to the proper signal in setupActions()
--- Use proper reference to the message log for providing indication of running procedures
+One should first decide on how often the required feature is used and how computation intensive is it. For interactive features that are called occasionally through the GUI (example: turn on/off background correction), one can follow the following procedure
+- Create an Action in View.Monitor.monitorMain:
+    + Create button/keyboard-shortcut in setupToolbars() and setupMenubar()
+    + Create the necessary actions and signals in setupActions() and setupSignals()
+    + Create/initialize necessary program variables in the init() module: e.g. self.bgimage
+    + Code the new method that performs the action and connect it to the proper signal in setupActions()
+    + Use proper reference to the message log for providing indication of running procedures
 
-
-For computation-intensive routines such a high-speed saving, tracking, or feedback, one should use a specialTaskWorker which runs at a high speed in a separate thread not to freeze the GUI.
+For computation-intensive routines such as high-speed saving, tracking, or feedback, one should use a specialTaskWorker which runs at a high speed in a separate thread not to freeze the GUI.
 
 

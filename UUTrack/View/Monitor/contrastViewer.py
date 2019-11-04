@@ -12,12 +12,12 @@ import copy
 from pyqtgraph.Qt import QtGui
 
 
-class crossCutWindow(QtGui.QMainWindow):
+class contrastWindow(QtGui.QMainWindow):
     """
     Simple window that relies on its parent for updating a 1-D plot.
     """
     def __init__(self, parent=None):
-        super(crossCutWindow, self).__init__(parent=parent)
+        super(contrastWindow, self).__init__(parent=parent)
         self.cc = pg.PlotWidget()
         self.setCentralWidget(self.cc)
         self.parent = parent
@@ -32,7 +32,8 @@ class crossCutWindow(QtGui.QMainWindow):
         self.cc.setRange(xRange=(0,100), yRange=(-20,500))
 
     def update(self):
-        """ Updates the 1-D plot. It is called externally from the main window.
+        """ WORK IN PROGRESS, has to make a variable that shows the calculated contrast in refreshing scope mode
+
         """
         if self.parent != None:
             if len(self.parent.tempimage) > 0:
@@ -46,7 +47,7 @@ class crossCutWindow(QtGui.QMainWindow):
                         d = d - bg
                     self.p.setData(d)
                     if np.mean(d) > 0:
-                        self.text.setText('Line %d\t, Average: %d\t Max: %d\t' %(s, np.mean(d), np.max(d)))
+                        self.text.setText('Mean: %d\t, Variance: %d\t Max: %d\t' %(s, np.mean(d), np.max(d)))
             else:
                 self.text.setText("Blank image")
 
@@ -55,7 +56,7 @@ class crossCutWindow(QtGui.QMainWindow):
 if __name__ == '__main__':
     import numpy as np
     app = QtGui.QApplication([])
-    win = crossCutWindow()
+    win = contrastWindow()
     x = np.random.normal(size=100)
     y = np.random.normal(size=100)
     win.cc.plot(x,y)
