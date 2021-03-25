@@ -28,7 +28,7 @@ pyqtgraph==0.10.0
 python-dateutil==2.6.0
 pytz==2016.10
 PyVISA==1.8
-PyYAML==5.1
+PyYAML==5.4
 requests==2.20.0
 scipy==0.18.1
 six==1.10.0
